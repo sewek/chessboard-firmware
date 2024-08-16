@@ -869,7 +869,6 @@ FodyWeavers.xsd
 # End of https://www.toptal.com/developers/gitignore/api/c,c++,linux,macos,windows,visualstudiocode,visualstudio,sublimetext,notepadpp,intellij+all,python,cmake,ninja
 
 # Custom
-test-coverage.*
-coverage*
-test-result*
-result*
+test-results.xml
+coverage.xml
+env*

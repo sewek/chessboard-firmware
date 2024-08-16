@@ -9,41 +9,49 @@ stages:
       - apt-get update
       - apt-get install -y cmake make gcovr
 
-compile:
+compile-firmware:
    stage: build
-   extends: .install-dependencies
-   cache:
-      key: "$CI_COMMIT_REF_SLUG"
+   image: nordicplayground/nrfconnect-sdk:main
+   script: "./scripts/build.sh"
+   artifacts:
       untracked: true
       paths:
-         - build/
-   script:
-      - rm -rf build
-      - mkdir build
-      - cd build
-      - cmake .. -DCMAKE_BUILD_TYPE=Debug
-      - make -j 8
+         - build/zephyr/*.bin
+         - build/zephyr/*.elf
+         - build/zephyr/*.hex
+
+compile-test:
+   stage: build
+   extends: .install-dependencies
+   script: "./scripts/build-test.sh"
    artifacts:
       untracked: true
       paths:
          - build/
-         - build/lib/
-         - build/lib/chess_logic/
-         - build/lib/chess_logic/tests
 
 test-chess_logic:
    stage: test
-   script: "./build/lib/chess_logic/tests --reporter junit -o test-results.xml"
+   needs:
+      - job: compile-test
+        artifacts: true
+   dependencies:
+      - compile-test
+   script: "./scripts/test-xml.sh"
    artifacts:
       reports:
          junit: test-results.xml
 
 coverage-chess_logic:
    stage: test
+   needs:
+      - job: compile-test
+        artifacts: true
+   dependencies:
+      - compile-test
    extends: .install-dependencies
-   script: "cd build && make coverage"
+   script: "./scripts/coverage.sh"
    artifacts:
       reports:
          coverage_report:
             coverage_format: cobertura
-            path: build/lib/chess_logic/coverage.xml
+            path: coverage.xml
