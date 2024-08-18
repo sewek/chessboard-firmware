@@ -3,7 +3,7 @@
 echo "Building the project..."
 
 rm -rf build
-west build -p -b chessboard app -DCMAKE_BUILD_TYPE=Release
+west build -p -b chessboard app -DBOARD_ROOT=$(pwd) -DCMAKE_BUILD_TYPE=Release
 
 # If the build fails, exit the script
 if [ $? -ne 0 ]; then
