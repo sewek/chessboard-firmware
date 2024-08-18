@@ -1,0 +1,286 @@
+
+/dts-v1/;
+#include <nordic/nrf52840_qiaa.dtsi>
+#include "chessboard-pinctrl.dtsi"
+#include <zephyr/dt-bindings/input/input-event-codes.h>
+#include <dt-bindings/display/ili9xxx.h>
+
+/ {
+   model = "Chessboard";
+   compatible = "nordic,nrf52840-dk-nrf52840";
+
+   chosen {
+      zephyr,console = &uart0;
+      zephyr,shell-uart = &uart0;
+      zephyr,uart-mcumgr = &uart0;
+      zephyr,bt-mon-uart = &uart0;
+      zephyr,bt-c2h-uart = &uart0;
+      zephyr,sram = &sram0;
+      zephyr,flash = &flash0;
+      zephyr,code-partition = &slot0_partition;
+      zephyr,ieee802154 = &ieee802154;
+   };
+
+   leds {
+      compatible = "gpio-leds";
+      mcuboot_led: mcuboot-led {
+         gpios = <&gpio1 10 GPIO_ACTIVE_HIGH>;
+      };
+   };
+
+   buttons {
+      compatible = "gpio-keys";
+      mcuboot_btn: mbuboot-btn {
+         gpios = <&gpio1 11 (GPIO_ACTIVE_LOW)>;
+         label = "Bootloader button";
+      };
+      button0_0: buttons0-0 {
+         gpios = <&gpio0 31 (GPIO_ACTIVE_LOW)>;
+         label = "Push buttons group 0 key 0";
+         zephyr,code = <INPUT_KEY_0>;
+      };
+      button0_1: buttons0-1 {
+         gpios = <&gpio0 29 (GPIO_ACTIVE_LOW)>;
+         label = "Push buttons group 0 key 1";
+         zephyr,code = <INPUT_KEY_1>;
+      };
+      button0_2: buttons0-2 {
+         gpios = <&gpio0 2 (GPIO_ACTIVE_LOW)>;
+         label = "Push buttons group 0 key 2";
+         zephyr,code = <INPUT_KEY_2>;
+      };
+      button0_3: buttons0-3 {
+         gpios = <&gpio1 15 (GPIO_ACTIVE_LOW)>;
+         label = "Push buttons group 0 key 3";
+         zephyr,code = <INPUT_KEY_3>;
+      };
+      button0_4: buttons0-4 {
+         gpios = <&gpio1 13 (GPIO_ACTIVE_LOW)>;
+         label = "Push buttons group 0 key 4";
+         zephyr,code = <INPUT_KEY_4>;
+      };
+      button1_0: buttons1-0 {
+         gpios = <&gpio0 30 (GPIO_ACTIVE_LOW)>;
+         label = "Push buttons group 1 key 0";
+         zephyr,code = <INPUT_KEY_5>;
+      };
+      button1_1: buttons1-1 {
+         gpios = <&gpio0 28 (GPIO_ACTIVE_LOW)>;
+         label = "Push buttons group 1 key 1";
+         zephyr,code = <INPUT_KEY_6>;
+      };
+      button1_2: buttons1-2 {
+         gpios = <&gpio0 3 (GPIO_ACTIVE_LOW)>;
+         label = "Push buttons group 1 key 2";
+         zephyr,code = <INPUT_KEY_7>;
+      };
+      button1_3: buttons1-3 {
+         gpios = <&gpio1 14 (GPIO_ACTIVE_LOW)>;
+         label = "Push buttons group 1 key 3";
+         zephyr,code = <INPUT_KEY_8>;
+      };
+      button1_4: buttons1-4 {
+         gpios = <&gpio1 12 (GPIO_ACTIVE_LOW)>;
+         label = "Push buttons group 1 key 4";
+         zephyr,code = <INPUT_KEY_9>;
+      };
+   };
+
+   vsupply {
+      compatible = "voltage-divider";
+      io-channels = <&adc 0>;
+      output-ohms = <100000>;
+      full-ohms = <(40000 + 100000)>;
+   };
+
+   isupply {
+      compatible = "voltage-divider";
+      io-channels = <&adc 1>;
+      output-ohms = <20000>;
+      full-ohms = <(10000 + 20000)>;
+   };
+
+   aliases {
+      sw0 = &button0_0;
+      sw1 = &button0_1;
+      sw2 = &button0_2;
+      sw3 = &button0_3;
+      sw4 = &button0_4;
+      sw5 = &button1_0;
+      sw6 = &button1_1;
+      sw7 = &button1_2;
+      sw8 = &button1_3;
+      sw9 = &button1_4;
+      bootloader-led0 = &mcuboot_led;
+      mcuboot-button0 = &mcuboot_btn;
+      mcuboot-led0 = &mcuboot_led;
+      watchdog0 = &wdt0;
+      spi-flash0 = &mx25r64;
+   };
+};
+
+&adc {
+   status = "okay";
+   #address-cells = <1>;
+   #size-cells = <0>;
+
+   channel@0 {
+      reg = <0>;
+      zephyr,gain = "ADC_GAIN_1_6";
+      zephyr,reference = "ADC_REF_INTERNAL";
+      zephyr,acquisition-time = <ADC_ACQ_TIME_DEFAULT>;
+      zephyr,input-positive = <NRF_SAADC_AIN2>; /* P0.04 */
+      zephyr,resolution = <12>;
+   };
+   channel@1 {
+      reg = <1>;
+      zephyr,gain = "ADC_GAIN_1_6";
+      zephyr,reference = "ADC_REF_INTERNAL";
+      zephyr,acquisition-time = <ADC_ACQ_TIME_DEFAULT>;
+      zephyr,input-positive = <NRF_SAADC_AIN3>; /* P0.05 */
+      zephyr,resolution = <12>;
+   };
+};
+
+&uicr {
+   gpio-as-nreset;
+};
+
+&gpiote {
+   status = "okay";
+};
+
+&gpio0 {
+   status = "okay";
+};
+
+&gpio1 {
+   status = "okay";
+};
+
+&uart0 {
+   compatible = "nordic,nrf-uarte";
+   status = "okay";
+   current-speed = <115200>;
+   pinctrl-0 = <&uart0_default>;
+   pinctrl-1 = <&uart0_sleep>;
+   pinctrl-names = "default", "sleep";
+};
+
+&i2c0 {
+   compatible = "nordic,nrf-twi";
+   status = "okay";
+   pinctrl-0 = <&i2c0_default>;
+   pinctrl-1 = <&i2c0_sleep>;
+   pinctrl-names = "default", "sleep";
+};
+
+&spi3 {
+   compatible = "nordic,nrf-spim";
+   status = "okay";
+   pinctrl-0 = <&spi3_default>;
+   pinctrl-1 = <&spi3_sleep>;
+   pinctrl-names = "default", "sleep";
+   cs-gpios = <&gpio0 15 (GPIO_ACTIVE_LOW)>, <&gpio0 13 (GPIO_ACTIVE_LOW)>;
+
+   display_white: ili9488@0 {
+      compatible = "ilitek,ili9488";
+      spi-max-frequency = <32000000>;
+      reg = <0>;
+      height = <480>;
+      width = <320>;
+      cmd-data-gpios = <&gpio0 25 (GPIO_ACTIVE_LOW)>;
+      reset-gpios = <&gpio1 6 (GPIO_ACTIVE_LOW)>;
+      pixel-format = <ILI9XXX_PIXEL_FORMAT_RGB565>;
+      rotation = <0>;
+      frmctr1 = [ a0 11  ];
+      pwctrl1 = [ 17 15  ];
+      pwctrl2 = [ 41  ];
+      pgamctrl = [ 00 03 09 08 16 0a 3f 78 4c 09 0a 08 16 1a 0f  ];
+      ngamctrl = [ 00 16 19 03 0f 05 32 45 46 04 0e 0d 35 37 0f  ];
+   };
+
+   display_black: ili9488@1 {
+      compatible = "ilitek,ili9488";
+      spi-max-frequency = <32000000>;
+      reg = <1>;
+      height = <480>;
+      width = <320>;
+      cmd-data-gpios = <&gpio0 25 (GPIO_ACTIVE_LOW)>;
+      reset-gpios = <&gpio1 7 (GPIO_ACTIVE_LOW)>;
+      pixel-format = <ILI9XXX_PIXEL_FORMAT_RGB565>;
+      rotation = <0>;
+      frmctr1 = [ a0 11  ];
+      pwctrl1 = [ 17 15  ];
+      pwctrl2 = [ 41  ];
+      pgamctrl = [ 00 03 09 08 16 0a 3f 78 4c 09 0a 08 16 1a 0f  ];
+      ngamctrl = [ 00 16 19 03 0f 05 32 45 46 04 0e 0d 35 37 0f  ];
+   };
+};
+
+&qspi {
+   status = "okay";
+   pinctrl-0 = <&qspi_default>;
+   pinctrl-1 = <&qspi_sleep>;
+   pinctrl-names = "default", "sleep";
+   mx25r64: mx25r6435f@0 {
+      compatible = "nordic,qspi-nor";
+      reg = <0>;
+      /* MX25R64 supports only pp and pp4io */
+      writeoc = "pp4io";
+      /* MX25R64 supports all readoc options */
+      readoc = "read4io";
+      sck-frequency = <8000000>;
+      jedec-id = [ c2 28 17  ];
+      sfdp-bfp = [ e5 20 f1 ff ff ff ff 03 44 eb 08 6b 08 3b 04 bb ee ff ff ff ff ff 00 ff ff ff 00 ff 0c 20 0f 52 10 d8 00 ff 23 72 f5 00 82 ed 04 cc 44 83 68 44 30 b0 30 b0 f7 c4 d5 5c 00 be 29 ff f0 d0 ff ff  ];
+      size = <67108864>;
+      has-dpd;
+      t-enter-dpd = <10000>;
+      t-exit-dpd = <35000>;
+   };
+};
+
+&ieee802154 {
+   status = "okay";
+};
+
+&flash0 {
+
+   partitions {
+      compatible = "fixed-partitions";
+      #address-cells = <1>;
+      #size-cells = <1>;
+
+      boot_partition: partition@0 {
+         label = "mcuboot";
+         reg = <0x00000000 0x0000C000>;
+      };
+      slot0_partition: partition@c000 {
+         label = "image-0";
+         reg = <0x0000C000 0x00076000>;
+      };
+      slot1_partition: partition@82000 {
+         label = "image-1";
+         reg = <0x00082000 0x00076000>;
+      };
+
+      /*
+       * The flash starting at 0x000f8000 and ending at
+       * 0x000fffff is reserved for use by the application.
+       */
+
+      /*
+       * Storage partition will be used by FCB/LittleFS/NVS
+       * if enabled.
+       */
+      storage_partition: partition@f8000 {
+         label = "storage";
+         reg = <0x000f8000 0x00008000>;
+      };
+   };
+};
+
+zephyr_udc0: &usbd {
+   compatible = "nordic,nrf-usbd";
+   status = "okay";
+};

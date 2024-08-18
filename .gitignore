@@ -872,3 +872,4 @@ FodyWeavers.xsd
 test-results.xml
 coverage.xml
 env*
+!boards/*
