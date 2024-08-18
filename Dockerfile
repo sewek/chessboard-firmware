@@ -17,10 +17,9 @@ SHELL [ "/bin/bash", "-euxo", "pipefail", "-c" ]
 RUN <<EOT
     apt-get -y update
     apt-get -y upgrade
-    apt-get -y install git wget unzip make cmake clang-format gcc-multilib make libffi7 python3 python3-pip
+    apt-get -y install wget unzip clang-format gcc-multilib make libffi7
     apt-get -y clean
     rm -rf /var/lib/apt/lists/*
-    pip3 install -U west
 EOT
 
 # Install toolchain
@@ -37,6 +36,12 @@ RUN <<EOT
     nrfutil toolchain-manager install --ncs-version ${toolchain_version}
     nrfutil toolchain-manager list
     rm -f /root/ncs/downloads/*
+EOT
+
+RUN <<EOT
+   echo "#!/bin/bash" > /root/env.sh
+   nrfutil toolchain-manager env --as-script > /root/env.sh
+   chmod +x /root/env.sh
 EOT
 
 # Nordic command line tools
@@ -69,3 +74,5 @@ RUN <<EOT
         echo "Skipping nRF Command Line Tools (not available for $arch)" ;
     fi
 EOT
+
+ENTRYPOINT ["/bin/bash", "-c", "source /root/env.sh && exec \"$@\"", "--"]
