@@ -17,7 +17,7 @@ SHELL [ "/bin/bash", "-euxo", "pipefail", "-c" ]
 RUN <<EOT
     apt-get -y update
     apt-get -y upgrade
-    apt-get -y install wget unzip clang-format gcc-multilib make libffi7 python3 python3-pip
+    apt-get -y install git wget unzip clang-format gcc-multilib make libffi7 python3 python3-pip
     apt-get -y clean
     rm -rf /var/lib/apt/lists/*
     pip3 install -U west
@@ -69,11 +69,3 @@ RUN <<EOT
         echo "Skipping nRF Command Line Tools (not available for $arch)" ;
     fi
 EOT
-
-# Launch into build environment with the passed arguments
-# Currently this is not supported in GitHub Actions
-# See https://github.com/actions/runner/issues/1964
-RUN echo "#!/bin/bash" > /root/entry.sh
-RUN echo "exec \"\$@\"" >> /root/entry.sh
-RUN chmod +x /root/entry.sh
-ENTRYPOINT [ "nrfutil", "toolchain-manager", "launch", "/bin/bash", "--", "/root/entry.sh" ]

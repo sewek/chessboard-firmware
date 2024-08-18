@@ -14,6 +14,7 @@ compile-firmware:
    image:
       name: registry.gitlab.com/projekt-inzynierski-uken/firmware/nrfconnect-sdk:latest
    before_script:
+      - chmod +x ./scripts/init.sh ./scripts/build.sh
       - ./scripts/init.sh
       - export ZEPHYR_TOOLCHAIN_VARIANT=zephyr
       - export ZEPHYR_BASE=$(pwd)/external/zephyr
