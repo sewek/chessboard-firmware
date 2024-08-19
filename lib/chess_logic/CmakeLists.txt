@@ -16,6 +16,7 @@ set(SOURCES
    src/chess.cpp
    src/chess_board.cpp
    src/chess_position.cpp
+   src/chess_move.cpp
    src/chess_events.cpp
    src/chess_game.cpp
 )
@@ -33,6 +34,7 @@ if(BUILD_UNIT_TESTS)
    test/game.cpp
    test/events.cpp
    test/position.cpp
+   test/move.cpp
    )
 
    enable_testing()
