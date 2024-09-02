@@ -22,7 +22,8 @@ if [ -f "${BASE_DIR}/keys/root-rsa-2048.pem" ]; then
     exit 1
 fi
 
-exec ${IMGTOOL_PATH} keygen -t rsa-2048 -k ${BASE_DIR}/keys/root-rsa-2048.pem
+${IMGTOOL_PATH} keygen -t rsa-2048 -k ${BASE_DIR}/keys/root-rsa-2048.pem
+${IMGTOOL_PATH} getpub -e pem -k ${BASE_DIR}/keys/root-rsa-2048.pem -o ${BASE_DIR}/keys/root-rsa-2048.pub
 
 # If the build fails, exit the script
 if [ $? -ne 0 ]; then
@@ -30,3 +31,4 @@ if [ $? -ne 0 ]; then
     exit 1
 fi
 
+echo "Successfully generated the key!"
