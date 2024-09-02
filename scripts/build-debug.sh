@@ -3,7 +3,7 @@
 echo "Building the project..."
 
 rm -rf build
-west build -p -b chessboard app -DBOARD_ROOT=$(pwd) -DCMAKE_BUILD_TYPE=Debug -DBUILD_UNIT_TESTS=ON -DBUILD_COVERAGE=ON
+west build -p -b chessboard app -DBOARD_ROOT=$(pwd) -DCMAKE_BUILD_TYPE=Debug -DCONFIG_DEBUG_OPTIMIZATIONS=y -DBUILD_UNIT_TESTS=ON -DBUILD_COVERAGE=ON
 
 # If the build fails, exit the script
 if [ $? -ne 0 ]; then
