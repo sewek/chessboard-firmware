@@ -873,3 +873,6 @@ test-results.xml
 coverage.xml
 env*
 !boards/*
+key/*
+keys/*
+*.pem
