@@ -8,8 +8,6 @@
 
 #include <inttypes.h>
 
-#include <string>
-
 #include "chess_types.h"
 
 /**
@@ -30,7 +28,7 @@ class ChessPosition {
    *
    * @param position The position in algebraic notation.
    */
-  explicit ChessPosition(const std::string& position);
+  explicit ChessPosition(char* position);
 
   /**
    * @brief Construct a new ChessPosition object.
@@ -72,7 +70,7 @@ class ChessPosition {
    *
    * @return The position in algebraic notation.
    */
-  std::string toString() const;
+  uint8_t toString(char* buff) const;
 
   /**
    * @brief Check if two positions are equal.
@@ -120,7 +118,7 @@ class ChessPosition {
    * @param position The position in algebraic notation.
    * @return The position from the given algebraic notation.
    */
-  static ChessPosition fromString(const std::string& position);
+  static ChessPosition fromString(char* position);
 
  private:
   uint8_t data_;

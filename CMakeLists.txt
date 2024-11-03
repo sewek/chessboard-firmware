@@ -1,3 +1,6 @@
-cmake_minimum_required(VERSION 3.13.1)
+
+# zephyr_syscall_include_directories(include)
+zephyr_include_directories(include)
 
 add_subdirectory(lib)
+add_subdirectory(drivers)

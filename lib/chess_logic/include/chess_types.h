@@ -1,8 +1,7 @@
 #ifndef CHESS_LOGIC_TYPES_H
 #define CHESS_LOGIC_TYPES_H
 
-#include <cinttypes>
-#include <functional>
+#include <inttypes.h>
 
 #ifndef __cplusplus
 #include <stdbool.h>
@@ -11,15 +10,6 @@
 enum class chess_piece_color_t {
   kWhite = 0,
   kBlack,
-};
-
-enum class chess_piece_type_t {
-  kPawn = 0,
-  kKnight,
-  kBishop,
-  kRook,
-  kQueen,
-  kKing,
 };
 
 enum class chess_file_t {
@@ -31,16 +21,6 @@ enum class chess_file_t {
   kF,
   kG,
   kH,
-};
-
-enum class chess_move_type_t {
-  kNormal = 0x0,
-  kCapture = 0x1,
-  kCastling = 0x2,
-  kCheck = 0x4,
-  kCheckmate = 0x8,
-  kPromotion = 0x10,
-  kEnPassant = 0x20,
 };
 
 enum class chess_game_state_t {
@@ -56,21 +36,9 @@ enum class chess_game_result_t {
 };
 
 typedef struct {
-  chess_piece_color_t color;
-  chess_piece_type_t type;
-} chess_piece_t;
-
-typedef struct {
   chess_file_t file;
   uint8_t rank;
 } chess_position_t;
-
-typedef struct {
-  chess_position_t from;
-  chess_position_t to;
-  chess_move_type_t type;
-  chess_piece_t piece;
-} chess_move_t;
 
 enum class ChessEventType {
   GameStarted = 0,
@@ -78,6 +46,35 @@ enum class ChessEventType {
   MoveMade,
   HighlightSquare,
   UnhighlightSquare,
+};
+
+enum class ChessMoveType {
+  Normal = 0,
+  Capture = 1,
+  Castling = 2,
+  Check = 4,
+  Checkmate = 8,
+  Promotion = 16,
+  EnPassant = 32,
+};
+
+enum class ChessColor {
+  White = 0,
+  Black,
+};
+
+enum class ChessPieceType {
+  Pawn = 0,
+  Knight,
+  Bishop,
+  Rook,
+  Queen,
+  King,
+};
+
+enum class ChessTileActionType {
+  PickUp = 0,
+  PutDown,
 };
 
 #endif  // CHESS_LOGIC_TYPES_H

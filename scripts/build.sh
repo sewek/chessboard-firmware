@@ -2,7 +2,13 @@
 
 echo "Building the project..."
 
-west build -p -b chessboard app
+if ! [ -f "$(pwd)/keys/root-rsa-2048.pem" ]; then
+   echo "Generating the root RSA key..."
+   ./scripts/generate-key.sh
+fi
+
+rm -rf build
+west build -p -b chessboard app -DBOARD_ROOT=$(pwd) -DCMAKE_BUILD_TYPE=Release -DCONFIG_SIZE_OPTIMIZATIONS=y
 
 # If the build fails, exit the script
 if [ $? -ne 0 ]; then

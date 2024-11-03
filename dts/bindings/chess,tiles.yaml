@@ -1,0 +1,5 @@
+description: Chessboard tiles board containing 2x2 tiles
+
+compatible: "chess,tiles"
+
+include: i2c-device.yaml

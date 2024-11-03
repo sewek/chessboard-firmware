@@ -1,9 +1,5 @@
 #include "chess_events.h"
 
-#include <algorithm>
-#include <functional>
-#include <vector>
-
 ChessEvents::ChessEvents() = default;
 
 ChessEvents::~ChessEvents() = default;
@@ -11,95 +7,128 @@ ChessEvents::~ChessEvents() = default;
 void ChessEvents::addListener(ChessEventType event,
                               ChessCallbackEmpty callback) {
   if (event == ChessEventType::GameStarted) {
-    this->callbacksGameStarted_.push_back(callback);
+    this->callbacksGameStarted_[this->callbackCountGameStarted_++] = callback;
   }
 
   if (event == ChessEventType::GameEnded) {
-    this->callbacksGameEnded_.push_back(callback);
+    this->callbacksGameEnded_[this->callbackCountGameEnded_++] = callback;
   }
 }
 
 void ChessEvents::addListener(ChessEventType event,
                               ChessCallbackWithMove callback) {
   if (event == ChessEventType::MoveMade) {
-    this->callbacksMoveMade_.push_back(callback);
+    this->callbacksMoveMade_[this->callbackCountMoveMade_++] = callback;
   }
 }
 
 void ChessEvents::addListener(ChessEventType event,
                               ChessCallbackWithPosition callback) {
   if (event == ChessEventType::HighlightSquare) {
-    this->callbacksHighlightSquare_.push_back(callback);
+    this->callbacksHighlightSquare_[this->callbackCountHighlightSquare_++] =
+        callback;
   }
 
   if (event == ChessEventType::UnhighlightSquare) {
-    this->callbacksUnhighlightSquare_.push_back(callback);
+    this->callbacksUnhighlightSquare_[this->callbackCountUnhighlightSquare_++] =
+        callback;
   }
 }
 
 void ChessEvents::removeListener(ChessEventType event,
                                  ChessCallbackEmpty callback) {
   if (event == ChessEventType::GameStarted) {
-    auto it = std::find_if(
-        this->callbacksGameStarted_.begin(), this->callbacksGameStarted_.end(),
-        [&](const ChessCallbackEmpty& cb) {
-          return cb.target<void()>() == callback.target<void>();
-        });
-    if (it != this->callbacksGameStarted_.end()) {
-      this->callbacksGameStarted_.erase(it);
-    }
+    this->removeListener((ChessCallbackUnknwon)callback,
+                         (ChessCallbackUnknwon*)this->callbacksGameStarted_,
+                         &this->callbackCountGameStarted_);
   }
 
   if (event == ChessEventType::GameEnded) {
-    auto it = std::find_if(
-        this->callbacksGameEnded_.begin(), this->callbacksGameEnded_.end(),
-        [&](const ChessCallbackEmpty& cb) {
-          return cb.target<void()>() == callback.target<void>();
-        });
-    if (it != this->callbacksGameEnded_.end()) {
-      this->callbacksGameEnded_.erase(it);
-    }
+    this->removeListener((ChessCallbackUnknwon)callback,
+                         (ChessCallbackUnknwon*)this->callbacksGameEnded_,
+                         &this->callbackCountGameEnded_);
   }
 }
 
 void ChessEvents::removeListener(ChessEventType event,
                                  ChessCallbackWithMove callback) {
   if (event == ChessEventType::MoveMade) {
-    auto it = std::find_if(this->callbacksMoveMade_.begin(),
-                           this->callbacksMoveMade_.end(),
-                           [&](const ChessCallbackWithMove& cb) {
-                             return cb.target<void(chess_move_t)>() ==
-                                    callback.target<void(chess_move_t)>();
-                           });
-    if (it != this->callbacksMoveMade_.end()) {
-      this->callbacksMoveMade_.erase(it);
-    }
+    this->removeListener((ChessCallbackUnknwon)callback,
+                         (ChessCallbackUnknwon*)this->callbacksMoveMade_,
+                         &this->callbackCountMoveMade_);
   }
 }
 
 void ChessEvents::removeListener(ChessEventType event,
                                  ChessCallbackWithPosition callback) {
   if (event == ChessEventType::HighlightSquare) {
-    auto it = std::find_if(this->callbacksHighlightSquare_.begin(),
-                           this->callbacksHighlightSquare_.end(),
-                           [&](const ChessCallbackWithPosition& cb) {
-                             return cb.target<void(ChessPosition)>() ==
-                                    callback.target<void(ChessPosition)>();
-                           });
-    if (it != this->callbacksHighlightSquare_.end()) {
-      this->callbacksHighlightSquare_.erase(it);
-    }
+    this->removeListener((ChessCallbackUnknwon)callback,
+                         (ChessCallbackUnknwon*)this->callbacksHighlightSquare_,
+                         &this->callbackCountHighlightSquare_);
   }
 
   if (event == ChessEventType::UnhighlightSquare) {
-    auto it = std::find_if(this->callbacksUnhighlightSquare_.begin(),
-                           this->callbacksUnhighlightSquare_.end(),
-                           [&](const ChessCallbackWithPosition& cb) {
-                             return cb.target<void(ChessPosition)>() ==
-                                    callback.target<void(ChessPosition)>();
-                           });
-    if (it != this->callbacksUnhighlightSquare_.end()) {
-      this->callbacksUnhighlightSquare_.erase(it);
+    this->removeListener(
+        (ChessCallbackUnknwon)callback,
+        (ChessCallbackUnknwon*)this->callbacksUnhighlightSquare_,
+        &this->callbackCountUnhighlightSquare_);
+  }
+}
+
+void ChessEvents::notifyGameStarted() {
+  for (const auto& callback : this->callbacksGameStarted_) {
+    if (callback != nullptr) {
+      callback();
+    }
+  }
+}
+
+void ChessEvents::notifyGameEnded() {
+  for (const auto& callback : this->callbacksGameEnded_) {
+    if (callback != nullptr) {
+      callback();
+    }
+  }
+}
+
+void ChessEvents::notifyMoveMade(ChessMove move) {
+  for (const auto& callback : this->callbacksMoveMade_) {
+    if (callback != nullptr) {
+      callback(move);
+    }
+  }
+}
+
+void ChessEvents::notifyHighlightSquare(ChessPosition position) {
+  for (const auto& callback : this->callbacksHighlightSquare_) {
+    if (callback != nullptr) {
+      callback(position);
+    }
+  }
+}
+
+void ChessEvents::notifyUnhighlightSquare(ChessPosition position) {
+  for (const auto& callback : this->callbacksUnhighlightSquare_) {
+    if (callback != nullptr) {
+      callback(position);
+    }
+  }
+}
+
+void ChessEvents::removeListener(ChessCallbackUnknwon callback,
+                                 ChessCallbackUnknwon* array, uint8_t* count) {
+  if (*count == 0) {
+    return;
+  }
+
+  for (uint8_t i = 0; i < *count; i++) {
+    if (array[i] == callback) {
+      for (uint8_t j = i; j < *count - 1; j++) {
+        array[j] = array[j + 1];
+      }
+
+      (*count)--;
+      return;
     }
   }
 }

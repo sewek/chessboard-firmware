@@ -54,10 +54,42 @@
       "unordered_map": "cpp",
       "variant": "cpp",
       "functional": "cpp",
-      "*.s": "cpp"
+      "*.s": "cpp",
+      "gpio.h": "c",
+      "tiles.h": "c",
+      "i2c.h": "c",
+      "log.h": "c",
+      "sensor.h": "c",
+      "deque": "cpp",
+      "list": "cpp",
+      "map": "cpp",
+      "set": "cpp",
+      "unordered_set": "cpp",
+      "__tree": "c",
+      "device.h": "c",
+      "queue": "cpp",
+      "regex": "cpp",
+      "span": "cpp",
+      "stack": "cpp",
+      "any": "cpp",
+      "util.h": "c",
+      "cinttypes": "cpp",
+      "complex": "cpp",
+      "memory": "cpp",
+      "print": "cpp",
+      "algorithm": "cpp",
+      "bmp388.h": "c"
    },
    "cmake.sourceDirectory": "${workspaceFolder}",
    "cmake.buildDirectory": "${workspaceFolder}/build",
    "C_Cpp.codeAnalysis.clangTidy.enabled": true,
    "C_Cpp.codeAnalysis.clangTidy.useBuildPath": true,
+   "yaml.schemas": {
+      "file:///Users/sewek/.vscode/extensions/nordic-semiconductor.nrf-connect-2024.7.13-darwin-arm64/schema/manifest-schema.json": "file:///Users/sewek/Project/chessboard/firmware/west.yml"
+   },
+   "C_Cpp.default.compileCommands": "build/compile_commands.json",
+   "terminal.integrated.scrollback": 8000,
+   "C_Cpp.codeAnalysis.clangTidy.checks.disabled": [
+      "google-readability-function-size"
+   ],
 }

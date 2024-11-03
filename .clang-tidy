@@ -4,7 +4,6 @@ Checks: >
   abseil-*,
   bugprone-*,
   google-*,
-  misc-*,
   modernize-*,
   performance-*,
   portability-*,
@@ -42,6 +41,7 @@ Checks: >
 WarningsAsErrors: "*"
 
 HeaderFilterRegex: "(app/|boards/|lib/).*\\.h$" # Only check headers in these directories
+ExcludeHeaderFilterRegex: "external/*" # Exclude headers in these directories
 
 CheckOptions:
   - { key: readability-identifier-naming.NamespaceCase, value: lower_case }

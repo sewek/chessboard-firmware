@@ -1,0 +1,45 @@
+
+config TILES_SENSOR
+      bool "Enable chessboard tiles sensor"
+      default n
+      select I2C
+      help
+         Enable support for the chessboard tiles sensor.
+
+if TILES_SENSOR
+
+menuconfig TILES_SENSOR_TRIGGER
+      bool "Enable trigger support"
+      default n
+      help
+         Enable support for the chessboard tiles sensor trigger.
+
+      config TILES_SENSOR_TRIGGER_THREAD_PRIORITY
+            int "Thread priority"
+            default 10
+            depends on TILES_SENSOR_TRIGGER
+            help
+               Priority for the trigger thread.
+
+      config TILES_SENSOR_TRIGGER_THREAD_STACK_SIZE
+            int "Thread stack size"
+            default 512
+            depends on TILES_SENSOR_TRIGGER
+            help
+               Stack size for the trigger thread.
+
+      config TILES_SENSOR_TRIGGER_THREAD_PERIOD_MS
+            int "Thread period"
+            default 2
+            depends on TILES_SENSOR_TRIGGER
+            help
+               Period in milliseconds for the trigger thread.
+
+      config TILES_SENSOR_TRIGGER_INTERVAL_MS
+            int "Trigger interval"
+            default 10
+            depends on TILES_SENSOR_TRIGGER
+            help
+               Interval in milliseconds between trigger events.
+
+endif # CHESSBOARD_TILES_SENSOR
