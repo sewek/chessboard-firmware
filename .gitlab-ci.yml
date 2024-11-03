@@ -61,4 +61,43 @@ coverage-chess_logic:
       reports:
          coverage_report:
             coverage_format: cobertura
-            path: coverage.xml
+            path: build/lib/chess_logic/coverage.xml
+
+quality-chess_logic:
+   stage: test
+   image: docker:stable
+   allow_failure: true
+   services:
+    - docker:stable-dind
+   script:
+    - docker run
+        --env SOURCE_CODE="$PWD"
+        --volume "$PWD":/code
+        --volume /var/run/docker.sock:/var/run/docker.sock
+        "registry.gitlab.com/gitlab-org/security-products/codequality:11-8-stable" /code/lib/chess_logic
+   artifacts:
+      paths: [gl-code-quality-report.json]
+      expire_in: 1 month
+   only:
+    - develop
+    - master
+
+quality-app:
+   stage: test
+   image: docker:stable
+   allow_failure: true
+   services:
+    - docker:stable-dind
+   script:
+    - docker run
+        --env SOURCE_CODE="$PWD"
+        --volume "$PWD":/code
+        --volume /var/run/docker.sock:/var/run/docker.sock
+        "registry.gitlab.com/gitlab-org/security-products/codequality:11-8-stable" /code/app
+   artifacts:
+      paths: [gl-code-quality-report.json]
+      expire_in: 1 month
+   only:
+    - develop
+    - master
+
