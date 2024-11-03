@@ -8,13 +8,13 @@ mcuboot:
    size: 0x20000
 mcuboot_secondary:
    address: 0x0
-   device: MX25R64
+   device: mx25r6435f
    end_address: 0x20000
    placement:
       align:
          start: 0x0
    region: external_flash
-   size: 0x20000
+   size: 0x20000 # 128KB
 settings:
    address: 0x20000
    end_address: 0x30000
@@ -22,12 +22,12 @@ settings:
       after:
          - mcuboot_secondary
    region: external_flash
-   size: 0x10000
+   size: 0x10000 # 64KB
 storage:
    address: 0x30000
-   end_address: 0x40000
+   end_address: 0x50000
    placement:
       after:
-         - mcuboot_secondary
+         - settings
    region: external_flash
-   size: 0x10000
+   size: 0x20000 # 128KB

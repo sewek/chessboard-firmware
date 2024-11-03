@@ -1,4 +1,4 @@
-project(chess_logic LANGUAGES CXX)
+#project(chess_logic LANGUAGES CXX)
 
 if (POLICY CMP0025)
    cmake_policy(SET CMP0025 NEW)
@@ -21,9 +21,14 @@ set(SOURCES
    src/chess_game.cpp
 )
 
-include_directories(include)
-add_library(chess_logic_lib ${SOURCES})
-target_include_directories(chess_logic_lib PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
+#include_directories(include)
+#add_library(chess_logic_lib ${SOURCES})
+#target_include_directories(chess_logic_lib PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
+zephyr_include_directories(include)
+
+zephyr_library()
+zephyr_library_include_directories(include)
+zephyr_library_sources(${SOURCES})
 
 if(BUILD_UNIT_TESTS)
    message("Building unit tests")

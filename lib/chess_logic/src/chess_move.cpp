@@ -5,6 +5,8 @@
 
 #include "chess_move.h"
 
+#include <string.h>
+
 ChessMove::ChessMove(ChessPosition from, ChessPosition to)
     : from_(from),
       to_(to),
@@ -30,11 +32,14 @@ bool ChessMove::isValid() const {
   return from_.isValid() && to_.isValid() && from_ != to_;
 }
 
-std::string ChessMove::toString() const {
-  std::string from = from_.toString();
-  std::string to = to_.toString();
+uint8_t ChessMove::toString(char* buff) const {
+  char from[2];
+  char to[2];
   char piece = ' ';
   char type = ' ';
+
+  from_.toString(from);
+  to_.toString(to);
 
   switch (piece_) {
     case ChessPieceType::Pawn:
@@ -83,21 +88,46 @@ std::string ChessMove::toString() const {
 
   if (type_ == ChessMoveType::Castling) {
     if (from_.getFile() - to_.getFile() > 2) {
-      return "O-O-O";
+      buff[0] = 'O';
+      buff[1] = '-';
+      buff[2] = 'O';
+      buff[3] = '-';
+      buff[4] = 'O';
+      return 5;
     }
 
-    return "O-O";
+    buff[0] = 'O';
+    buff[1] = '-';
+    buff[2] = 'O';
+    return 3;
   }
 
   if (type_ == ChessMoveType::Promotion) {
-    return from + to + type + piece;
+    buff[0] = from[0];
+    buff[1] = from[1];
+    buff[2] = to[0];
+    buff[3] = to[1];
+    buff[4] = type;
+    buff[5] = piece;
+    return 6;
   }
 
   if (type_ == ChessMoveType::Normal) {
-    return piece + from + to;
+    buff[0] = piece;
+    buff[1] = from[0];
+    buff[2] = from[1];
+    buff[3] = to[0];
+    buff[4] = to[1];
+    return 6;
   }
 
-  return piece + from + type + to;
+  buff[0] = piece;
+  buff[1] = from[0];
+  buff[2] = from[1];
+  buff[3] = type;
+  buff[4] = to[0];
+  buff[5] = to[1];
+  return 6;
 }
 
 bool ChessMove::operator==(const ChessMove& other) const {

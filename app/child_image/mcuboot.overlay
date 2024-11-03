@@ -1,6 +1,8 @@
-/delete-node/ &display_white;
-/delete-node/ &display_black;
+/* /delete-node/ &display_white;
+/delete-node/ &display_black; */
+
 
 &spi3 {
    status = "disabled";
 };
+

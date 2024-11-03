@@ -1,7 +1,0 @@
-
-config CHESSBOARD_TILES_SENSOR
-      bool "Enable chessboard tiles sensor"
-      default n
-      select I2C
-      help
-         Enable support for the chessboard tiles sensor.

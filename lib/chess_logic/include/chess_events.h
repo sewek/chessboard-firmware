@@ -1,19 +1,21 @@
 #ifndef CHESS_EVENTS_H
 #define CHESS_EVENTS_H
 
-#include <functional>
-#include <vector>
-
 #include "chess_move.h"
 #include "chess_position.h"
 #include "chess_types.h"
 
-using ChessCallbackEmpty = std::function<void()>;
-using ChessCallbackWithMove = std::function<void(ChessMove)>;
-using ChessCallbackWithPosition = std::function<void(ChessPosition)>;
+#define CHESS_EVENTS_MAX_LISTENERS 10
+
+using ChessCallbackUnknwon = void (*)();
+using ChessCallbackEmpty = void (*)();
+using ChessCallbackWithMove = void (*)(ChessMove);
+using ChessCallbackWithPosition = void (*)(ChessPosition);
 
 class ChessEvents {
  public:
+  uint8_t MAX_LISTENERS = CHESS_EVENTS_MAX_LISTENERS;
+
   ChessEvents();
   ~ChessEvents();
 
@@ -33,11 +35,22 @@ class ChessEvents {
   void notifyUnhighlightSquare(ChessPosition position);
 
  private:
-  std::vector<ChessCallbackEmpty> callbacksGameStarted_;
-  std::vector<ChessCallbackEmpty> callbacksGameEnded_;
-  std::vector<ChessCallbackWithMove> callbacksMoveMade_;
-  std::vector<ChessCallbackWithPosition> callbacksHighlightSquare_;
-  std::vector<ChessCallbackWithPosition> callbacksUnhighlightSquare_;
+  uint8_t callbackCountGameStarted_ = 0;
+  uint8_t callbackCountGameEnded_ = 0;
+  uint8_t callbackCountMoveMade_ = 0;
+  uint8_t callbackCountHighlightSquare_ = 0;
+  uint8_t callbackCountUnhighlightSquare_ = 0;
+
+  ChessCallbackEmpty callbacksGameStarted_[CHESS_EVENTS_MAX_LISTENERS];
+  ChessCallbackEmpty callbacksGameEnded_[CHESS_EVENTS_MAX_LISTENERS];
+  ChessCallbackWithMove callbacksMoveMade_[CHESS_EVENTS_MAX_LISTENERS];
+  ChessCallbackWithPosition
+      callbacksHighlightSquare_[CHESS_EVENTS_MAX_LISTENERS];
+  ChessCallbackWithPosition
+      callbacksUnhighlightSquare_[CHESS_EVENTS_MAX_LISTENERS];
+
+  void removeListener(ChessCallbackUnknwon callback,
+                      ChessCallbackUnknwon* array, uint8_t* count);
 };
 
 #endif  // CHESS_EVENTS_H

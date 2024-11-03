@@ -1,5 +1,5 @@
-
 /dts-v1/;
+
 #include <nordic/nrf52840_qiaa.dtsi>
 #include "chessboard-pinctrl.dtsi"
 #include <zephyr/dt-bindings/input/input-event-codes.h>
@@ -7,7 +7,7 @@
 
 / {
    model = "Chessboard";
-   compatible = "nordic,nrf52840-dk-nrf52840";
+   compatible = "nordic,nrf52840-chessboard";
 
    chosen {
       zephyr,console = &uart0;
@@ -19,7 +19,7 @@
       zephyr,flash = &flash0;
       zephyr,code-partition = &slot0_partition;
       zephyr,ieee802154 = &ieee802154;
-      nordic,pm-ext-flash = &mx25r64;
+      nordic,pm-ext-flash = &mx25r6435f;
    };
 
    leds {
@@ -101,6 +101,32 @@
       full-ohms = <(10000 + 20000)>;
    };
 
+   fstab {
+      compatible = "zephyr,fstab";
+      etc: etc {
+         compatible = "zephyr,fstab,littlefs";
+         mount-point = "/etc";
+         partition = <&settings_partition>;
+         automount;
+         read-size = <16>;
+         prog-size = <16>;
+         cache-size = <64>;
+         lookahead-size = <32>;
+         block-cycles = <512>;
+      };
+      mnt: mnt {
+         compatible = "zephyr,fstab,littlefs";
+         mount-point = "/mnt";
+         partition = <&storage_partition>;
+         automount;
+         read-size = <16>;
+         prog-size = <16>;
+         cache-size = <64>;
+         lookahead-size = <32>;
+         block-cycles = <512>;
+      };
+   };
+
    aliases {
       sw0 = &button0_0;
       sw1 = &button0_1;
@@ -116,7 +142,7 @@
       mcuboot-button0 = &mcuboot_btn;
       mcuboot-led0 = &mcuboot_led;
       watchdog0 = &wdt0;
-      spi-flash0 = &mx25r64;
+      spi-flash0 = &mx25r6435f;
    };
 };
 
@@ -171,9 +197,39 @@
 &i2c0 {
    compatible = "nordic,nrf-twi";
    status = "okay";
+   clock-frequency = <100000>;
    pinctrl-0 = <&i2c0_default>;
    pinctrl-1 = <&i2c0_sleep>;
    pinctrl-names = "default", "sleep";
+
+
+   tile0: tiles@40 {
+      status = "okay";
+      reg = <0x40>;
+      compatible = "chess,tiles";
+   };
+
+   /*
+   tiles1: tiles@11 {
+      reg = <0x11>;
+      compatible = "chess,tiles";
+   };
+
+   tiles2: tiles@12 {
+      reg = <0x12>;
+      compatible = "chess,tiles";
+   };
+
+   tiles3: tiles@13 {
+      reg = <0x13>;
+      compatible = "chess,tiles";
+   };
+
+   tiles4: tiles@14 {
+      reg = <0x14>;
+      compatible = "chess,tiles";
+   };
+    */
 };
 
 &spi3 {
@@ -184,7 +240,7 @@
    pinctrl-names = "default", "sleep";
    cs-gpios = <&gpio0 15 (GPIO_ACTIVE_LOW)>, <&gpio0 13 (GPIO_ACTIVE_LOW)>;
 
-   display_white: ili9488@0 {
+   /* display_white: ili9488@0 {
       compatible = "ilitek,ili9488";
       spi-max-frequency = <32000000>;
       reg = <0>;
@@ -216,7 +272,7 @@
       pwctrl2 = [ 41  ];
       pgamctrl = [ 00 03 09 08 16 0a 3f 78 4c 09 0a 08 16 1a 0f  ];
       ngamctrl = [ 00 16 19 03 0f 05 32 45 46 04 0e 0d 35 37 0f  ];
-   };
+   }; */
 };
 
 &qspi {
@@ -224,7 +280,7 @@
    pinctrl-0 = <&qspi_default>;
    pinctrl-1 = <&qspi_sleep>;
    pinctrl-names = "default", "sleep";
-   mx25r64: mx25r6435f@0 {
+   mx25r6435f: mx25r6435f@0 {
       compatible = "nordic,qspi-nor";
       reg = <0>;
       label = "MX25R64";
@@ -239,6 +295,23 @@
       has-dpd;
       t-enter-dpd = <10000>;
       t-exit-dpd = <35000>;
+   };
+};
+
+&mx25r6435f {
+   partitions {
+      compatible = "fixed-partitions";
+      #address-cells = <1>;
+      #size-cells = <1>;
+
+      settings_partition: partition@20000 {
+         label = "settings";
+         reg = <0x20000 0x10000>;
+      };
+      storage_partition: partition@30000 {
+         label = "storage";
+         reg = <0x30000 0x10000>;
+      };
    };
 };
 
@@ -264,10 +337,6 @@
       slot1_partition: partition@82000 {
          label = "image-1";
          reg = <0x00082000 0x00076000>;
-      };
-      storage_partition: partition@f8000 {
-         label = "storage";
-         reg = <0x000f8000 0x00008000>;
       };
    };
 };

@@ -1,8 +1,7 @@
 #ifndef CHESS_LOGIC_TYPES_H
 #define CHESS_LOGIC_TYPES_H
 
-#include <cinttypes>
-#include <functional>
+#include <inttypes.h>
 
 #ifndef __cplusplus
 #include <stdbool.h>
@@ -71,6 +70,11 @@ enum class ChessPieceType {
   Rook,
   Queen,
   King,
+};
+
+enum class ChessTileActionType {
+  PickUp = 0,
+  PutDown,
 };
 
 #endif  // CHESS_LOGIC_TYPES_H

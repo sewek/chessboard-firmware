@@ -8,8 +8,6 @@
 
 #include <inttypes.h>
 
-#include <string>
-
 #include "chess_position.h"
 #include "chess_types.h"
 
@@ -86,7 +84,7 @@ class ChessMove {
    *
    * @return The move in algebraic notation.
    */
-  std::string toString() const;
+  uint8_t toString(char* buff) const;
 
   /**
    * @brief Check if two moves are equal.

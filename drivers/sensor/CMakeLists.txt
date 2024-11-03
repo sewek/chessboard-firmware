@@ -1,1 +1,1 @@
-add_subdirectory_ifdef(CONFIG_CHESSBOARD_TILES_SENSOR chessboard_tiles)
+add_subdirectory_ifdef(CONFIG_TILES_SENSOR tiles)
