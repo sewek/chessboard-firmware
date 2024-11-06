@@ -16,13 +16,14 @@
  */
 class ChessMove {
  public:
+  ChessMove() = default;
   /**
    * @brief Construct a new ChessMove object.
    *
    * @param from The position the move is from.
    * @param to The position the move is to.
    */
-  ChessMove(ChessPosition from, ChessPosition to);
+  ChessMove(ChessPosition* from, ChessPosition* to);
 
   /**
    * @brief Construct a new ChessMove object.
@@ -31,7 +32,7 @@ class ChessMove {
    * @param to The position the move is to.
    * @param piece The piece type of the move.
    */
-  ChessMove(ChessPosition from, ChessPosition to, ChessPieceType piece);
+  ChessMove(ChessPosition* from, ChessPosition* to, ChessPieceType piece);
 
   /**
    * @brief Construct a new ChessMove object.
@@ -41,7 +42,7 @@ class ChessMove {
    * @param piece The piece type of the move.
    * @param type The type of the move.
    */
-  ChessMove(ChessPosition from, ChessPosition to, ChessPieceType piece,
+  ChessMove(ChessPosition* from, ChessPosition* to, ChessPieceType piece,
             ChessMoveType type);
 
   /**
@@ -49,14 +50,14 @@ class ChessMove {
    *
    * @return The position the move is from.
    */
-  ChessPosition getFrom() const;
+  ChessPosition* getFrom() const;
 
   /**
    * @brief Get the position the move is to.
    *
    * @return The position the move is to.
    */
-  ChessPosition getTo() const;
+  ChessPosition* getTo() const;
 
   /**
    * @brief Get the piece type of the move.
@@ -101,8 +102,8 @@ class ChessMove {
   bool operator!=(const ChessMove& other) const;
 
  private:
-  ChessPosition from_;
-  ChessPosition to_;
+  ChessPosition* from_;
+  ChessPosition* to_;
   ChessPieceType piece_;
   ChessMoveType type_;
 };

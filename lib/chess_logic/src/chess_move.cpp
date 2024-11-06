@@ -7,29 +7,30 @@
 
 #include <string.h>
 
-ChessMove::ChessMove(ChessPosition from, ChessPosition to)
+ChessMove::ChessMove(ChessPosition* from, ChessPosition* to)
     : from_(from),
       to_(to),
       piece_(ChessPieceType::Pawn),
       type_(ChessMoveType::Normal) {}
 
-ChessMove::ChessMove(ChessPosition from, ChessPosition to, ChessPieceType piece)
+ChessMove::ChessMove(ChessPosition* from, ChessPosition* to,
+                     ChessPieceType piece)
     : from_(from), to_(to), piece_(piece), type_(ChessMoveType::Normal) {}
 
-ChessMove::ChessMove(ChessPosition from, ChessPosition to, ChessPieceType piece,
-                     ChessMoveType type)
+ChessMove::ChessMove(ChessPosition* from, ChessPosition* to,
+                     ChessPieceType piece, ChessMoveType type)
     : from_(from), to_(to), piece_(piece), type_(type) {}
 
-ChessPosition ChessMove::getFrom() const { return from_; }
+ChessPosition* ChessMove::getFrom() const { return from_; }
 
-ChessPosition ChessMove::getTo() const { return to_; }
+ChessPosition* ChessMove::getTo() const { return to_; }
 
 ChessPieceType ChessMove::getPiece() const { return piece_; }
 
 ChessMoveType ChessMove::getType() const { return type_; }
 
 bool ChessMove::isValid() const {
-  return from_.isValid() && to_.isValid() && from_ != to_;
+  return from_->isValid() && to_->isValid() && from_ != to_;
 }
 
 uint8_t ChessMove::toString(char* buff) const {
@@ -38,8 +39,8 @@ uint8_t ChessMove::toString(char* buff) const {
   char piece = ' ';
   char type = ' ';
 
-  from_.toString(from);
-  to_.toString(to);
+  from_->toString(from);
+  to_->toString(to);
 
   switch (piece_) {
     case ChessPieceType::Pawn:
@@ -87,7 +88,7 @@ uint8_t ChessMove::toString(char* buff) const {
   }
 
   if (type_ == ChessMoveType::Castling) {
-    if (from_.getFile() - to_.getFile() > 2) {
+    if (from_->getFile() - to_->getFile() > 2) {
       buff[0] = 'O';
       buff[1] = '-';
       buff[2] = 'O';
