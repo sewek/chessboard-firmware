@@ -2,6 +2,10 @@ menu "Zephyr"
 source "Kconfig.zephyr"
 endmenu
 
+menu "Application Configuration"
+rsource "src/display/Kconfig"
+endmenu
+
 module = APP
 module-str = APP
 source "subsys/logging/Kconfig.template.log_config"

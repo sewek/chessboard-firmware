@@ -78,7 +78,11 @@
       "memory": "cpp",
       "print": "cpp",
       "algorithm": "cpp",
-      "bmp388.h": "c"
+      "bmp388.h": "c",
+      "printk.h": "c",
+      "lvgl_display.h": "c",
+      "lv_disp.h": "c",
+      "lv_hal.h": "c"
    },
    "cmake.sourceDirectory": "${workspaceFolder}",
    "cmake.buildDirectory": "${workspaceFolder}/build",

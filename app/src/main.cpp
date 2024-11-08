@@ -4,7 +4,9 @@
  */
 #include <chess.h>
 #include <chess_types.h>
+#include <lvgl.h>
 #include <zephyr/device.h>
+#include <zephyr/drivers/display.h>
 #include <zephyr/fs/fs.h>
 #include <zephyr/fs/littlefs.h>
 #include <zephyr/kernel.h>
@@ -12,6 +14,7 @@
 #include <zephyr/storage/flash_map.h>
 #include <zephyr/usb/usb_device.h>
 
+#include "display.h"
 #include "tiles.h"
 
 #define CONFIG_BOARD "nRF52840"
@@ -24,6 +27,14 @@ LOG_MODULE_REGISTER(main);
 FS_FSTAB_DECLARE_ENTRY(ETC_PARTITION_NODE);
 FS_FSTAB_DECLARE_ENTRY(MNT_PARTITION_NODE);
 
+Display white_display =
+    Display(DEVICE_DT_GET(DT_NODELABEL(display_white)),
+            DT_PROP(DT_NODELABEL(display_white), width),
+            DT_PROP(DT_NODELABEL(display_white), height), 24);
+Display black_display =
+    Display(DEVICE_DT_GET(DT_NODELABEL(display_black)),
+            DT_PROP(DT_NODELABEL(display_black), width),
+            DT_PROP(DT_NODELABEL(display_black), height), 24);
 Tiles tiles;
 Chess chess;
 
@@ -77,12 +88,12 @@ void tilesChangeCallback(const struct device *dev,
 
     if (state_changed) {
       // Test log
-      char buff[3];
+      /* char buff[3];
       position->toString(buff);
       buff[2] = '\0';
 
       LOG_INF("Tile at %s has been %s\n", buff,
-              state ? "put down" : "picked up");
+              state ? "put down" : "picked up"); */
 
       tile->state = state;
       ChessTileActionType action =
@@ -113,8 +124,31 @@ int main() {
   }
   LOG_INF("Tiles initialized\n");
 
+  LOG_INF("Initializing displays");
+  white_display.init();
+  black_display.init();
+
+  lv_obj_t *hello_world_label;
+  hello_world_label =
+      lv_label_create(lv_disp_get_scr_act(white_display.display));
+  lv_obj_set_style_text_font(hello_world_label, &lv_font_montserrat_24, 0);
+  lv_label_set_text(hello_world_label, "Ekran dla bialych");
+  lv_obj_align(hello_world_label, LV_ALIGN_CENTER, 0, 0);
+
+  lv_obj_t *hello_world_label2;
+  hello_world_label2 =
+      lv_label_create(lv_disp_get_scr_act(black_display.display));
+  lv_obj_set_style_text_font(hello_world_label2, &lv_font_montserrat_24, 0);
+  lv_label_set_text(hello_world_label2, "Ekran dla czarnych");
+  lv_obj_align(hello_world_label2, LV_ALIGN_CENTER, 0, 0);
+
+  lv_task_handler();
+  display_blanking_off(white_display.dev);
+  display_blanking_off(black_display.dev);
+
   while (true) {
-    k_sleep(K_MSEC(1000));
+    lv_task_handler();
+    k_sleep(K_MSEC(100));
   }
 
   return 0;

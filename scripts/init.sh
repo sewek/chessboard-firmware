@@ -12,6 +12,6 @@ if [ $? -ne 0 ]; then
 fi
 
 # Copy zephyr modified files
-cp ./app/src/lvgl/lvgl.c ./external/zephyr/modules/lvgl/lvgl.c
+mv ./external/zephyr/modules/lvgl/CMakeLists.txt ./external/zephyr/modules/lvgl/_CMakeLists.txt
 
 echo "Initialization finished!"
