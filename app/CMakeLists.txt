@@ -14,6 +14,7 @@ find_package(Zephyr REQUIRED HINTS $ENV{ZEPHYR_BASE})
 project(app)
 target_sources(app PRIVATE src/main.cpp)
 add_subdirectory(src/tiles)
+add_subdirectory(src/display)
 
 # Include directories
 zephyr_include_directories(include)
