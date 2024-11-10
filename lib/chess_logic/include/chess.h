@@ -19,7 +19,13 @@ class Chess : public ChessEvents {
    */
   void notifyTileAction(ChessPosition *position, ChessTileActionType action);
 
+  /**
+   * @brief Start game by user
+   */
+  ChessGameStartError startGame();
+
  private:
+  ChessTileState tileState[8][8] = {};
   ChessPosition position[8][8] = {
       {
           ChessPosition("a1"),
@@ -102,9 +108,68 @@ class Chess : public ChessEvents {
           ChessPosition("h8"),
       },
   };
-  ChessPiece piece[32];
+  ChessPiece piece[32] = {
+      ChessPiece(ChessColor::White, ChessPieceType::Rook),
+      ChessPiece(ChessColor::White, ChessPieceType::Knight),
+      ChessPiece(ChessColor::White, ChessPieceType::Bishop),
+      ChessPiece(ChessColor::White, ChessPieceType::Queen),
+      ChessPiece(ChessColor::White, ChessPieceType::King),
+      ChessPiece(ChessColor::White, ChessPieceType::Bishop),
+      ChessPiece(ChessColor::White, ChessPieceType::Knight),
+      ChessPiece(ChessColor::White, ChessPieceType::Rook),
+      ChessPiece(ChessColor::White, ChessPieceType::Pawn),
+      ChessPiece(ChessColor::White, ChessPieceType::Pawn),
+      ChessPiece(ChessColor::White, ChessPieceType::Pawn),
+      ChessPiece(ChessColor::White, ChessPieceType::Pawn),
+      ChessPiece(ChessColor::White, ChessPieceType::Pawn),
+      ChessPiece(ChessColor::White, ChessPieceType::Pawn),
+      ChessPiece(ChessColor::White, ChessPieceType::Pawn),
+      ChessPiece(ChessColor::White, ChessPieceType::Pawn),
+      ChessPiece(ChessColor::Black, ChessPieceType::Rook),
+      ChessPiece(ChessColor::Black, ChessPieceType::Knight),
+      ChessPiece(ChessColor::Black, ChessPieceType::Bishop),
+      ChessPiece(ChessColor::Black, ChessPieceType::Queen),
+      ChessPiece(ChessColor::Black, ChessPieceType::King),
+      ChessPiece(ChessColor::Black, ChessPieceType::Bishop),
+      ChessPiece(ChessColor::Black, ChessPieceType::Knight),
+      ChessPiece(ChessColor::Black, ChessPieceType::Rook),
+      ChessPiece(ChessColor::Black, ChessPieceType::Pawn),
+      ChessPiece(ChessColor::Black, ChessPieceType::Pawn),
+      ChessPiece(ChessColor::Black, ChessPieceType::Pawn),
+      ChessPiece(ChessColor::Black, ChessPieceType::Pawn),
+      ChessPiece(ChessColor::Black, ChessPieceType::Pawn),
+      ChessPiece(ChessColor::Black, ChessPieceType::Pawn),
+      ChessPiece(ChessColor::Black, ChessPieceType::Pawn),
+      ChessPiece(ChessColor::Black, ChessPieceType::Pawn),
+  };
+  ChessPiece pieceSimulationBackup[32];
+  ChessPiece *pickedUpPiece = nullptr;
   ChessMove move[CHESS_MOVE_MAX];
   uint16_t move_index = 0;
+  ChessGameState gameState = ChessGameState::NotStarted;
+  ChessGameResult gameResult = ChessGameResult::Draw;
+  uint8_t whiteWrongMoves = 0;
+  uint8_t blackWrongMoves = 0;
+
+  // void highlightPositions(ChessPosition *position, uint8_t count);
+  ChessColor getCurrentPlayerColor();
+  uint8_t getAvailablePositions(ChessPiece *piece,
+                                ChessPosition *chessPositions);
+  bool isKingChecked(ChessColor color);
+  bool willBeKingChecked(ChessPosition *kingPosition, ChessColor color);
+  ChessPiece *findPiece(ChessPosition *position);
+  ChessPiece *findPiece(ChessPieceType type, ChessColor color);
+  uint8_t findPieces(ChessPieceType type, ChessColor color, ChessPiece *pieces);
+  int isOccupied(ChessPosition *position, ChessColor color);
+  void createMove(ChessMove *move, ChessPosition *from, ChessPosition *to);
+  void applyMove(ChessMove *move);
+  int checkPiecesArrangement();
+  void assignPiecesToPositions();
+
+  void startSimulation();
+  void endSimulation();
+  void simulateMove(ChessMove *move);
+  bool isCastlingPossible(ChessCastlingType type, ChessColor color);
 };
 
 #endif  // _CHESS_LOGIC_H_

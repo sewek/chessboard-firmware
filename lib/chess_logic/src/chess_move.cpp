@@ -8,24 +8,20 @@
 #include <string.h>
 
 ChessMove::ChessMove(ChessPosition* from, ChessPosition* to)
-    : from_(from),
-      to_(to),
-      piece_(ChessPieceType::Pawn),
-      type_(ChessMoveType::Normal) {}
+    : from_(from), to_(to), piece_(nullptr), type_(ChessMoveType::Normal) {}
 
-ChessMove::ChessMove(ChessPosition* from, ChessPosition* to,
-                     ChessPieceType piece)
+ChessMove::ChessMove(ChessPosition* from, ChessPosition* to, ChessPiece* piece)
     : from_(from), to_(to), piece_(piece), type_(ChessMoveType::Normal) {}
 
-ChessMove::ChessMove(ChessPosition* from, ChessPosition* to,
-                     ChessPieceType piece, ChessMoveType type)
+ChessMove::ChessMove(ChessPosition* from, ChessPosition* to, ChessPiece* piece,
+                     ChessMoveType type)
     : from_(from), to_(to), piece_(piece), type_(type) {}
 
 ChessPosition* ChessMove::getFrom() const { return from_; }
 
 ChessPosition* ChessMove::getTo() const { return to_; }
 
-ChessPieceType ChessMove::getPiece() const { return piece_; }
+ChessPiece* ChessMove::getPiece() const { return piece_; }
 
 ChessMoveType ChessMove::getType() const { return type_; }
 
@@ -42,7 +38,7 @@ uint8_t ChessMove::toString(char* buff) const {
   from_->toString(from);
   to_->toString(to);
 
-  switch (piece_) {
+  switch (piece_->getType()) {
     case ChessPieceType::Pawn:
       piece = 'P';
       break;

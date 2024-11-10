@@ -8,8 +8,11 @@
 
 #include <inttypes.h>
 
+#include "chess_piece.h"
 #include "chess_position.h"
 #include "chess_types.h"
+
+class ChessPiece;
 
 /**
  * @brief Represents a move in a chess game.
@@ -32,7 +35,7 @@ class ChessMove {
    * @param to The position the move is to.
    * @param piece The piece type of the move.
    */
-  ChessMove(ChessPosition* from, ChessPosition* to, ChessPieceType piece);
+  ChessMove(ChessPosition* from, ChessPosition* to, ChessPiece* piece);
 
   /**
    * @brief Construct a new ChessMove object.
@@ -42,7 +45,7 @@ class ChessMove {
    * @param piece The piece type of the move.
    * @param type The type of the move.
    */
-  ChessMove(ChessPosition* from, ChessPosition* to, ChessPieceType piece,
+  ChessMove(ChessPosition* from, ChessPosition* to, ChessPiece* piece,
             ChessMoveType type);
 
   /**
@@ -64,7 +67,7 @@ class ChessMove {
    *
    * @return The piece type of the move.
    */
-  ChessPieceType getPiece() const;
+  ChessPiece* getPiece() const;
 
   /**
    * @brief Get the type of the move.
@@ -72,6 +75,26 @@ class ChessMove {
    * @return The type of the move.
    */
   ChessMoveType getType() const;
+
+  /**
+   * @brief Set the position the move is from.
+   */
+  void setFrom(ChessPosition* from) { from_ = from; }
+
+  /**
+   * @brief Set the position the move is to.
+   */
+  void setTo(ChessPosition* to) { to_ = to; }
+
+  /**
+   * @brief Set the piece type of the move.
+   */
+  void setPiece(ChessPiece* piece) { piece_ = piece; }
+
+  /**
+   * @brief Set the type of the move.
+   */
+  void setType(ChessMoveType type) { type_ = type; }
 
   /**
    * @brief Check if the move is valid.
@@ -104,7 +127,7 @@ class ChessMove {
  private:
   ChessPosition* from_;
   ChessPosition* to_;
-  ChessPieceType piece_;
+  ChessPiece* piece_;
   ChessMoveType type_;
 };
 
