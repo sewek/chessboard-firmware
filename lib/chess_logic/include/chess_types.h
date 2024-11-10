@@ -46,6 +46,7 @@ enum class ChessEventType {
   MoveMade,
   HighlightSquare,
   UnhighlightSquare,
+  GameCannotStart,
 };
 
 enum class ChessMoveType {
@@ -75,6 +76,42 @@ enum class ChessPieceType {
 enum class ChessTileActionType {
   PickUp = 0,
   PutDown,
+};
+
+enum class ChessTileState {
+  Available = 0,
+  Taken,
+};
+
+enum class ChessCastlingType {
+  None = 0,
+  Short,
+  Long,
+};
+
+enum class ChessGameResult {
+  WhiteWins = 0,
+  BlackWins,
+  Draw,
+};
+
+enum class ChessGameState {
+  NotStarted = 0,
+  InProgress,
+  Ended,
+};
+
+enum class ChessGameStartError {
+  Ok = 0,
+  InvalidPieceArrangement,
+  GameAlreadyStarted,
+};
+
+enum class ChessHighlightType {
+  NormalMove = 0,
+  CaptureMove,
+  Check,
+  Error,
 };
 
 #endif  // CHESS_LOGIC_TYPES_H

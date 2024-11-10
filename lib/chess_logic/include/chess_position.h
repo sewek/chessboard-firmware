@@ -17,18 +17,23 @@ class ChessPosition {
  public:
   /**
    * @brief Construct a new ChessPosition object.
+   */
+  ChessPosition() = default;
+
+  /**
+   * @brief Construct a new ChessPosition object.
    *
    * @param file The file of the position.
    * @param rank The rank of the position.
    */
-  ChessPosition(char file, int rank);
+  ChessPosition(const char file, int rank);
 
   /**
    * @brief Construct a new ChessPosition object.
    *
    * @param position The position in algebraic notation.
    */
-  explicit ChessPosition(char* position);
+  explicit ChessPosition(const char* position);
 
   /**
    * @brief Construct a new ChessPosition object.

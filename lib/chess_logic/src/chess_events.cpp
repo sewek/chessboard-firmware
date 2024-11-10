@@ -24,13 +24,21 @@ void ChessEvents::addListener(ChessEventType event,
 
 void ChessEvents::addListener(ChessEventType event,
                               ChessCallbackWithPosition callback) {
-  if (event == ChessEventType::HighlightSquare) {
-    this->callbacksHighlightSquare_[this->callbackCountHighlightSquare_++] =
+  if (event == ChessEventType::UnhighlightSquare) {
+    this->callbacksUnhighlightSquare_[this->callbackCountUnhighlightSquare_++] =
         callback;
   }
 
-  if (event == ChessEventType::UnhighlightSquare) {
-    this->callbacksUnhighlightSquare_[this->callbackCountUnhighlightSquare_++] =
+  if (event == ChessEventType::GameCannotStart) {
+    this->callbacksGameCantStart_[this->callbackCountGameCantStart_++] =
+        (callback);
+  }
+}
+
+void ChessEvents::addListener(ChessEventType event,
+                              ChessCallbackWithPositionAndHighlight callback) {
+  if (event == ChessEventType::HighlightSquare) {
+    this->callbacksHighlightSquare_[this->callbackCountHighlightSquare_++] =
         callback;
   }
 }
@@ -61,17 +69,26 @@ void ChessEvents::removeListener(ChessEventType event,
 
 void ChessEvents::removeListener(ChessEventType event,
                                  ChessCallbackWithPosition callback) {
-  if (event == ChessEventType::HighlightSquare) {
-    this->removeListener((ChessCallbackUnknwon)callback,
-                         (ChessCallbackUnknwon*)this->callbacksHighlightSquare_,
-                         &this->callbackCountHighlightSquare_);
-  }
-
   if (event == ChessEventType::UnhighlightSquare) {
     this->removeListener(
         (ChessCallbackUnknwon)callback,
         (ChessCallbackUnknwon*)this->callbacksUnhighlightSquare_,
         &this->callbackCountUnhighlightSquare_);
+  }
+
+  if (event == ChessEventType::GameCannotStart) {
+    this->removeListener((ChessCallbackUnknwon)callback,
+                         (ChessCallbackUnknwon*)this->callbacksGameCantStart_,
+                         &this->callbackCountGameCantStart_);
+  }
+}
+
+void ChessEvents::removeListener(
+    ChessEventType event, ChessCallbackWithPositionAndHighlight callback) {
+  if (event == ChessEventType::HighlightSquare) {
+    this->removeListener((ChessCallbackUnknwon)callback,
+                         (ChessCallbackUnknwon*)this->callbacksHighlightSquare_,
+                         &this->callbackCountHighlightSquare_);
   }
 }
 
@@ -91,7 +108,7 @@ void ChessEvents::notifyGameEnded() {
   }
 }
 
-void ChessEvents::notifyMoveMade(ChessMove move) {
+void ChessEvents::notifyMoveMade(ChessMove* move) {
   for (const auto& callback : this->callbacksMoveMade_) {
     if (callback != nullptr) {
       callback(move);
@@ -99,16 +116,25 @@ void ChessEvents::notifyMoveMade(ChessMove move) {
   }
 }
 
-void ChessEvents::notifyHighlightSquare(ChessPosition position) {
+void ChessEvents::notifyHighlightSquare(ChessPosition* position,
+                                        ChessHighlightType type) {
   for (const auto& callback : this->callbacksHighlightSquare_) {
+    if (callback != nullptr) {
+      callback(position, type);
+    }
+  }
+}
+
+void ChessEvents::notifyUnhighlightSquare(ChessPosition* position) {
+  for (const auto& callback : this->callbacksUnhighlightSquare_) {
     if (callback != nullptr) {
       callback(position);
     }
   }
 }
 
-void ChessEvents::notifyUnhighlightSquare(ChessPosition position) {
-  for (const auto& callback : this->callbacksUnhighlightSquare_) {
+void ChessEvents::notifyGameCannotStart(ChessPosition* position) {
+  for (const auto& callback : this->callbacksGameCantStart_) {
     if (callback != nullptr) {
       callback(position);
     }

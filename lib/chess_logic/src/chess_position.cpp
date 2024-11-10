@@ -6,7 +6,7 @@
 
 #include "chess_position.h"
 
-ChessPosition::ChessPosition(char file, int rank) {
+ChessPosition::ChessPosition(const char file, int rank) {
   if (file < 'a' || file > 'h' || rank < 1 || rank > 8) {
     this->data_ = 0;
     return;
@@ -15,7 +15,7 @@ ChessPosition::ChessPosition(char file, int rank) {
   this->data_ = ((file - 'a' + 1) << 4) | (rank);
 }
 
-ChessPosition::ChessPosition(char* position) {
+ChessPosition::ChessPosition(const char* position) {
   const char file = position[0];
   const char rank = position[1];
 
