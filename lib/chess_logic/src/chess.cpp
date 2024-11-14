@@ -79,10 +79,12 @@ ChessGameStartError Chess::startGame() {
 
   this->gameState = ChessGameState::NotStarted;
 
+#ifndef CONFIG_CHESS_LIB_TEST
   err = this->checkPiecesArrangement();
   if (err != 0) {
     return ChessGameStartError::InvalidPieceArrangement;
   }
+#endif
 
   this->assignPiecesToPositions();
 
@@ -117,6 +119,7 @@ int Chess::checkPiecesArrangement() {
 
 // przypisujemy pionki
 void Chess::assignPiecesToPositions() {
+#ifndef CONFIG_CHESS_LIB_TEST
   for (int i = 0; i < 8; ++i) {
     this->piece[i].setPosition(&this->position[i][0]);
   }
@@ -132,6 +135,10 @@ void Chess::assignPiecesToPositions() {
   for (int i = 0; i < 8; ++i) {
     this->piece[24 + i].setPosition(&this->position[i][6]);
   }
+#else
+  this->piece[0].setPosition(&this->position[0][0]);
+  this->piece[8].setPosition(&this->position[0][1]);
+#endif
 }
 
 // podświetlenie kwadracikow

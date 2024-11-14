@@ -1,0 +1,6 @@
+
+config CHESS_LIB_TEST
+   bool "Enable chess library tests"
+   default n
+   help
+      Enable test version without checking for correct positions of pieces.
