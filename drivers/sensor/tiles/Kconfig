@@ -16,7 +16,7 @@ menuconfig TILES_SENSOR_TRIGGER
 
       config TILES_SENSOR_TRIGGER_THREAD_PRIORITY
             int "Thread priority"
-            default 10
+            default 0
             depends on TILES_SENSOR_TRIGGER
             help
                Priority for the trigger thread.
@@ -30,14 +30,14 @@ menuconfig TILES_SENSOR_TRIGGER
 
       config TILES_SENSOR_TRIGGER_THREAD_PERIOD_MS
             int "Thread period"
-            default 2
+            default 10
             depends on TILES_SENSOR_TRIGGER
             help
                Period in milliseconds for the trigger thread.
 
       config TILES_SENSOR_TRIGGER_INTERVAL_MS
             int "Trigger interval"
-            default 10
+            default 100
             depends on TILES_SENSOR_TRIGGER
             help
                Interval in milliseconds between trigger events.

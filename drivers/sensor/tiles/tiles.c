@@ -51,6 +51,12 @@ struct tiles_data {
   // Trigger and corresponding handler
   sensor_trigger_handler_t trg_handler;
   const struct sensor_trigger *trigger;
+
+  K_KERNEL_STACK_MEMBER(thread_stack,
+                        CONFIG_TILES_SENSOR_TRIGGER_THREAD_STACK_SIZE);
+  struct k_thread thread;
+  struct k_sem sem;
+  struct k_timer timer;
 #endif
 
   // Management configuration
@@ -83,18 +89,6 @@ struct tiles_config {
   struct i2c_dt_spec i2c;
 };
 
-#ifdef CONFIG_TILES_SENSOR_TRIGGER
-// Thread instance
-static struct k_thread tiles_thread;
-static struct k_sem tiles_sem;
-#endif
-
-#ifdef CONFIG_TILES_SENSOR_TRIGGER
-static K_THREAD_STACK_DEFINE(thread_stack,
-                             CONFIG_TILES_SENSOR_TRIGGER_THREAD_STACK_SIZE);
-static K_TIMER_DEFINE(fetch_state_timer, NULL, NULL);
-#endif
-
 static int tiles_channel_get(const struct device *dev, enum sensor_channel chan,
                              struct sensor_value *val) {
   struct tiles_data *data = dev->data;
@@ -122,15 +116,9 @@ static int tiles_sample_fetch(const struct device *dev,
   int ret = 0;
   uint8_t buff[2];
 
-  if (k_sem_take(&tiles_sem, K_FOREVER) < 0) {
-    LOG_ERR("Failed to take semaphore.");
-    return -EBUSY;
-  }
-
   ret = i2c_reg_read_byte_dt(&cfg->i2c, TILES_REG_HAL_STATE, &buff[0]);
   if (ret < 0) {
     LOG_ERR("Failed to read HAL state, error: %d", ret);
-    k_sem_give(&tiles_sem);
     return ret;
   } else {
     data->tiles_state = buff[0];
@@ -139,13 +127,10 @@ static int tiles_sample_fetch(const struct device *dev,
   ret = i2c_reg_read_byte_dt(&cfg->i2c, TILES_REG_HAL_STATE_PREV, &buff[1]);
   if (ret < 0) {
     LOG_ERR("Failed to read HAL prev state, error: %d", ret);
-    k_sem_give(&tiles_sem);
     return ret;
   } else {
     data->tiles_state_prev = buff[1];
   }
-
-  k_sem_give(&tiles_sem);
 
   return 0;
 }
@@ -164,11 +149,6 @@ static int tiles_attr_set(const struct device *dev, enum sensor_channel chan,
       (enum sensor_channel_tiles)chan != SENSOR_CHAN_TILES_POS) {
     LOG_ERR("Channel not supported");
     return -ENOTSUP;
-  }
-
-  if (k_sem_take(&tiles_sem, K_FOREVER) < 0) {
-    LOG_ERR("Failed to take semaphore.");
-    return -EBUSY;
   }
 
   switch ((enum sensor_attribute_tiles)attr) {
@@ -302,8 +282,6 @@ static int tiles_attr_set(const struct device *dev, enum sensor_channel chan,
       ret = -ENOTSUP;
   }
 
-  k_sem_give(&tiles_sem);
-
   return ret;
 }
 
@@ -321,11 +299,6 @@ static int tiles_attr_get(const struct device *dev, enum sensor_channel chan,
       (enum sensor_channel_tiles)chan != SENSOR_CHAN_TILES_POS) {
     LOG_ERR("Channel not supported");
     return -ENOTSUP;
-  }
-
-  if (k_sem_take(&tiles_sem, K_FOREVER) < 0) {
-    LOG_ERR("Failed to take semaphore.");
-    return -EBUSY;
   }
 
   switch ((enum sensor_attribute_tiles)attr) {
@@ -394,8 +367,6 @@ static int tiles_attr_get(const struct device *dev, enum sensor_channel chan,
       ret = -ENOTSUP;
       break;
   }
-
-  k_sem_give(&tiles_sem);
 
   switch ((enum sensor_attribute_tiles)attr) {
     case SENSOR_ATTR_TILES_ENABLE:
@@ -479,17 +450,25 @@ static void tiles_thread_fn(void *arg1, void *arg2, void *arg3) {
   struct tiles_data *data = dev->data;
   uint8_t prev_state = 0;
 
+  k_timer_start(&data->timer, K_MSEC(CONFIG_TILES_SENSOR_TRIGGER_INTERVAL_MS),
+                K_NO_WAIT);
+
   while (1) {
-    if (!(data->config & (TILES_ENABLE | TILES_ENABLE_HAL))) {
-      k_sleep(K_MSEC(CONFIG_TILES_SENSOR_TRIGGER_THREAD_PERIOD_MS));
-      continue;
+    if (data->config & (TILES_ENABLE | TILES_ENABLE_HAL) == 0) {
+      goto sleep;
     }
 
-    if (k_timer_remaining_get(&fetch_state_timer) == 0) {
+    if (k_timer_remaining_get(&data->timer) == 0) {
+      if (k_sem_take(&data->sem, K_MSEC(100)) < 0) {
+        LOG_ERR("Failed to take semaphore.");
+        goto sleep;
+      }
+
       if (tiles_sample_fetch(
               dev, (enum sensor_channel)SENSOR_CHAN_TILES_STATE) < 0) {
         LOG_ERR("Failed to fetch data sample in thread");
-        continue;
+        k_sem_give(&data->sem);
+        goto sleep;
       }
 
       if (data->trigger->type == SENSOR_TRIG_TIMER && data->trg_handler) {
@@ -502,9 +481,13 @@ static void tiles_thread_fn(void *arg1, void *arg2, void *arg3) {
         data->trg_handler(dev, data->trigger);
       }
 
-      k_timer_start(&fetch_state_timer,
+      k_sem_give(&data->sem);
+
+      k_timer_start(&data->timer,
                     K_MSEC(CONFIG_TILES_SENSOR_TRIGGER_INTERVAL_MS), K_NO_WAIT);
     }
+
+  sleep:
     k_sleep(K_MSEC(CONFIG_TILES_SENSOR_TRIGGER_THREAD_PERIOD_MS));
   }
 }
@@ -520,26 +503,31 @@ static const struct sensor_driver_api kTilesDriverApi = {
 #endif
 };
 
+static void wait_for_ready(const struct device *dev) {
+  const struct tiles_config *cfg = dev->config;
+  uint8_t data;
+
+  while (!device_is_ready(cfg->i2c.bus)) {
+    k_sleep(K_MSEC(10));
+  }
+
+  while (i2c_reg_read_byte_dt(&cfg->i2c, TILES_REG_MANAGEMENT, &data) < 0) {
+    k_sleep(K_MSEC(10));
+  }
+}
+
 // NOLINTNEXTLINE
 int chessboard_sensor_init(const struct device *dev) {
   struct tiles_data *data = dev->data;
   const struct tiles_config *cfg = dev->config;
   uint8_t id;
 
-  if (k_sem_init(&tiles_sem, 1, 1) < 0) {
-    LOG_ERR("Failed to initialize semaphore.");
-    return -EBUSY;
-  }
-
-  if (k_sem_take(&tiles_sem, K_FOREVER) < 0) {
-    LOG_ERR("Failed to take semaphore.");
-    return -EBUSY;
-  }
-
   if (!device_is_ready(cfg->i2c.bus)) {
     LOG_ERR("Bus device is not ready");
     return -ENODEV;
   }
+
+  wait_for_ready(dev);
 
   /* check chip ID */
   if (i2c_reg_read_byte_dt(&cfg->i2c, TILES_REG_CHIP_ID, &id) < 0) {
@@ -573,6 +561,11 @@ int chessboard_sensor_init(const struct device *dev) {
     return -EIO;
   }
 
+  if (i2c_reg_write_byte_dt(&cfg->i2c, TILES_REG_LED_BRIGHTNESS, 255) < 0) {
+    LOG_ERR("Failed to set LED brightness.");
+    return -EIO;
+  }
+
   /* enable chip */
   if (i2c_reg_write_byte_dt(&cfg->i2c, TILES_REG_MANAGEMENT, data->config) <
       0) {
@@ -580,20 +573,19 @@ int chessboard_sensor_init(const struct device *dev) {
     return -EIO;
   }
 
-  k_sem_give(&tiles_sem);
-
 #ifdef CONFIG_TILES_SENSOR_TRIGGER
-  k_thread_create(&tiles_thread, thread_stack,
+  k_sem_init(&data->sem, 1, 1);
+  k_timer_init(&data->timer, NULL, NULL);
+  k_thread_create(&data->thread, data->thread_stack,
                   CONFIG_TILES_SENSOR_TRIGGER_THREAD_STACK_SIZE,
                   tiles_thread_fn, (void *)dev, NULL, NULL,
                   K_PRIO_COOP(CONFIG_TILES_SENSOR_TRIGGER_THREAD_PRIORITY), 0,
                   K_NO_WAIT);
-  k_thread_name_set(&tiles_thread, "tiles_thread");
+  char thread_name[CONFIG_THREAD_MAX_NAME_LEN];
+  snprintf(thread_name, sizeof(thread_name), "%s_thread", dev->name);
+  k_thread_name_set(&data->thread, thread_name);
 
-  k_timer_start(&fetch_state_timer,
-                K_MSEC(CONFIG_TILES_SENSOR_TRIGGER_INTERVAL_MS), K_NO_WAIT);
-
-  k_thread_start(&tiles_thread);
+  // k_thread_start(&data->thread);
 #endif
 
   return 0;

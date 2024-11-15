@@ -55,7 +55,7 @@ static int cmd_get_handler(const struct shell *sh, size_t argc, char **argv) {
 
   shell_fprintf(sh, SHELL_NORMAL, "Tile position: %s\n", buff);
 
-  Tile *tile = tiles.getTile(position);
+  Tile *tile = tiles.getTile(&position);
 
   if (tile == nullptr) {
     shell_fprintf(sh, SHELL_ERROR, "Tile not found\n");
@@ -95,7 +95,7 @@ static int cmd_set_color_handler(const struct shell *sh, size_t argc,
   ChessPosition position = ChessPosition(argv[1]);
   uint32_t color = strtoul(argv[2], nullptr, 16);
 
-  int ret = tiles.setTileColor(position, color);
+  int ret = tiles.setTileColor(&position, color);
 
   if (ret < 0) {
     shell_fprintf(sh, SHELL_ERROR, "Failed to set tile color\n");
@@ -116,7 +116,7 @@ static int cmd_set_position_handler(const struct shell *sh, size_t argc,
   ChessPosition position = ChessPosition(argv[1]);
   ChessPosition new_position = ChessPosition(argv[2]);
 
-  int ret = tiles.setTilePosition(position, new_position);
+  int ret = tiles.setTilePosition(&position, &new_position);
 
   if (ret < 0) {
     shell_fprintf(sh, SHELL_ERROR, "Failed to set tile position\n");
@@ -141,7 +141,7 @@ static int cmd_set_threshold_handler(const struct shell *sh, size_t argc,
   ChessPosition position = ChessPosition(argv[1]);
   uint16_t threshold = strtoul(argv[2], nullptr, 10);
 
-  int ret = tiles.setTileThreshold(position, threshold);
+  int ret = tiles.setTileThreshold(&position, threshold);
 
   if (ret < 0) {
     shell_fprintf(sh, SHELL_ERROR, "Failed to set tile threshold\n");
@@ -161,7 +161,7 @@ static int cmd_set_interval_handler(const struct shell *sh, size_t argc,
   ChessPosition position = ChessPosition(argv[1]);
   uint16_t interval = strtoul(argv[2], nullptr, 10);
 
-  int ret = tiles.setTileInterval(position, interval);
+  int ret = tiles.setTileInterval(&position, interval);
 
   if (ret < 0) {
     shell_fprintf(sh, SHELL_ERROR, "Failed to set tile interval\n");

@@ -203,34 +203,44 @@
    pinctrl-1 = <&i2c0_sleep>;
    pinctrl-names = "default", "sleep";
 
-
    tile0: tiles@40 {
       status = "okay";
       reg = <0x40>;
       compatible = "chess,tiles";
    };
 
+   tile1: tiles@41 {
+      status = "okay";
+      reg = <0x41>;
+      compatible = "chess,tiles";
+   };
+
+   tile2: tiles@42 {
+      status = "okay";
+      reg = <0x42>;
+      compatible = "chess,tiles";
+   };
+
+
    /*
-   tiles1: tiles@11 {
-      reg = <0x11>;
-      compatible = "chess,tiles";
-   };
-
-   tiles2: tiles@12 {
-      reg = <0x12>;
-      compatible = "chess,tiles";
-   };
-
-   tiles3: tiles@13 {
-      reg = <0x13>;
-      compatible = "chess,tiles";
-   };
-
-   tiles4: tiles@14 {
-      reg = <0x14>;
+   tiles3: tiles@43 {
+      reg = <0x43>;
       compatible = "chess,tiles";
    };
     */
+
+   tile4: tiles@44 {
+      status = "okay";
+      reg = <0x44>;
+      compatible = "chess,tiles";
+   };
+
+   tile5: tiles@45 {
+      status = "okay";
+      reg = <0x45>;
+      compatible = "chess,tiles";
+   };
+
 };
 
 &spi3 {
