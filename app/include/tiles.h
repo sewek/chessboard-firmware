@@ -44,7 +44,7 @@ class Tiles {
    * @param position The position of the tile
    * @return The tile at the given position
    */
-  Tile *getTile(const ChessPosition &position);
+  Tile *getTile(ChessPosition *position);
 
   /**
    * @brief Get the tiles count
@@ -58,7 +58,7 @@ class Tiles {
    * @param color The color to set
    * @return 0 on success, negative error code on failure
    */
-  int setTileColor(const ChessPosition &position, uint32_t color);
+  int setTileColor(ChessPosition *position, uint32_t color);
 
   /**
    * @brief Set tile position
@@ -66,8 +66,7 @@ class Tiles {
    * @param new_position The new position to set
    * @return 0 on success, negative error code on failure
    */
-  int setTilePosition(const ChessPosition &position,
-                      ChessPosition &new_position);
+  int setTilePosition(ChessPosition *position, ChessPosition *new_position);
 
   /**
    * @brief Set tile threshold
@@ -75,7 +74,7 @@ class Tiles {
    * @param threshold The threshold to set
    * @return 0 on success, negative error code on failure
    */
-  int setTileThreshold(const ChessPosition &position, uint16_t threshold);
+  int setTileThreshold(ChessPosition *position, uint16_t threshold);
 
   /**
    * @brief Set tile interval
@@ -83,7 +82,7 @@ class Tiles {
    * @param interval The interval to set
    * @return 0 on success, negative error code on failure
    */
-  int setTileInterval(const ChessPosition &position, uint8_t interval);
+  int setTileInterval(ChessPosition *position, uint8_t interval);
 
   /**
    * @brief Set trigger handler
@@ -100,7 +99,7 @@ class Tiles {
   };
   Tile tiles[64];
 
-  static uint8_t positionToIndex(const ChessPosition &position);
+  static uint8_t positionToIndex(ChessPosition *position);
   static ChessPosition indexToPosition(uint8_t index);
 
  private:

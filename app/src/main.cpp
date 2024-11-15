@@ -15,6 +15,7 @@
 #include <zephyr/usb/usb_device.h>
 
 #include "display.h"
+#include "highlights.h"
 #include "tiles.h"
 
 #define CONFIG_BOARD "nRF52840"
@@ -39,29 +40,34 @@ Tiles tiles;
 Chess chess;
 
 void gameStartedCb() { LOG_INF("Game started\n"); }
+
 void gameEndedCb() { LOG_INF("Game ended\n"); }
-void moveMadeCb(ChessMove move) {
+
+void moveMadeCb(ChessMove *move) {
   char buff[7];
-  move.toString(buff);
+  move->toString(buff);
   buff[6] = '\0';
   LOG_INF("Move made: %s\n", buff);
 }
-void pieceHighlightedCb(ChessPosition position) {
+
+void pieceHighlightedCb(ChessPosition *position, ChessHighlightType type) {
   char buff[3];
-  position.toString(buff);
+  position->toString(buff);
   buff[2] = '\0';
   LOG_INF("Piece at %s highlighted\n", buff);
 
   tiles.setTileColor(position, 0x00FF00);
 }
-void pieceUnhighlightedCb(ChessPosition position) {
+
+void pieceUnhighlightedCb(ChessPosition *position) {
   char buff[3];
-  position.toString(buff);
+  position->toString(buff);
   buff[2] = '\0';
   LOG_INF("Piece at %s unhighlighted\n", buff);
 
   tiles.setTileColor(position, 0x000000);
 }
+
 void tilesChangeCallback(const struct device *dev,
                          const struct sensor_trigger *trg) {
   struct sensor_value buff;
@@ -88,12 +94,12 @@ void tilesChangeCallback(const struct device *dev,
 
     if (state_changed) {
       // Test log
-      /* char buff[3];
+      char buff[3];
       position->toString(buff);
       buff[2] = '\0';
 
       LOG_INF("Tile at %s has been %s\n", buff,
-              state ? "put down" : "picked up"); */
+              state ? "put down" : "picked up");
 
       tile->state = state;
       ChessTileActionType action =
@@ -124,6 +130,8 @@ int main() {
   }
   LOG_INF("Tiles initialized\n");
 
+  refreshTilesColor(&tiles);
+
   LOG_INF("Initializing displays");
   white_display.init();
   black_display.init();
@@ -148,7 +156,8 @@ int main() {
 
   while (true) {
     lv_task_handler();
-    k_sleep(K_MSEC(100));
+    refreshTilesColor(&tiles);
+    k_sleep(K_MSEC(1000));
   }
 
   return 0;

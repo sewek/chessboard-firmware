@@ -50,7 +50,7 @@ int Tiles::init() {
         &buff_color);
 
     ChessPosition ch1_position = ChessPosition((uint8_t)(buff_pos.val1));
-    this->tiles[Tiles::positionToIndex(ch1_position)] =
+    this->tiles[Tiles::positionToIndex(&ch1_position)] =
         Tile(&ch1_position, buff_color.val1, buff_state.val1 & 0x01,
              (device *)dev, 1);
 
@@ -65,7 +65,7 @@ int Tiles::init() {
                     &buff_color);
 
     ChessPosition ch2_position = ChessPosition((uint8_t)buff_pos.val1);
-    this->tiles[Tiles::positionToIndex(ch2_position)] =
+    this->tiles[Tiles::positionToIndex(&ch2_position)] =
         Tile(&ch2_position, buff_color.val1, buff_state.val1 & 0x02,
              (device *)dev, 2);
 
@@ -80,7 +80,7 @@ int Tiles::init() {
                     &buff_color);
 
     ChessPosition ch3_position = ChessPosition((uint8_t)buff_pos.val1);
-    this->tiles[Tiles::positionToIndex(ch3_position)] =
+    this->tiles[Tiles::positionToIndex(&ch3_position)] =
         Tile(&ch3_position, buff_color.val1, buff_state.val1 & 0x04,
              (device *)dev, 3);
 
@@ -95,10 +95,11 @@ int Tiles::init() {
                     &buff_color);
 
     ChessPosition ch4_position = ChessPosition((uint8_t)buff_pos.val1);
-    this->tiles[Tiles::positionToIndex(ch4_position)] =
+    this->tiles[Tiles::positionToIndex(&ch4_position)] =
         Tile(&ch4_position, buff_color.val1, buff_state.val1 & 0x08,
              (device *)dev, 4);
 
+#ifdef CONFIG_TILES_SENSOR_TRIGGER
     // Trigger
     if (this->trigger_handler != nullptr) {
       if (sensor_trigger_set(dev, &this->trigger, this->trigger_handler) < 0) {
@@ -109,6 +110,7 @@ int Tiles::init() {
     } else {
       LOG_WRN("No trigger handler set");
     }
+#endif
   }
 
   return 0;
@@ -116,8 +118,8 @@ int Tiles::init() {
 
 Tile *Tiles::getTiles() { return this->tiles; }
 
-Tile *Tiles::getTile(const ChessPosition &position) {
-  if (Tiles::positionToIndex(position) >= this->tiles_count) {
+Tile *Tiles::getTile(ChessPosition *position) {
+  if (Tiles::positionToIndex(position) >= 64) {
     return nullptr;
   }
 
@@ -128,9 +130,10 @@ void Tiles::setTriggerHandler(sensor_trigger_handler_t handler) {
   trigger_handler = handler;
 }
 
-int Tiles::setTileColor(const ChessPosition &position, uint32_t color) {
-  Tile *tile = getTile(position);
+int Tiles::setTileColor(ChessPosition *position, uint32_t color) {
+  Tile *tile = this->getTile(position);
   if (tile == nullptr) {
+    // LOG_ERR("Tile not found");
     return -ENOEXEC;
   }
 
@@ -141,28 +144,31 @@ int Tiles::setTileColor(const ChessPosition &position, uint32_t color) {
       .val2 = 0,
   };
 
+  // LOG_INF("Setting tile color to %x", color);
+
   if (sensor_attr_set(tile->dev,
                       (enum sensor_channel)SENSOR_CHAN_TILES_LED_COLOR,
                       (enum sensor_attribute)(SENSOR_ATTR_TILES_LED_CH1_COLOR +
                                               tile->channel - 1),
                       &buff) < 0) {
+    // LOG_ERR("Failed to set tile color");
     return -ENOTSUP;
   }
 
   return 0;
 }
 
-int Tiles::setTilePosition(const ChessPosition &position,
-                           ChessPosition &new_position) {
+int Tiles::setTilePosition(ChessPosition *position,
+                           ChessPosition *new_position) {
   Tile *tile = getTile(position);
   if (tile == nullptr) {
     return -ENOEXEC;
   }
 
-  tile->position = new_position;
+  tile->position = *new_position;
 
   struct sensor_value buff = {
-      .val1 = new_position.toData(),
+      .val1 = new_position->toData(),
       .val2 = 0,
   };
 
@@ -176,7 +182,7 @@ int Tiles::setTilePosition(const ChessPosition &position,
   return 0;
 }
 
-int Tiles::setTileThreshold(const ChessPosition &position, uint16_t threshold) {
+int Tiles::setTileThreshold(ChessPosition *position, uint16_t threshold) {
   Tile *tile = getTile(position);
   if (tile == nullptr) {
     return -ENOEXEC;
@@ -198,7 +204,7 @@ int Tiles::setTileThreshold(const ChessPosition &position, uint16_t threshold) {
   return 0;
 }
 
-int Tiles::setTileInterval(const ChessPosition &position, uint8_t interval) {
+int Tiles::setTileInterval(ChessPosition *position, uint8_t interval) {
   Tile *tile = getTile(position);
   if (tile == nullptr) {
     return -ENOEXEC;
@@ -220,15 +226,15 @@ int Tiles::setTileInterval(const ChessPosition &position, uint8_t interval) {
   return 0;
 }
 
-uint8_t Tiles::positionToIndex(const ChessPosition &position) {
-  if (!position.isValid()) {
+uint8_t Tiles::positionToIndex(ChessPosition *position) {
+  if (!position->isValid()) {
     LOG_ERR("Invalid position");
     return 0;
   }
 
-  return (position.getRank() - 1) * 8 + position.getFile() - 1;
+  return (position->getFile() - 1) * 8 + (position->getRank() - 1);
 }
 
 ChessPosition Tiles::indexToPosition(uint8_t index) {
-  return ChessPosition(index / 8 + 1, index % 8 + 1);
+  return ChessPosition((index / 8) + 1, (index % 8) + 1);
 }
