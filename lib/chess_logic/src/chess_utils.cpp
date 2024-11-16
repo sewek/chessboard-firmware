@@ -2,7 +2,7 @@
 
 ChessPiece *Chess::findPiece(ChessPosition *position) {
   for (int i = 0; i < 32; ++i) {
-    if (this->piece[i].position == position) {
+    if (*this->piece[i].position == *position) {
       return &this->piece[i];
     }
   }

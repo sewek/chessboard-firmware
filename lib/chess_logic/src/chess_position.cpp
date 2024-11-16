@@ -7,12 +7,21 @@
 #include "chess_position.h"
 
 ChessPosition::ChessPosition(const char file, int rank) {
-  if (file < 'a' || file > 'h' || rank < 1 || rank > 8) {
+  if ((file < 'a' || file > 'h') && (rank < 1 || rank > 8)) {
     this->data_ = 0;
     return;
   }
 
-  this->data_ = ((file - 'a' + 1) << 4) | (rank);
+  if (rank < 1 || rank > 8) {
+    this->data_ = 0;
+    return;
+  }
+
+  if (file >= 'a' && file <= 'h') {
+    this->data_ = ((file - 'a' + 1) << 4) | (rank);
+  } else {
+    this->data_ = (file << 4) | (rank);
+  }
 }
 
 ChessPosition::ChessPosition(const char* position) {

@@ -24,4 +24,6 @@ uint32_t getTileDarkColor();
 
 void refreshTilesColor(Tiles* tiles);
 
+void refreshTileColor(Tiles* tiles, ChessPosition* position);
+
 #endif  // HIGHLIGHTS_H

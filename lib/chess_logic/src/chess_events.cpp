@@ -1,5 +1,7 @@
 #include "chess_events.h"
 
+#include "chess_log.h"
+
 ChessEvents::ChessEvents() = default;
 
 ChessEvents::~ChessEvents() = default;
@@ -93,50 +95,55 @@ void ChessEvents::removeListener(
 }
 
 void ChessEvents::notifyGameStarted() {
-  for (const auto& callback : this->callbacksGameStarted_) {
-    if (callback != nullptr) {
-      callback();
+  for (int i = 0; i < this->callbackCountGameStarted_; i++) {
+    if (this->callbacksGameStarted_[i]) {
+      this->callbacksGameStarted_[i]();
     }
   }
 }
 
 void ChessEvents::notifyGameEnded() {
-  for (const auto& callback : this->callbacksGameEnded_) {
-    if (callback != nullptr) {
-      callback();
+  for (int i = 0; i < this->callbackCountGameEnded_; i++) {
+    if (this->callbacksGameEnded_[i]) {
+      this->callbacksGameEnded_[i]();
     }
   }
 }
 
 void ChessEvents::notifyMoveMade(ChessMove* move) {
-  for (const auto& callback : this->callbacksMoveMade_) {
-    if (callback != nullptr) {
-      callback(move);
+  for (int i = 0; i < this->callbackCountMoveMade_; i++) {
+    if (this->callbacksMoveMade_[i]) {
+      this->callbacksMoveMade_[i](move);
     }
   }
 }
 
 void ChessEvents::notifyHighlightSquare(ChessPosition* position,
                                         ChessHighlightType type) {
-  for (const auto& callback : this->callbacksHighlightSquare_) {
-    if (callback != nullptr) {
-      callback(position, type);
+  print_debug("Highlighting square\n");
+  for (int i = 0; i < this->callbackCountHighlightSquare_; i++) {
+    if (this->callbacksHighlightSquare_[i]) {
+      print_debug("Executing callback %d %p\n", i,
+                  this->callbacksHighlightSquare_[i]);
+      this->callbacksHighlightSquare_[i](position, type);
+    } else {
+      print_debug("Callback %d is null\n", i);
     }
   }
 }
 
 void ChessEvents::notifyUnhighlightSquare(ChessPosition* position) {
-  for (const auto& callback : this->callbacksUnhighlightSquare_) {
-    if (callback != nullptr) {
-      callback(position);
+  for (int i = 0; i < this->callbackCountUnhighlightSquare_; i++) {
+    if (this->callbacksUnhighlightSquare_[i]) {
+      this->callbacksUnhighlightSquare_[i](position);
     }
   }
 }
 
 void ChessEvents::notifyGameCannotStart(ChessPosition* position) {
-  for (const auto& callback : this->callbacksGameCantStart_) {
-    if (callback != nullptr) {
-      callback(position);
+  for (int i = 0; i < this->callbackCountGameCantStart_; i++) {
+    if (this->callbacksGameCantStart_[i]) {
+      this->callbacksGameCantStart_[i](position);
     }
   }
 }

@@ -151,6 +151,10 @@ static int tiles_attr_set(const struct device *dev, enum sensor_channel chan,
     return -ENOTSUP;
   }
 
+  if (k_sem_take(&data->sem, K_MSEC(100)) < 0) {
+    return -EBUSY;
+  }
+
   switch ((enum sensor_attribute_tiles)attr) {
     case SENSOR_ATTR_TILES_RESET:
       if (val->val1) {
@@ -281,6 +285,8 @@ static int tiles_attr_set(const struct device *dev, enum sensor_channel chan,
       LOG_ERR("Sensor attribute not supported");
       ret = -ENOTSUP;
   }
+
+  k_sem_give(&data->sem);
 
   return ret;
 }

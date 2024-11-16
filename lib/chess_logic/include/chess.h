@@ -4,6 +4,7 @@
 #include "chess_board.h"
 #include "chess_events.h"
 #include "chess_game.h"
+#include "chess_log.h"
 #include "chess_piece.h"
 #include "chess_types.h"
 
