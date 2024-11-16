@@ -18,9 +18,9 @@ ChessPosition::ChessPosition(const char file, int rank) {
   }
 
   if (file >= 'a' && file <= 'h') {
-    this->data_ = ((file - 'a' + 1) << 4) | (rank);
+    this->data_ = (((file - 'a' + 1) & 0x0f) << 4) | (rank & 0x0f);
   } else {
-    this->data_ = (file << 4) | (rank);
+    this->data_ = ((file & 0x0f) << 4) | (rank & 0x0f);
   }
 }
 
@@ -38,11 +38,13 @@ ChessPosition::ChessPosition(const char* position) {
 
 ChessPosition::ChessPosition(uint8_t data) { this->data_ = data; }
 
-uint8_t ChessPosition::getFile() const { return (this->data_ >> 4) & 0x07; }
+uint8_t ChessPosition::getFile() const { return (this->data_ >> 4) & 0x0f; }
 
-uint8_t ChessPosition::getRank() const { return this->data_ & 0x07; }
+uint8_t ChessPosition::getRank() const { return this->data_ & 0x0f; }
 
-bool ChessPosition::isValid() const { return this->data_ != 0; }
+bool ChessPosition::isValid() const {
+  return (this->data_ & 0xf0) && (this->data_ & 0x0f);
+}
 
 uint8_t ChessPosition::toData() const { return this->data_; }
 

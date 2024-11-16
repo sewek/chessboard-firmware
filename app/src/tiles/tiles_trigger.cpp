@@ -38,14 +38,6 @@ void tilesChangeCallback(const struct device *dev,
     bool state_changed = (tile->state != state);
 
     if (state_changed) {
-      // Test log
-      char buff[3];
-      position->toString(buff);
-      buff[2] = '\0';
-
-      LOG_INF("CALLBACK: Tile at %s has been %s\n", buff,
-              state ? "put down" : "picked up");
-
       tile->state = state;
 
       while (k_msgq_put(&chess_queue, &tile, K_NO_WAIT) != 0) {

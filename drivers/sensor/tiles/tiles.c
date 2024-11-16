@@ -549,7 +549,7 @@ int chessboard_sensor_init(const struct device *dev) {
   data->config = 0;
   data->config |= TILES_ENABLE | TILES_ENABLE_HAL | TILES_ENABLE_LED;
   data->hal_interval = 0x32;   // 50ms
-  data->hal_threshold = 0x0a;  // 10G * 1.4mV/G = 14mV
+  data->hal_threshold = 0x0c;  // 15G * 1.4mV/G = 21mV
 
   /* set HAL interval */
   if (i2c_reg_write_byte_dt(&cfg->i2c, TILES_REG_HAL_INTERVAL,

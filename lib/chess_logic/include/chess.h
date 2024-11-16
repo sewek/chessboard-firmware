@@ -171,6 +171,7 @@ class Chess : public ChessEvents {
   void endSimulation();
   void simulateMove(ChessMove *move);
   bool isCastlingPossible(ChessCastlingType type, ChessColor color);
+  ChessPosition *getPosition(const char *position);
 };
 
 #endif  // _CHESS_LOGIC_H_
