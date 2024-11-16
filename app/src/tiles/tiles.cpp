@@ -133,7 +133,12 @@ void Tiles::setTriggerHandler(sensor_trigger_handler_t handler) {
 int Tiles::setTileColor(ChessPosition *position, uint32_t color) {
   Tile *tile = this->getTile(position);
   if (tile == nullptr) {
-    // LOG_ERR("Tile not found");
+    LOG_ERR("Tile not found");
+    return -ENOEXEC;
+  }
+
+  if (tile->dev == nullptr) {
+    LOG_ERR("Device not found");
     return -ENOEXEC;
   }
 
@@ -144,14 +149,14 @@ int Tiles::setTileColor(ChessPosition *position, uint32_t color) {
       .val2 = 0,
   };
 
-  // LOG_INF("Setting tile color to %x", color);
+  LOG_INF("Setting tile color to %x", color);
 
   if (sensor_attr_set(tile->dev,
                       (enum sensor_channel)SENSOR_CHAN_TILES_LED_COLOR,
                       (enum sensor_attribute)(SENSOR_ATTR_TILES_LED_CH1_COLOR +
                                               tile->channel - 1),
                       &buff) < 0) {
-    // LOG_ERR("Failed to set tile color");
+    LOG_ERR("Failed to set tile color");
     return -ENOTSUP;
   }
 

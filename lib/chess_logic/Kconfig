@@ -1,6 +1,16 @@
 
+menu "Chess library configuration"
+
+config CHESS_LIB_DEBUG
+   bool "Enable chess library debug"
+   default n
+   help
+      Enable debug messages in the chess library.
+
 config CHESS_LIB_TEST
    bool "Enable chess library tests"
    default n
    help
       Enable test version without checking for correct positions of pieces.
+
+endmenu

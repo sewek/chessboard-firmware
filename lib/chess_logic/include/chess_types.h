@@ -112,6 +112,14 @@ enum class ChessHighlightType {
   CaptureMove,
   Check,
   Error,
+  Info,
+};
+
+enum class ChessLogLevel {
+  Debug = 0,
+  Info,
+  Warning,
+  Error,
 };
 
 #endif  // CHESS_LOGIC_TYPES_H

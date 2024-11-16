@@ -215,12 +215,11 @@
       compatible = "chess,tiles";
    };
 
-   tile2: tiles@42 {
+   /* tile2: tiles@42 {
       status = "okay";
       reg = <0x42>;
       compatible = "chess,tiles";
-   };
-
+   }; */
 
    /*
    tiles3: tiles@43 {
@@ -240,7 +239,6 @@
       reg = <0x45>;
       compatible = "chess,tiles";
    };
-
 };
 
 &spi3 {

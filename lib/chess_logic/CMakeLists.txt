@@ -19,6 +19,10 @@ set(SOURCES
    src/chess_move.cpp
    src/chess_events.cpp
    src/chess_game.cpp
+   src/chess_piece.cpp
+   src/chess_simulation.cpp
+   src/chess_utils.cpp
+   src/chess_logic.cpp
 )
 
 #include_directories(include)

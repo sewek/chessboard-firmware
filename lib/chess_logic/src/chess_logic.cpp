@@ -89,7 +89,7 @@ uint8_t Chess::getAvailablePositions(ChessPiece *piece,
 
     // po prostym ruchy
     case ChessPieceType::Rook: {
-      for (int road = 1; road <= 7; ++road) {
+      for (uint8_t road = 1; road <= 7; ++road) {
         tempPosition =
             ChessPosition(position->getFile() + road, position->getRank());
         if (!tempPosition.isValid()) {
@@ -107,7 +107,7 @@ uint8_t Chess::getAvailablePositions(ChessPiece *piece,
         }
       }
 
-      for (int road = 1; road <= 7; ++road) {
+      for (uint8_t road = 1; road <= 7; ++road) {
         tempPosition =
             ChessPosition(position->getFile() - road, position->getRank());
         if (!tempPosition.isValid()) {
@@ -125,7 +125,7 @@ uint8_t Chess::getAvailablePositions(ChessPiece *piece,
         }
       }
 
-      for (int road = 1; road <= 7; ++road) {
+      for (uint8_t road = 1; road <= 7; ++road) {
         tempPosition =
             ChessPosition(position->getFile(), position->getRank() + road);
         if (!tempPosition.isValid()) {
@@ -143,7 +143,7 @@ uint8_t Chess::getAvailablePositions(ChessPiece *piece,
         }
       }
 
-      for (int road = 1; road <= 7; ++road) {
+      for (uint8_t road = 1; road <= 7; ++road) {
         tempPosition =
             ChessPosition(position->getFile(), position->getRank() - road);
         if (!tempPosition.isValid()) {
@@ -160,6 +160,7 @@ uint8_t Chess::getAvailablePositions(ChessPiece *piece,
           break;
         }
       }
+
     } break;
 
     // koń zjebany jakiś nie wiem jak to inzczej

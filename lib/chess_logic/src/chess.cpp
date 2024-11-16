@@ -1,30 +1,60 @@
 
 #include "chess.h"
 
+#include "chess_log.h"
+
 Chess::Chess() = default;
 
 Chess::~Chess() = default;
 
 void Chess::notifyTileAction(ChessPosition *position,
                              ChessTileActionType action) {
+  print_debug(
+      "Tile at %d %d has been %s\n", position->getRank(), position->getFile(),
+      action == ChessTileActionType::PutDown ? "put down" : "picked up");
+
   this->tileState[position->getRank()][position->getFile()] =
       (action == ChessTileActionType::PickUp ? ChessTileState::Available
                                              : ChessTileState::Taken);
 
+  if (this->gameState != ChessGameState::InProgress) {
+    print_debug("Game is not in progress, skipping\n");
+    return;
+  }
+
   ChessPiece *piece = this->findPiece(position);
   ChessColor color = this->getCurrentPlayerColor();
 
+  print_debug("Move made by %s\n",
+              color == ChessColor::White ? "white" : "black");
+  if (piece != nullptr) {
+    print_debug("Found piece type %d, color %s\n", piece->getType(),
+                piece->getColor() == ChessColor::White ? "white" : "black");
+  } else {
+    print_debug("No piece found\n");
+  }
+
+  // Pionek został podniesiony
   if (action == ChessTileActionType::PickUp && piece != nullptr &&
       piece->getColor() == color) {
+    print_debug("First picked up piece\n");
+
     ChessPosition possiblePositions[27];
     uint8_t count = this->getAvailablePositions(piece, possiblePositions);
     this->pickedUpPiece = piece;
 
+    print_debug("Found %d possible positions\n", count);
+    print_debug("Saved picked up piece\n");
+
+    notifyHighlightSquare(piece->getPosition(), ChessHighlightType::Info);
+
     for (int i = 0; i < count; ++i) {
       if (this->findPiece(&possiblePositions[i]) == nullptr) {
+        print_debug("Highlighting normal move\n");
         notifyHighlightSquare(&possiblePositions[i],
                               ChessHighlightType::NormalMove);
       } else {
+        print_debug("Highlighting capture move\n");
         notifyHighlightSquare(&possiblePositions[i],
                               ChessHighlightType::CaptureMove);
       }
@@ -33,13 +63,38 @@ void Chess::notifyTileAction(ChessPosition *position,
     return;
   }
 
+  // Pionek został odłożony na to samo pole
+  if (action == ChessTileActionType::PutDown &&
+      this->pickedUpPiece != nullptr && piece != nullptr &&
+      piece->getPosition() == this->pickedUpPiece->getPosition()) {
+    print_debug("Picked up piece put down on the same position\n");
+
+    ChessPosition possiblePositions[27];
+    uint8_t count =
+        this->getAvailablePositions(this->pickedUpPiece, possiblePositions);
+
+    notifyUnhighlightSquare(this->pickedUpPiece->getPosition());
+    for (int i = 0; i < count; ++i) {
+      notifyUnhighlightSquare(&possiblePositions[i]);
+    }
+
+    this->pickedUpPiece = nullptr;
+    return;
+  }
+
+  // Pionek został odłożony na inne pole
   if (action == ChessTileActionType::PutDown &&
       this->pickedUpPiece != nullptr) {
+    print_debug("Puted down picked up piece\n");
+
     ChessPosition possiblePositions[27];
     uint8_t count =
         this->getAvailablePositions(this->pickedUpPiece, possiblePositions);
     bool isGoodMove = false;
 
+    print_debug("Found %d possible positions to unhighlight\n", count);
+
+    notifyUnhighlightSquare(this->pickedUpPiece->getPosition());
     for (int i = 0; i < count; ++i) {
       notifyUnhighlightSquare(&possiblePositions[i]);
     }
@@ -52,12 +107,18 @@ void Chess::notifyTileAction(ChessPosition *position,
     }
 
     if (isGoodMove) {
+      print_debug("Good move\n");
+
       // TODO: Add move to history
       ChessMove *move = nullptr;
       this->createMove(move, this->pickedUpPiece->getPosition(), position);
       this->applyMove(move);
       // notifyMoveMade(move);
+      this->pickedUpPiece = nullptr;
+
+      print_debug("Move applied\n");
     } else {
+      print_debug("Wrong move\n");
       if (color == ChessColor::White) {
         this->whiteWrongMoves++;
       } else {
@@ -68,16 +129,22 @@ void Chess::notifyTileAction(ChessPosition *position,
                             ChessHighlightType::Error);
     }
   }
+
+  print_debug("End of notifyTileAction\n");
 }
 
 ChessGameStartError Chess::startGame() {
   int err = 0;
 
+  print_debug("Starting game\n");
+
   if (this->gameState == ChessGameState::InProgress) {
+    print_error("Game already started\n");
     return ChessGameStartError::GameAlreadyStarted;
   }
 
   this->gameState = ChessGameState::NotStarted;
+  print_debug("Game state set to not started\n");
 
 #ifndef CONFIG_CHESS_LIB_TEST
   err = this->checkPiecesArrangement();
@@ -94,6 +161,8 @@ ChessGameStartError Chess::startGame() {
 }
 
 int Chess::checkPiecesArrangement() {
+  print_debug("Checking pieces arrangement\n");
+
   for (uint8_t rank = 0; rank < 8; rank++) {
     for (uint8_t file = 0; file < 8; file++) {
       if (this->tileState[rank][file] == ChessTileState::Available &&
@@ -114,11 +183,14 @@ int Chess::checkPiecesArrangement() {
     }
   }
 
+  print_debug("Pieces arrangement is correct\n");
+
   return 0;
 }
 
 // przypisujemy pionki
 void Chess::assignPiecesToPositions() {
+  print_debug("Assigning pieces to positions\n");
 #ifndef CONFIG_CHESS_LIB_TEST
   for (int i = 0; i < 8; ++i) {
     this->piece[i].setPosition(&this->position[i][0]);
@@ -135,9 +207,15 @@ void Chess::assignPiecesToPositions() {
   for (int i = 0; i < 8; ++i) {
     this->piece[24 + i].setPosition(&this->position[i][6]);
   }
+
+  print_debug("Assigned all pieces\n");
+
 #else
   this->piece[0].setPosition(&this->position[0][0]);
-  this->piece[8].setPosition(&this->position[0][1]);
+  this->piece[16].setPosition(&this->position[0][2]);
+
+  print_debug("Piece 0 assigned to position A1\n");
+  // print_debug("Piece 8 assigned to position A2\n");
 #endif
 }
 

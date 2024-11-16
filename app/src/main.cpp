@@ -51,12 +51,13 @@ void moveMadeCb(ChessMove *move) {
 }
 
 void pieceHighlightedCb(ChessPosition *position, ChessHighlightType type) {
+  printk("Highlighting piece\n");
   char buff[3];
   position->toString(buff);
   buff[2] = '\0';
   LOG_INF("Piece at %s highlighted\n", buff);
 
-  tiles.setTileColor(position, 0x00FF00);
+  tiles.setTileColor(position, getColor(type));
 }
 
 void pieceUnhighlightedCb(ChessPosition *position) {
@@ -65,10 +66,10 @@ void pieceUnhighlightedCb(ChessPosition *position) {
   buff[2] = '\0';
   LOG_INF("Piece at %s unhighlighted\n", buff);
 
-  tiles.setTileColor(position, 0x000000);
+  refreshTileColor(&tiles, position);
 }
 
-void tilesChangeCallback(const struct device *dev,
+/* void tilesChangeCallback(const struct device *dev,
                          const struct sensor_trigger *trg) {
   struct sensor_value buff;
   Tile *tile = nullptr;
@@ -92,6 +93,8 @@ void tilesChangeCallback(const struct device *dev,
 
     bool state_changed = (tile->state != state);
 
+    LOG_INF("Tile %d state: %d\n", i, state);
+
     if (state_changed) {
       // Test log
       char buff[3];
@@ -107,7 +110,7 @@ void tilesChangeCallback(const struct device *dev,
       chess.notifyTileAction(position, action);
     }
   }
-}
+} */
 
 int main() {
   LOG_INF("build time: " __DATE__ " " __TIME__ "\n");
@@ -131,6 +134,23 @@ int main() {
   LOG_INF("Tiles initialized\n");
 
   refreshTilesColor(&tiles);
+
+  Tile *tile = nullptr;
+  for (int i = 0; i < 64; i++) {
+    tile = &tiles.tiles[i];
+    if (tile->dev == nullptr) {
+      continue;
+    }
+
+    chess.notifyTileAction(&tile->position, tile->state
+                                                ? ChessTileActionType::PutDown
+                                                : ChessTileActionType::PickUp);
+  }
+
+  if (chess.startGame() != ChessGameStartError::Ok) {
+    LOG_ERR("Failed to start game\n");
+    return -1;
+  }
 
   LOG_INF("Initializing displays");
   white_display.init();
@@ -156,7 +176,6 @@ int main() {
 
   while (true) {
     lv_task_handler();
-    refreshTilesColor(&tiles);
     k_sleep(K_MSEC(1000));
   }
 

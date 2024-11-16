@@ -18,6 +18,8 @@ uint32_t getColor(ChessHighlightType type) {
       return rgbToHex(CHECK_COLOR);
     case ChessHighlightType::Error:
       return rgbToHex(ERROR_COLOR);
+    case ChessHighlightType::Info:
+      return rgbToHex(INFO_COLOR);
     default:
       return rgbToHex(0x000000);
   }
@@ -49,5 +51,23 @@ void refreshTilesColor(Tiles* tiles) {
       tiles->setTileColor(&tile->position, getTileLightColor());
       // LOG_INF("Tile %d is light", i);
     }
+  }
+}
+
+void refreshTileColor(Tiles* tiles, ChessPosition* position) {
+  Tile* tile = tiles->getTile(position);
+  if (tile == nullptr) {
+    return;
+  }
+
+  uint8_t file = position->getFile();
+  uint8_t rank = position->getRank();
+
+  if ((file % 2) == (rank % 2)) {
+    tiles->setTileColor(position, getTileDarkColor());
+    // LOG_INF("Tile %d is dark", i);
+  } else {
+    tiles->setTileColor(position, getTileLightColor());
+    // LOG_INF("Tile %d is light", i);
   }
 }
