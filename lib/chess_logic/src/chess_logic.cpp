@@ -92,99 +92,73 @@ uint8_t Chess::getAvailablePositions(ChessPiece *piece,
     // po prostym ruchy
     case ChessPieceType::Rook: {
       for (uint8_t road = 1; road <= 7; ++road) {
-        print_debug("#1 Road: %d\n", road);
         tempPosition =
             ChessPosition(position->getFile() + road, position->getRank());
         if (!tempPosition.isValid()) {
-          print_debug("Position is not valid, break\n");
           break;
         }
         isOccupied = this->isOccupied(&tempPosition, piece->getColor());
 
         if (isOccupied == 0) {
-          print_debug("Position is not occupied, add\n");
           chessPositions[count++] = tempPosition;
         } else if (isOccupied == -1) {
-          print_debug(
-              "Position is occupied by opponent piece, add and break\n");
           chessPositions[count++] = tempPosition;
           break;
         } else {
-          print_debug("Position is occupied by our piece, break\n");
           break;
         }
       }
 
       for (uint8_t road = 1; road <= 7; ++road) {
-        print_debug("#2 Road: %d\n", road);
         tempPosition =
             ChessPosition(position->getFile() - road, position->getRank());
-        print_debug("Position %d %d\n", tempPosition.getFile(),
-                    tempPosition.getRank());
         if (!tempPosition.isValid()) {
-          print_debug("Position is not valid, break\n");
           break;
         }
         isOccupied = this->isOccupied(&tempPosition, piece->getColor());
 
         if (isOccupied == 0) {
-          print_debug("Position is not occupied, add\n");
           chessPositions[count++] = tempPosition;
         } else if (isOccupied == -1) {
-          print_debug(
-              "Position is occupied by opponent piece, add and break\n");
           chessPositions[count++] = tempPosition;
           break;
         } else {
-          print_debug("Position is occupied by our piece, break\n");
           break;
         }
       }
 
       for (uint8_t road = 1; road <= 7; ++road) {
-        print_debug("#3 Road: %d\n", road);
         tempPosition =
             ChessPosition(position->getFile(), position->getRank() + road);
         if (!tempPosition.isValid()) {
-          print_debug("Position is not valid, break\n");
           break;
         }
         isOccupied = this->isOccupied(&tempPosition, piece->getColor());
 
         if (isOccupied == 0) {
-          print_debug("Position is not occupied, add\n");
           chessPositions[count++] = tempPosition;
         } else if (isOccupied == -1) {
-          print_debug(
-              "Position is occupied by opponent piece, add and break\n");
           chessPositions[count++] = tempPosition;
           break;
         } else {
-          print_debug("Position is occupied by our piece, break\n");
           break;
         }
       }
 
       for (uint8_t road = 1; road <= 7; ++road) {
-        print_debug("#4 Road: %d\n", road);
         tempPosition =
             ChessPosition(position->getFile(), position->getRank() - road);
         if (!tempPosition.isValid()) {
-          print_debug("Position is not valid, break\n");
           break;
         }
         isOccupied = this->isOccupied(&tempPosition, piece->getColor());
 
         if (isOccupied == 0) {
-          print_debug("Position is not occupied, add\n");
           chessPositions[count++] = tempPosition;
         } else if (isOccupied == -1) {
-          print_debug(
-              "Position is occupied by opponent piece, add and break\n");
           chessPositions[count++] = tempPosition;
           break;
         } else {
-          print_debug("Position is occupied by our piece, break\n");
           break;
         }
       }
