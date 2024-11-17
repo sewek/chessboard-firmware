@@ -50,11 +50,9 @@ void Chess::notifyTileAction(ChessPosition *position,
 
     for (int i = 0; i < count; ++i) {
       if (this->findPiece(&possiblePositions[i]) == nullptr) {
-        print_debug("Highlighting normal move\n");
         notifyHighlightSquare(&possiblePositions[i],
                               ChessHighlightType::NormalMove);
       } else {
-        print_debug("Highlighting capture move\n");
         notifyHighlightSquare(&possiblePositions[i],
                               ChessHighlightType::CaptureMove);
       }
@@ -69,13 +67,25 @@ void Chess::notifyTileAction(ChessPosition *position,
       piece->getPosition() == this->pickedUpPiece->getPosition()) {
     print_debug("Picked up piece put down on the same position\n");
 
-    ChessPosition possiblePositions[27];
-    uint8_t count =
-        this->getAvailablePositions(this->pickedUpPiece, possiblePositions);
+    for (int i = 0; i < 8; i++) {
+      for (int j = 0; j < 8; j++) {
+        notifyUnhighlightSquare(&this->position[i][j]);
+      }
+    }
 
-    notifyUnhighlightSquare(this->pickedUpPiece->getPosition());
-    for (int i = 0; i < count; ++i) {
-      notifyUnhighlightSquare(&possiblePositions[i]);
+    ChessPiece *whiteKing =
+        this->findPiece(ChessPieceType::King, ChessColor::White);
+    ChessPiece *blackKing =
+        this->findPiece(ChessPieceType::King, ChessColor::Black);
+
+    if (this->isKingChecked(ChessColor::White)) {
+      notifyHighlightSquare(whiteKing->getPosition(),
+                            ChessHighlightType::Check);
+    }
+
+    if (this->isKingChecked(ChessColor::Black)) {
+      notifyHighlightSquare(blackKing->getPosition(),
+                            ChessHighlightType::Check);
     }
 
     this->pickedUpPiece = nullptr;
@@ -108,15 +118,35 @@ void Chess::notifyTileAction(ChessPosition *position,
 
     if (isGoodMove) {
       print_debug("Good move\n");
-
       // TODO: Add move to history
-      ChessMove *move = nullptr;
+      ChessMove *move = &this->move[this->move_index];
       this->createMove(move, this->pickedUpPiece->getPosition(), position);
       this->applyMove(move);
       // notifyMoveMade(move);
       this->pickedUpPiece = nullptr;
 
       print_debug("Move applied\n");
+
+      ChessPiece *whiteKing =
+          this->findPiece(ChessPieceType::King, ChessColor::White);
+      ChessPiece *blackKing =
+          this->findPiece(ChessPieceType::King, ChessColor::Black);
+
+      for (int i = 0; i < 8; i++) {
+        for (int j = 0; j < 8; j++) {
+          notifyUnhighlightSquare(&this->position[i][j]);
+        }
+      }
+
+      if (this->isKingChecked(ChessColor::White)) {
+        notifyHighlightSquare(whiteKing->getPosition(),
+                              ChessHighlightType::Check);
+      }
+
+      if (this->isKingChecked(ChessColor::Black)) {
+        notifyHighlightSquare(blackKing->getPosition(),
+                              ChessHighlightType::Check);
+      }
     } else {
       print_debug("Wrong move\n");
       if (color == ChessColor::White) {
@@ -127,6 +157,7 @@ void Chess::notifyTileAction(ChessPosition *position,
 
       notifyHighlightSquare(this->pickedUpPiece->getPosition(),
                             ChessHighlightType::Error);
+      notifyHighlightSquare(position, ChessHighlightType::Error);
     }
   }
 
@@ -211,8 +242,12 @@ void Chess::assignPiecesToPositions() {
   print_debug("Assigned all pieces\n");
 
 #else
-  this->piece[0].setPosition(&this->position[0][0]);
-  this->piece[16].setPosition(&this->position[0][2]);
+  this->piece[0].setPosition(this->getPosition("a1"));
+  this->piece[3].setPosition(this->getPosition("b1"));
+  this->piece[1].setPosition(this->getPosition("d2"));
+  this->piece[18].setPosition(this->getPosition("a3"));
+  this->piece[20].setPosition(this->getPosition("d4"));
+  this->piece[24].setPosition(this->getPosition("b4"));
 
   print_debug("Piece 0 assigned to position A1\n");
   // print_debug("Piece 8 assigned to position A2\n");

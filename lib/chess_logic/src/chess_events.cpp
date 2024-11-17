@@ -1,7 +1,5 @@
 #include "chess_events.h"
 
-#include "chess_log.h"
-
 ChessEvents::ChessEvents() = default;
 
 ChessEvents::~ChessEvents() = default;
@@ -120,14 +118,9 @@ void ChessEvents::notifyMoveMade(ChessMove* move) {
 
 void ChessEvents::notifyHighlightSquare(ChessPosition* position,
                                         ChessHighlightType type) {
-  print_debug("Highlighting square\n");
   for (int i = 0; i < this->callbackCountHighlightSquare_; i++) {
     if (this->callbacksHighlightSquare_[i]) {
-      print_debug("Executing callback %d %p\n", i,
-                  this->callbacksHighlightSquare_[i]);
       this->callbacksHighlightSquare_[i](position, type);
-    } else {
-      print_debug("Callback %d is null\n", i);
     }
   }
 }

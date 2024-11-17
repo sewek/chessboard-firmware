@@ -82,7 +82,10 @@
       "printk.h": "c",
       "lvgl_display.h": "c",
       "lv_disp.h": "c",
-      "lv_hal.h": "c"
+      "lv_hal.h": "c",
+      "future": "cpp",
+      "type_traits": "cpp",
+      "forward_list": "cpp"
    },
    "cmake.sourceDirectory": "${workspaceFolder}",
    "cmake.buildDirectory": "${workspaceFolder}/build",

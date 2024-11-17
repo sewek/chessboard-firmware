@@ -1,4 +1,5 @@
 #include "chess.h"
+#include "chess_log.h"
 
 ChessPiece *Chess::findPiece(ChessPosition *position) {
   for (int i = 0; i < 32; ++i) {
@@ -41,25 +42,23 @@ int Chess::isOccupied(ChessPosition *position, ChessColor color) {
 
   if (found->getColor() == color) {
     return 1;  // nasza figura
-  } else {
-    return -1;  // figura prezciwnika
   }
+
+  return -1;  // figura prezciwnika
 }
 
 // szach ten tego
 bool Chess::isKingChecked(ChessColor color) {
-  ChessPosition *kingPosition = nullptr;
+  ChessPiece *king = this->findPiece(ChessPieceType::King, color);
   ChessPiece *oponent = nullptr;
 
-  for (int i = 0; i < 32; ++i) {
-    if (this->piece[i].getType() == ChessPieceType::King &&
-        this->piece[i].getColor() == this->piece->getColor()) {
-      kingPosition = this->piece[i].getPosition();
-      break;
-    }
+  if (king == nullptr) {
+    print_error("King not found\n");
+    return false;  // błąd
   }
 
-  if (kingPosition == nullptr) {
+  if (king->getPosition() == nullptr) {
+    print_error("King not on board\n");
     return false;  // błąd
   }
 
@@ -69,16 +68,20 @@ bool Chess::isKingChecked(ChessColor color) {
   for (int i = 0; i < 32; ++i) {
     oponent = &this->piece[i];
 
+    if (oponent->getPosition() == nullptr || oponent->isOnBoard == false) {
+      continue;
+    }
+
     if (oponent->getColor() == color) {
       continue;
     }
 
-    positionsCount = this->getAvailablePositions(oponent, positions);
-    for (int j = 0; j < positionsCount; ++j) {
-      currentPosition = &positions[i];
+    positionsCount = this->getAvailablePositions(oponent, positions, false);
 
-      if (currentPosition == kingPosition) {
-        notifyHighlightSquare(kingPosition, ChessHighlightType::Check);
+    for (int j = 0; j < positionsCount; ++j) {
+      currentPosition = &positions[j];
+
+      if (*currentPosition == *king->getPosition()) {
         return true;  // szach
       }
     }
@@ -225,12 +228,19 @@ bool Chess::isCastlingPossible(ChessCastlingType type, ChessColor color) {
 
 void Chess::createMove(ChessMove *move, ChessPosition *from,
                        ChessPosition *to) {
+  print_debug("Creating move\n");
   if (move == nullptr) {
-    move = &this->move[this->move_index];
+    print_error("Move is null\n");
+    return;
   }
 
   ChessPiece *piece = this->findPiece(from);
   ChessPiece *oponent = this->findPiece(to);
+
+  if (oponent != nullptr) {
+    print_debug("Found oponent piece %d %s\n", oponent->getType(),
+                oponent->getColor() == ChessColor::White ? "white" : "black");
+  }
 
   move->setFrom(from);
   move->setTo(to);
@@ -243,15 +253,32 @@ void Chess::createMove(ChessMove *move, ChessPosition *from,
 }
 
 void Chess::applyMove(ChessMove *move) {
+  print_debug("Applying move\n");
   ChessPiece *piece = this->findPiece(move->getFrom());
   ChessPiece *oponent = this->findPiece(move->getTo());
 
   if (oponent != nullptr) {
     oponent->setPosition(nullptr);
+    print_debug("Captured piece\n");
   }
+
+  print_debug("Moving piece from %d %d to %d %d\n", move->getFrom()->getRank(),
+              move->getFrom()->getFile(), move->getTo()->getRank(),
+              move->getTo()->getFile());
 
   piece->setPosition(move->getTo());
   piece->setLastMove(move);
 
   this->move_index++;
+}
+
+ChessPosition *Chess::getPosition(const char *position) {
+  uint8_t file = position[0] - 'a';
+  uint8_t rank = position[1] - '1';
+
+  if (file < 0 || file > 7 || rank < 0 || rank > 7) {
+    return nullptr;
+  }
+
+  return &this->position[file][rank];
 }

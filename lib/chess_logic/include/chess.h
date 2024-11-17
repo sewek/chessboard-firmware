@@ -155,7 +155,8 @@ class Chess : public ChessEvents {
   // void highlightPositions(ChessPosition *position, uint8_t count);
   ChessColor getCurrentPlayerColor();
   uint8_t getAvailablePositions(ChessPiece *piece,
-                                ChessPosition *chessPositions);
+                                ChessPosition *chessPositions,
+                                bool removeKingCheck = true);
   bool isKingChecked(ChessColor color);
   bool willBeKingChecked(ChessPosition *kingPosition, ChessColor color);
   ChessPiece *findPiece(ChessPosition *position);
@@ -171,6 +172,7 @@ class Chess : public ChessEvents {
   void endSimulation();
   void simulateMove(ChessMove *move);
   bool isCastlingPossible(ChessCastlingType type, ChessColor color);
+  ChessPosition *getPosition(const char *position);
 };
 
 #endif  // _CHESS_LOGIC_H_
