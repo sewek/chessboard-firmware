@@ -155,7 +155,8 @@ class Chess : public ChessEvents {
   // void highlightPositions(ChessPosition *position, uint8_t count);
   ChessColor getCurrentPlayerColor();
   uint8_t getAvailablePositions(ChessPiece *piece,
-                                ChessPosition *chessPositions);
+                                ChessPosition *chessPositions,
+                                bool removeKingCheck = true);
   bool isKingChecked(ChessColor color);
   bool willBeKingChecked(ChessPosition *kingPosition, ChessColor color);
   ChessPiece *findPiece(ChessPosition *position);

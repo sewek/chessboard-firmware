@@ -67,13 +67,25 @@ void Chess::notifyTileAction(ChessPosition *position,
       piece->getPosition() == this->pickedUpPiece->getPosition()) {
     print_debug("Picked up piece put down on the same position\n");
 
-    ChessPosition possiblePositions[27];
-    uint8_t count =
-        this->getAvailablePositions(this->pickedUpPiece, possiblePositions);
+    for (int i = 0; i < 8; i++) {
+      for (int j = 0; j < 8; j++) {
+        notifyUnhighlightSquare(&this->position[i][j]);
+      }
+    }
 
-    notifyUnhighlightSquare(this->pickedUpPiece->getPosition());
-    for (int i = 0; i < count; ++i) {
-      notifyUnhighlightSquare(&possiblePositions[i]);
+    ChessPiece *whiteKing =
+        this->findPiece(ChessPieceType::King, ChessColor::White);
+    ChessPiece *blackKing =
+        this->findPiece(ChessPieceType::King, ChessColor::Black);
+
+    if (this->isKingChecked(ChessColor::White)) {
+      notifyHighlightSquare(whiteKing->getPosition(),
+                            ChessHighlightType::Check);
+    }
+
+    if (this->isKingChecked(ChessColor::Black)) {
+      notifyHighlightSquare(blackKing->getPosition(),
+                            ChessHighlightType::Check);
     }
 
     this->pickedUpPiece = nullptr;
@@ -106,15 +118,35 @@ void Chess::notifyTileAction(ChessPosition *position,
 
     if (isGoodMove) {
       print_debug("Good move\n");
-
       // TODO: Add move to history
-      ChessMove *move = nullptr;
+      ChessMove *move = &this->move[this->move_index];
       this->createMove(move, this->pickedUpPiece->getPosition(), position);
       this->applyMove(move);
       // notifyMoveMade(move);
       this->pickedUpPiece = nullptr;
 
       print_debug("Move applied\n");
+
+      ChessPiece *whiteKing =
+          this->findPiece(ChessPieceType::King, ChessColor::White);
+      ChessPiece *blackKing =
+          this->findPiece(ChessPieceType::King, ChessColor::Black);
+
+      for (int i = 0; i < 8; i++) {
+        for (int j = 0; j < 8; j++) {
+          notifyUnhighlightSquare(&this->position[i][j]);
+        }
+      }
+
+      if (this->isKingChecked(ChessColor::White)) {
+        notifyHighlightSquare(whiteKing->getPosition(),
+                              ChessHighlightType::Check);
+      }
+
+      if (this->isKingChecked(ChessColor::Black)) {
+        notifyHighlightSquare(blackKing->getPosition(),
+                              ChessHighlightType::Check);
+      }
     } else {
       print_debug("Wrong move\n");
       if (color == ChessColor::White) {
@@ -125,6 +157,7 @@ void Chess::notifyTileAction(ChessPosition *position,
 
       notifyHighlightSquare(this->pickedUpPiece->getPosition(),
                             ChessHighlightType::Error);
+      notifyHighlightSquare(position, ChessHighlightType::Error);
     }
   }
 

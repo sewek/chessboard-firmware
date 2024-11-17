@@ -49,18 +49,16 @@ int Chess::isOccupied(ChessPosition *position, ChessColor color) {
 
 // szach ten tego
 bool Chess::isKingChecked(ChessColor color) {
-  ChessPosition *kingPosition = nullptr;
+  ChessPiece *king = this->findPiece(ChessPieceType::King, color);
   ChessPiece *oponent = nullptr;
 
-  for (int i = 0; i < 32; ++i) {
-    if (this->piece[i].getType() == ChessPieceType::King &&
-        this->piece[i].getColor() == this->piece->getColor()) {
-      kingPosition = this->piece[i].getPosition();
-      break;
-    }
+  if (king == nullptr) {
+    print_error("King not found\n");
+    return false;  // błąd
   }
 
-  if (kingPosition == nullptr) {
+  if (king->getPosition() == nullptr) {
+    print_error("King not on board\n");
     return false;  // błąd
   }
 
@@ -70,16 +68,20 @@ bool Chess::isKingChecked(ChessColor color) {
   for (int i = 0; i < 32; ++i) {
     oponent = &this->piece[i];
 
+    if (oponent->getPosition() == nullptr || oponent->isOnBoard == false) {
+      continue;
+    }
+
     if (oponent->getColor() == color) {
       continue;
     }
 
-    positionsCount = this->getAvailablePositions(oponent, positions);
-    for (int j = 0; j < positionsCount; ++j) {
-      currentPosition = &positions[i];
+    positionsCount = this->getAvailablePositions(oponent, positions, false);
 
-      if (currentPosition == kingPosition) {
-        notifyHighlightSquare(kingPosition, ChessHighlightType::Check);
+    for (int j = 0; j < positionsCount; ++j) {
+      currentPosition = &positions[j];
+
+      if (*currentPosition == *king->getPosition()) {
         return true;  // szach
       }
     }
@@ -228,13 +230,13 @@ void Chess::createMove(ChessMove *move, ChessPosition *from,
                        ChessPosition *to) {
   print_debug("Creating move\n");
   if (move == nullptr) {
-    move = &this->move[this->move_index];
+    print_error("Move is null\n");
+    return;
   }
 
   ChessPiece *piece = this->findPiece(from);
   ChessPiece *oponent = this->findPiece(to);
-  print_debug("Found piece %d %s\n", piece->getType(),
-              piece->getColor() == ChessColor::White ? "white" : "black");
+
   if (oponent != nullptr) {
     print_debug("Found oponent piece %d %s\n", oponent->getType(),
                 oponent->getColor() == ChessColor::White ? "white" : "black");

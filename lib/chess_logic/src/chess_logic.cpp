@@ -11,7 +11,8 @@ static void removePosition(ChessPosition *array, uint8_t *count,
 
 // moliwe ruchy figur
 uint8_t Chess::getAvailablePositions(ChessPiece *piece,
-                                     ChessPosition *chessPositions) {
+                                     ChessPosition *chessPositions,
+                                     bool removeKingCheck) {
   uint8_t count = 0;
   ChessPosition *position = piece->getPosition();
   ChessPosition tempPosition = ChessPosition(0, 0);  // tymczasowa zmienna
@@ -454,18 +455,21 @@ uint8_t Chess::getAvailablePositions(ChessPiece *piece,
   }
 
   // Symulujemy ruchy i sprawdzamy czy król jest szachowany
-  ChessMove simulatedMove;
-  for (uint8_t i = 0; i < count; i++) {
-    this->startSimulation();
+  if (removeKingCheck) {
+    ChessMove simulatedMove;
+    for (int i = 0; i < count; i++) {
+      this->startSimulation();
 
-    simulatedMove = ChessMove(position, &chessPositions[i]);
-    this->simulateMove(&simulatedMove);
+      simulatedMove = ChessMove(position, &chessPositions[i]);
+      this->simulateMove(&simulatedMove);
 
-    if (this->isKingChecked(piece->getColor())) {
-      removePosition(chessPositions, &count, i);
+      if (this->isKingChecked(piece->getColor())) {
+        removePosition(chessPositions, &count, i);
+        i--;
+      }
+
+      this->endSimulation();
     }
-
-    this->endSimulation();
   }
 
   return count;
