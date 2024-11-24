@@ -16,6 +16,7 @@ target_sources(app PRIVATE src/main.cpp src/highlights.cpp)
 add_subdirectory(src/tiles)
 add_subdirectory(src/display)
 add_subdirectory(src/screens)
+add_subdirectory(src/buttons)
 
 # Include directories
 zephyr_include_directories(include)
