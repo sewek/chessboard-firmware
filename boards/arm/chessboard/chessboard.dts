@@ -129,16 +129,16 @@
    };
 
    aliases {
-      sw0 = &button0_0;
-      sw1 = &button0_1;
-      sw2 = &button0_2;
-      sw3 = &button0_3;
-      sw4 = &button0_4;
-      sw5 = &button1_0;
-      sw6 = &button1_1;
-      sw7 = &button1_2;
-      sw8 = &button1_3;
-      sw9 = &button1_4;
+      btn0 = &button0_0;
+      btn1 = &button0_1;
+      btn2 = &button0_2;
+      btn3 = &button0_3;
+      btn4 = &button0_4;
+      btn5 = &button1_0;
+      btn6 = &button1_1;
+      btn7 = &button1_2;
+      btn8 = &button1_3;
+      btn9 = &button1_4;
       bootloader-led0 = &mcuboot_led;
       mcuboot-button0 = &mcuboot_btn;
       mcuboot-led0 = &mcuboot_led;
