@@ -242,12 +242,16 @@ void Chess::assignPiecesToPositions() {
   print_debug("Assigned all pieces\n");
 
 #else
+  /*
   this->piece[0].setPosition(this->getPosition("a1"));
   this->piece[3].setPosition(this->getPosition("b1"));
   this->piece[1].setPosition(this->getPosition("d2"));
   this->piece[18].setPosition(this->getPosition("a3"));
   this->piece[20].setPosition(this->getPosition("d4"));
   this->piece[24].setPosition(this->getPosition("b4"));
+  */
+  this->piece[8].setPosition(this->getPosition("c2"));
+  this->piece[30].setPosition(this->getPosition("b4"));
 
   print_debug("Piece 0 assigned to position A1\n");
   // print_debug("Piece 8 assigned to position A2\n");
