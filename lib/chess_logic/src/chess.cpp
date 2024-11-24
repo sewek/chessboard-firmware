@@ -138,29 +138,89 @@ void Chess::notifyTileAction(ChessPosition *position,
         }
       }
 
+      if (this->repeatedPosition >= 10) {
+        this->gameResult = ChessGameResult::Draw;
+        this->gameState = ChessGameState::Ended;
+        notifyGameEnded();
+        return;
+      }
+
+      if (this->isMatPossible() == false) {
+        this->gameResult = ChessGameResult::Draw;
+        this->gameState = ChessGameState::Ended;
+        notifyGameEnded();
+        return;
+      }
+
+      if (this->movesFor50Rule == 100) {
+        this->gameResult = ChessGameResult::Draw;
+        this->gameState = ChessGameState::Ended;
+        notifyGameEnded();
+        return;
+      }
+
       if (this->isKingChecked(ChessColor::White)) {
         notifyHighlightSquare(whiteKing->getPosition(),
                               ChessHighlightType::Check);
+      }
+
+      if (this->isKingCheckmate(ChessColor::White)) {
+        notifyHighlightSquare(whiteKing->getPosition(),
+                              ChessHighlightType::Checkmate);
+        this->gameResult = ChessGameResult::BlackWins;
+        this->gameState = ChessGameState::Ended;
+        notifyGameEnded();
+        return;
       }
 
       if (this->isKingChecked(ChessColor::Black)) {
         notifyHighlightSquare(blackKing->getPosition(),
                               ChessHighlightType::Check);
       }
-    } else {
+
+      if (this->isKingCheckmate(ChessColor::Black)) {
+        notifyHighlightSquare(blackKing->getPosition(),
+                              ChessHighlightType::Checkmate);
+        this->gameResult = ChessGameResult::WhiteWins;
+        this->gameState = ChessGameState::Ended;
+        notifyGameEnded();
+        return;
+      }
+
+      if (this->isStalemate(color)) {
+        this->gameResult = ChessGameResult::Draw;
+        this->gameState = ChessGameState::Ended;
+        notifyGameEnded();
+        return;
+      }
+
       print_debug("Wrong move\n");
       if (color == ChessColor::White) {
         this->whiteWrongMoves++;
+        if (this->whiteWrongMoves >= 3) {
+          this->gameResult = ChessGameResult::BlackWins;
+          this->gameState = ChessGameState::Ended;
+          notifyGameEnded();
+          return;
+        }
       } else {
         this->blackWrongMoves++;
+        if (this->blackWrongMoves >= 3) {
+          this->gameResult = ChessGameResult::WhiteWins;
+          this->gameState = ChessGameState::Ended;
+          notifyGameEnded();
+          return;
+        }
       }
 
       notifyHighlightSquare(this->pickedUpPiece->getPosition(),
                             ChessHighlightType::Error);
       notifyHighlightSquare(position, ChessHighlightType::Error);
+
+    } else {
+      notifyError(color);
     }
   }
-
   print_debug("End of notifyTileAction\n");
 }
 
@@ -255,8 +315,8 @@ void Chess::assignPiecesToPositions() {
 }
 
 // podświetlenie kwadracikow
-/* void Chess::highlightPositions(ChessPosition *chessPositions, uint8_t count)
-{ ChessPosition *position; for (int i = 0; i < count; ++i) { position =
+/* void Chess::highlightPositions(ChessPosition *chessPositions, uint8_t
+count) { ChessPosition *position; for (int i = 0; i < count; ++i) { position =
 &chessPositions[i];
     // tu podświetla ormmalny ruch
     if (isOccupied(piece, chessPositions[i]) = 0) {
