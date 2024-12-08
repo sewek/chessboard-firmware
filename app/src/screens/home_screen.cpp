@@ -16,9 +16,14 @@ HomeScreen::HomeScreen(ChessColor color) : BaseScreen(color) {}
 HomeScreen::~HomeScreen() {}
 
 void HomeScreen::init() {
-  lv_obj_clear_flag(this->screen, LV_OBJ_FLAG_SCROLLABLE);  /// Flags
+  if (this->screen == nullptr) this->screen = lv_obj_create(nullptr);
 
-  this->ui_Button2 = lv_btn_create(this->screen);
+  lv_obj_clear_flag(this->screen, LV_OBJ_FLAG_SCROLLABLE);  /// Flags
+  lv_obj_set_style_bg_color(this->screen, lv_color_hex(0xFFFFFF),
+                            LV_STATE_DEFAULT);
+
+  if (this->ui_Button2 == nullptr)
+    this->ui_Button2 = lv_btn_create(this->screen);
   lv_obj_set_width(this->ui_Button2, 315);
   lv_obj_set_height(this->ui_Button2, 50);
   lv_obj_set_x(this->ui_Button2, 0);
@@ -30,6 +35,8 @@ void HomeScreen::init() {
   lv_obj_set_style_radius(this->ui_Button2, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
   lv_obj_set_style_bg_color(this->ui_Button2, lv_color_hex(0xFFFFFF),
                             LV_PART_MAIN | LV_STATE_DEFAULT);
+  lv_obj_set_style_bg_color(this->ui_Button2, lv_color_hex(0xD9EAFD),
+                            LV_PART_MAIN | LV_STATE_FOCUSED);
   lv_obj_set_style_bg_opa(this->ui_Button2, 255,
                           LV_PART_MAIN | LV_STATE_DEFAULT);
   lv_obj_set_style_shadow_color(this->ui_Button2, lv_color_hex(0xFFFFFF),
@@ -41,7 +48,8 @@ void HomeScreen::init() {
   lv_obj_set_style_text_opa(this->ui_Button2, 255,
                             LV_PART_MAIN | LV_STATE_DEFAULT);
 
-  this->ui_Label1 = lv_label_create(this->ui_Button2);
+  if (this->ui_Label1 == nullptr)
+    this->ui_Label1 = lv_label_create(this->ui_Button2);
   lv_obj_set_width(this->ui_Label1, LV_SIZE_CONTENT);   /// 1
   lv_obj_set_height(this->ui_Label1, LV_SIZE_CONTENT);  /// 1
   lv_obj_set_align(this->ui_Label1, LV_ALIGN_CENTER);
@@ -53,7 +61,8 @@ void HomeScreen::init() {
   lv_obj_set_style_text_font(this->ui_Label1, &lv_font_montserrat_26,
                              LV_PART_MAIN | LV_STATE_DEFAULT);
 
-  this->ui_Button1 = lv_btn_create(this->screen);
+  if (this->ui_Button1 == nullptr)
+    this->ui_Button1 = lv_btn_create(this->screen);
   lv_obj_set_width(this->ui_Button1, 315);
   lv_obj_set_height(this->ui_Button1, 50);
   lv_obj_set_x(this->ui_Button1, 0);
@@ -65,6 +74,8 @@ void HomeScreen::init() {
   lv_obj_set_style_radius(this->ui_Button1, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
   lv_obj_set_style_bg_color(this->ui_Button1, lv_color_hex(0xFFFFFF),
                             LV_PART_MAIN | LV_STATE_DEFAULT);
+  lv_obj_set_style_bg_color(this->ui_Button1, lv_color_hex(0xD9EAFD),
+                            LV_PART_MAIN | LV_STATE_FOCUSED);
   lv_obj_set_style_bg_opa(this->ui_Button1, 255,
                           LV_PART_MAIN | LV_STATE_DEFAULT);
   lv_obj_set_style_shadow_color(this->ui_Button1, lv_color_hex(0xFFFFFF),
@@ -76,7 +87,8 @@ void HomeScreen::init() {
   lv_obj_set_style_text_opa(this->ui_Button1, 255,
                             LV_PART_MAIN | LV_STATE_DEFAULT);
 
-  this->ui_Label2 = lv_label_create(this->ui_Button1);
+  if (this->ui_Label2 == nullptr)
+    this->ui_Label2 = lv_label_create(this->ui_Button1);
   lv_obj_set_width(this->ui_Label2, LV_SIZE_CONTENT);   /// 1
   lv_obj_set_height(this->ui_Label2, LV_SIZE_CONTENT);  /// 1
   lv_obj_set_align(this->ui_Label2, LV_ALIGN_CENTER);
@@ -88,7 +100,8 @@ void HomeScreen::init() {
   lv_obj_set_style_text_font(this->ui_Label2, &lv_font_montserrat_26,
                              LV_PART_MAIN | LV_STATE_DEFAULT);
 
-  this->ui_Button3 = lv_btn_create(this->screen);
+  if (this->ui_Button3 == nullptr)
+    this->ui_Button3 = lv_btn_create(this->screen);
   lv_obj_set_width(this->ui_Button3, 315);
   lv_obj_set_height(this->ui_Button3, 50);
   lv_obj_set_x(this->ui_Button3, 0);
@@ -100,6 +113,8 @@ void HomeScreen::init() {
   lv_obj_set_style_radius(this->ui_Button3, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
   lv_obj_set_style_bg_color(this->ui_Button3, lv_color_hex(0xFFFFFF),
                             LV_PART_MAIN | LV_STATE_DEFAULT);
+  lv_obj_set_style_bg_color(this->ui_Button3, lv_color_hex(0xD9EAFD),
+                            LV_PART_MAIN | LV_STATE_FOCUSED);
   lv_obj_set_style_bg_opa(this->ui_Button3, 255,
                           LV_PART_MAIN | LV_STATE_DEFAULT);
   lv_obj_set_style_shadow_color(this->ui_Button3, lv_color_hex(0xFFFFFF),
@@ -111,7 +126,8 @@ void HomeScreen::init() {
   lv_obj_set_style_text_opa(this->ui_Button3, 255,
                             LV_PART_MAIN | LV_STATE_DEFAULT);
 
-  this->ui_Label3 = lv_label_create(this->ui_Button3);
+  if (this->ui_Label3 == nullptr)
+    this->ui_Label3 = lv_label_create(this->ui_Button3);
   lv_obj_set_width(this->ui_Label3, LV_SIZE_CONTENT);   /// 1
   lv_obj_set_height(this->ui_Label3, LV_SIZE_CONTENT);  /// 1
   lv_obj_set_align(this->ui_Label3, LV_ALIGN_CENTER);
@@ -123,7 +139,8 @@ void HomeScreen::init() {
   lv_obj_set_style_text_font(this->ui_Label3, &lv_font_montserrat_26,
                              LV_PART_MAIN | LV_STATE_DEFAULT);
 
-  this->ui_Label4 = lv_label_create(this->screen);
+  if (this->ui_Label4 == nullptr)
+    this->ui_Label4 = lv_label_create(this->screen);
   lv_obj_set_width(this->ui_Label4, LV_SIZE_CONTENT);   /// 1
   lv_obj_set_height(this->ui_Label4, LV_SIZE_CONTENT);  /// 1
   lv_obj_set_x(this->ui_Label4, 0);
@@ -141,25 +158,71 @@ void HomeScreen::init() {
   lv_obj_set_style_text_font(this->ui_Label4, &lv_font_montserrat_46,
                              LV_PART_MAIN | LV_STATE_DEFAULT);
 
-  this->ui_Image6 = lv_img_create(this->screen);
+  if (this->ui_Image6 == nullptr) this->ui_Image6 = lv_img_create(this->screen);
   lv_img_set_src(this->ui_Image6, &ui_img_chess_plt45_svg_png);
-  lv_obj_set_width(this->ui_Image6, LV_SIZE_CONTENT);   /// 1
-  lv_obj_set_height(this->ui_Image6, LV_SIZE_CONTENT);  /// 1
-  lv_obj_set_x(this->ui_Image6, 87);
+  lv_obj_set_width(this->ui_Image6,
+                   LV_SIZE_CONTENT);  /// 1 lv_obj_set_height(this->ui_Image6,
+                                      /// LV_SIZE_CONTENT);
+  lv_obj_set_x(this->ui_Image6, 90);
   lv_obj_set_y(this->ui_Image6, -188);
   lv_obj_set_align(this->ui_Image6, LV_ALIGN_CENTER);
   lv_obj_add_flag(this->ui_Image6, LV_OBJ_FLAG_ADV_HITTEST);   /// Flags
   lv_obj_clear_flag(this->ui_Image6, LV_OBJ_FLAG_SCROLLABLE);  /// Flags
 
-  this->ui_Image1 = lv_img_create(this->screen);
+  if (this->ui_Image1 == nullptr) this->ui_Image1 = lv_img_create(this->screen);
   lv_img_set_src(this->ui_Image1, &ui_img_chess_plt45_svg_png);
   lv_obj_set_width(this->ui_Image1, LV_SIZE_CONTENT);   /// 1
   lv_obj_set_height(this->ui_Image1, LV_SIZE_CONTENT);  /// 1
-  lv_obj_set_x(this->ui_Image1, -84);
+  lv_obj_set_x(this->ui_Image1, -90);
   lv_obj_set_y(this->ui_Image1, -188);
   lv_obj_set_align(this->ui_Image1, LV_ALIGN_CENTER);
   lv_obj_add_flag(this->ui_Image1, LV_OBJ_FLAG_ADV_HITTEST);   /// Flags
   lv_obj_clear_flag(this->ui_Image1, LV_OBJ_FLAG_SCROLLABLE);  /// Flags
 }
 
-void HomeScreen::update() {}
+void HomeScreen::update() {
+  if (buttons.isPressed(this->color, ButtonType::Up)) {
+    this->buttonIndex = (this->buttonIndex + 1) % 3;
+  }
+
+  if (buttons.isPressed(this->color, ButtonType::Down)) {
+    this->buttonIndex = (this->buttonIndex + 2) % 3;
+  }
+
+  switch (this->buttonIndex) {
+    case 0:
+      lv_obj_clear_state(this->ui_Button1, LV_STATE_FOCUSED);
+      lv_obj_add_state(this->ui_Button2, LV_STATE_FOCUSED);
+      lv_obj_clear_state(this->ui_Button3, LV_STATE_FOCUSED);
+      break;
+    case 1:
+      lv_obj_clear_state(this->ui_Button1, LV_STATE_FOCUSED);
+      lv_obj_clear_state(this->ui_Button2, LV_STATE_FOCUSED);
+      lv_obj_add_state(this->ui_Button3, LV_STATE_FOCUSED);
+      break;
+    case 2:
+      lv_obj_add_state(this->ui_Button1, LV_STATE_FOCUSED);
+      lv_obj_clear_state(this->ui_Button2, LV_STATE_FOCUSED);
+      lv_obj_clear_state(this->ui_Button3, LV_STATE_FOCUSED);
+      break;
+    default:
+      break;
+  }
+
+  if (buttons.isPressed(this->color, ButtonType::Accept)) {
+    switch (this->buttonIndex) {
+      case 0:
+        // LOG_INF("Start button pressed\n");
+        break;
+      case 1:
+        // LOG_INF("Settings button pressed\n");
+        break;
+      case 2:
+        // LOG_INF("Info button pressed\n");
+        break;
+      default:
+        // LOG_ERR("Unknown button index\n");
+        break;
+    }
+  }
+}

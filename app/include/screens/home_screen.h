@@ -7,7 +7,6 @@
 #define HOME_SCREEN_H
 
 #include "base_screen.h"
-
 #include "images.h"
 
 /**
@@ -18,11 +17,12 @@ class HomeScreen : public BaseScreen {
   explicit HomeScreen(ChessColor color);
   ~HomeScreen();
 
-  const char *getName() override { return "home"; }
+  const char* getName() override { return "home"; }
   void init() override;
   void update() override;
 
  private:
+  uint8_t buttonIndex = 0;
   lv_obj_t* ui_Button1 = nullptr;
   lv_obj_t* ui_Button2 = nullptr;
   lv_obj_t* ui_Button3 = nullptr;

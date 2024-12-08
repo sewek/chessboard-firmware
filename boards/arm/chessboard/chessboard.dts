@@ -251,15 +251,15 @@
    pinctrl-names = "default", "sleep";
    cs-gpios = <&gpio0 15 (GPIO_ACTIVE_LOW)>, <&gpio0 13 (GPIO_ACTIVE_LOW)>;
 
-   display_white: ili9488@0 {
+   display_white: ili9488@1 {
       compatible = "ilitek,ili9488";
       status = "okay";
       spi-max-frequency = <16000000>;
-      reg = <0>;
+      reg = <1>;
       height = <480>;
       width = <320>;
       cmd-data-gpios = <&gpio0 25 (GPIO_ACTIVE_LOW)>;
-      reset-gpios = <&gpio1 6 (GPIO_ACTIVE_LOW)>;
+      reset-gpios = <&gpio1 7 (GPIO_ACTIVE_LOW)>;
       pixel-format = <ILI9XXX_PIXEL_FORMAT_RGB888>; //<ILI9XXX_PIXEL_FORMAT_RGB565>;
       rotation = <180>;
       frmctr1 = [ a0 11  ];
@@ -269,15 +269,15 @@
       ngamctrl = [ 00 16 19 03 0f 05 32 45 46 04 0e 0d 35 37 0f  ];
    };
 
-   display_black: ili9488@1 {
+   display_black: ili9488@0 {
       compatible = "ilitek,ili9488";
       status = "okay";
       spi-max-frequency = <16000000>;
-      reg = <1>;
+      reg = <0>;
       height = <480>;
       width = <320>;
       cmd-data-gpios = <&gpio0 25 (GPIO_ACTIVE_LOW)>;
-      reset-gpios = <&gpio1 7 (GPIO_ACTIVE_LOW)>;
+      reset-gpios = <&gpio1 6 (GPIO_ACTIVE_LOW)>;
       pixel-format = <ILI9XXX_PIXEL_FORMAT_RGB888>;
       rotation = <180>;
       frmctr1 = [ a0 11  ];
