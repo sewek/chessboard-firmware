@@ -36,22 +36,22 @@
          gpios = <&gpio1 11 (GPIO_ACTIVE_LOW)>;
          label = "Bootloader button";
       };
-      button0_0: buttons0-0 {
+      button0_3: buttons0-0 {
          gpios = <&gpio0 31 (GPIO_ACTIVE_LOW)>;
          label = "Push buttons group 0 key 0";
          zephyr,code = <INPUT_KEY_0>;
       };
-      button0_1: buttons0-1 {
+      button0_2: buttons0-1 {
          gpios = <&gpio0 29 (GPIO_ACTIVE_LOW)>;
          label = "Push buttons group 0 key 1";
          zephyr,code = <INPUT_KEY_1>;
       };
-      button0_2: buttons0-2 {
+      button0_1: buttons0-2 {
          gpios = <&gpio0 2 (GPIO_ACTIVE_LOW)>;
          label = "Push buttons group 0 key 2";
          zephyr,code = <INPUT_KEY_2>;
       };
-      button0_3: buttons0-3 {
+      button0_0: buttons0-3 {
          gpios = <&gpio1 15 (GPIO_ACTIVE_LOW)>;
          label = "Push buttons group 0 key 3";
          zephyr,code = <INPUT_KEY_3>;
@@ -61,12 +61,12 @@
          label = "Push buttons group 0 key 4";
          zephyr,code = <INPUT_KEY_4>;
       };
-      button1_0: buttons1-0 {
+      button1_4: buttons1-0 {
          gpios = <&gpio0 30 (GPIO_ACTIVE_LOW)>;
          label = "Push buttons group 1 key 0";
          zephyr,code = <INPUT_KEY_5>;
       };
-      button1_1: buttons1-1 {
+      button1_3: buttons1-1 {
          gpios = <&gpio0 28 (GPIO_ACTIVE_LOW)>;
          label = "Push buttons group 1 key 1";
          zephyr,code = <INPUT_KEY_6>;
@@ -76,12 +76,12 @@
          label = "Push buttons group 1 key 2";
          zephyr,code = <INPUT_KEY_7>;
       };
-      button1_3: buttons1-3 {
+      button1_1: buttons1-3 {
          gpios = <&gpio1 14 (GPIO_ACTIVE_LOW)>;
          label = "Push buttons group 1 key 3";
          zephyr,code = <INPUT_KEY_8>;
       };
-      button1_4: buttons1-4 {
+      button1_0: buttons1-4 {
          gpios = <&gpio1 12 (GPIO_ACTIVE_LOW)>;
          label = "Push buttons group 1 key 4";
          zephyr,code = <INPUT_KEY_9>;
@@ -180,10 +180,12 @@
 
 &gpio0 {
    status = "okay";
+   sense-edge-mask = <0xffffffff>;
 };
 
 &gpio1 {
    status = "okay";
+   sense-edge-mask = <0xffffffff>;
 };
 
 &uart0 {
@@ -203,6 +205,7 @@
    pinctrl-1 = <&i2c0_sleep>;
    pinctrl-names = "default", "sleep";
 
+   /*
    tile0: tiles@40 {
       status = "okay";
       reg = <0x40>;
@@ -215,18 +218,16 @@
       compatible = "chess,tiles";
    };
 
-   /* tile2: tiles@42 {
+   tile2: tiles@42 {
       status = "okay";
       reg = <0x42>;
       compatible = "chess,tiles";
-   }; */
+   };
 
-   /*
    tiles3: tiles@43 {
       reg = <0x43>;
       compatible = "chess,tiles";
    };
-    */
 
    tile4: tiles@44 {
       status = "okay";
@@ -239,6 +240,7 @@
       reg = <0x45>;
       compatible = "chess,tiles";
    };
+    */
 };
 
 &spi3 {
@@ -259,7 +261,7 @@
       cmd-data-gpios = <&gpio0 25 (GPIO_ACTIVE_LOW)>;
       reset-gpios = <&gpio1 6 (GPIO_ACTIVE_LOW)>;
       pixel-format = <ILI9XXX_PIXEL_FORMAT_RGB888>; //<ILI9XXX_PIXEL_FORMAT_RGB565>;
-      rotation = <0>;
+      rotation = <180>;
       frmctr1 = [ a0 11  ];
       pwctrl1 = [ 17 15  ];
       pwctrl2 = [ 41  ];
@@ -277,7 +279,7 @@
       cmd-data-gpios = <&gpio0 25 (GPIO_ACTIVE_LOW)>;
       reset-gpios = <&gpio1 7 (GPIO_ACTIVE_LOW)>;
       pixel-format = <ILI9XXX_PIXEL_FORMAT_RGB888>;
-      rotation = <0>;
+      rotation = <180>;
       frmctr1 = [ a0 11  ];
       pwctrl1 = [ 17 15  ];
       pwctrl2 = [ 41  ];

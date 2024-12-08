@@ -15,8 +15,14 @@
  */
 class BaseScreen {
  public:
-  BaseScreen() { this->screen = lv_obj_create(nullptr); }
+  explicit BaseScreen(ChessColor color) { this->color = color; }
   ~BaseScreen() = default;
+
+  /**
+   * @brief This function is used to get the name of the screen.
+   * @return The name of the screen
+   */
+  virtual const char *getName() = 0;
 
   /**
    * @brief This function is used to draw the screen on startup.
@@ -39,11 +45,6 @@ class BaseScreen {
    * @return The screen object
    */
   lv_obj_t *getScreen() { return this->screen; }
-
-  /**
-   * @brief This function is used to set the color of the screen.
-   */
-  void setColor(ChessColor color) { this->color = color; }
 
  protected:
   ChessColor color = ChessColor::White;

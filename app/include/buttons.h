@@ -7,15 +7,16 @@
 #ifndef BUTTONS_H
 #define BUTTONS_H
 
-#include <button.h>
 #include <zephyr/device.h>
 #include <zephyr/devicetree.h>
+
+#include "button.h"
 
 #define BUTTONS_COUNT 10
 
 class Buttons {
  public:
-  Button[BUTTONS_COUNT] buttons;
+  Button buttons[BUTTONS_COUNT];
 
   Buttons() = default;
   ~Buttons();
@@ -30,8 +31,10 @@ class Buttons {
   Button *getButton(struct gpio_dt_spec *spec);
   Button *getButton(struct gpio_callback *callback);
 
+  bool isPressed(ChessColor color, ButtonType type);
+
  private:
-  const struct gpio_dt_spec buttons_spec[BUTTONS_COUNT] = {
+  struct gpio_dt_spec buttons_spec[BUTTONS_COUNT] = {
       GPIO_DT_SPEC_GET(DT_ALIAS(btn0), gpios),
       GPIO_DT_SPEC_GET(DT_ALIAS(btn1), gpios),
       GPIO_DT_SPEC_GET(DT_ALIAS(btn2), gpios),
@@ -43,11 +46,10 @@ class Buttons {
       GPIO_DT_SPEC_GET(DT_ALIAS(btn8), gpios),
       GPIO_DT_SPEC_GET(DT_ALIAS(btn9), gpios),
   };
-  const struct gpio_callback buttons_cb[BUTTONS_COUNT];
+  struct gpio_callback buttons_cb[BUTTONS_COUNT];
 };
 
 void buttonPressedCallback(const struct device *dev, struct gpio_callback *cb,
                            uint32_t pins);
-void buttonPressedHandler(void *arg1, void *arg2, void *arg3);
 
 #endif  // BUTTONS_H
