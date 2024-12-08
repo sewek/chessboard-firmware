@@ -14,9 +14,12 @@
 #include <zephyr/storage/flash_map.h>
 #include <zephyr/usb/usb_device.h>
 
+#include "buttons.h"
 #include "display.h"
 #include "highlights.h"
+#include "screens/screen_controller.h"
 #include "tiles.h"
+#include "timer.h"
 
 #define CONFIG_BOARD "nRF52840"
 
@@ -28,15 +31,20 @@ LOG_MODULE_REGISTER(main);
 FS_FSTAB_DECLARE_ENTRY(ETC_PARTITION_NODE);
 FS_FSTAB_DECLARE_ENTRY(MNT_PARTITION_NODE);
 
-Display white_display =
-    Display(DEVICE_DT_GET(DT_NODELABEL(display_white)),
-            DT_PROP(DT_NODELABEL(display_white), width),
-            DT_PROP(DT_NODELABEL(display_white), height), 24);
-Display black_display =
-    Display(DEVICE_DT_GET(DT_NODELABEL(display_black)),
-            DT_PROP(DT_NODELABEL(display_black), width),
-            DT_PROP(DT_NODELABEL(display_black), height), 24);
+/* Timers */
+Timer whiteTimer;
+Timer blackTimer;
+
+/* Buttons */
+Buttons buttons;
+
+/* Displays */
+ScreenController screenController;
+
+/* Tiles */
 Tiles tiles;
+
+/* Chess */
 Chess chess;
 
 void gameStartedCb() { LOG_INF("Game started\n"); }
@@ -125,6 +133,22 @@ int main() {
   chess.addListener(ChessEventType::UnhighlightSquare, pieceUnhighlightedCb);
   tiles.setTriggerHandler(tilesChangeCallback);
 
+  LOG_INF("Initializing buttons");
+  ret = buttons.init();
+  if (ret < 0) {
+    LOG_ERR("Failed to initialize buttons\n");
+    return ret;
+  }
+  LOG_INF("Buttons initialized\n");
+
+  LOG_INF("Initializing screen controller");
+  ret = screenController.init();
+  if (ret < 0) {
+    LOG_ERR("Failed to initialize screen controller\n");
+    return ret;
+  }
+  LOG_INF("Screen controller initialized\n");
+
   LOG_INF("Initializing tiles");
   ret = tiles.init();
   if (ret < 0) {
@@ -152,31 +176,13 @@ int main() {
     return -1;
   }
 
-  LOG_INF("Initializing displays");
-  white_display.init();
-  black_display.init();
-
-  lv_obj_t *hello_world_label;
-  hello_world_label =
-      lv_label_create(lv_disp_get_scr_act(white_display.display));
-  lv_obj_set_style_text_font(hello_world_label, &lv_font_montserrat_24, 0);
-  lv_label_set_text(hello_world_label, "Ekran dla bialych");
-  lv_obj_align(hello_world_label, LV_ALIGN_CENTER, 0, 0);
-
-  lv_obj_t *hello_world_label2;
-  hello_world_label2 =
-      lv_label_create(lv_disp_get_scr_act(black_display.display));
-  lv_obj_set_style_text_font(hello_world_label2, &lv_font_montserrat_24, 0);
-  lv_label_set_text(hello_world_label2, "Ekran dla czarnych");
-  lv_obj_align(hello_world_label2, LV_ALIGN_CENTER, 0, 0);
-
-  lv_task_handler();
-  display_blanking_off(white_display.dev);
-  display_blanking_off(black_display.dev);
+  // display_blanking_off(white_display.dev);
+  // display_blanking_off(black_display.dev);
 
   while (true) {
-    lv_task_handler();
-    k_sleep(K_MSEC(1000));
+    // Refresh the screen
+    screenController.run();
+    k_sleep(K_MSEC(200));
   }
 
   return 0;

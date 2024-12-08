@@ -15,3 +15,12 @@ Button::~Button() {
   this->color = ChessColor::White;
   this->type = ButtonType::Up;
 }
+
+bool Button::isPressed() {
+  if (this->pressedCount > 0) {
+    this->pressedCount--;
+    return true;
+  }
+
+  return false;
+}

@@ -12,7 +12,7 @@ set_property(GLOBAL PROPERTY CSTD c11)
 find_package(Zephyr REQUIRED HINTS $ENV{ZEPHYR_BASE})
 
 project(app)
-target_sources(app PRIVATE src/main.cpp src/highlights.cpp)
+target_sources(app PRIVATE src/main.cpp src/highlights.cpp src/timer.cpp)
 add_subdirectory(src/tiles)
 add_subdirectory(src/display)
 add_subdirectory(src/screens)

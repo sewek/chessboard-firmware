@@ -30,6 +30,7 @@ int Buttons::init() {
   Button *button = nullptr;
   struct gpio_dt_spec *spec = nullptr;
   struct gpio_callback *callback = nullptr;
+
   for (int i = 0; i < BUTTONS_COUNT; i++) {
     button = &this->buttons[i];
     spec = &this->buttons_spec[i];
@@ -61,9 +62,10 @@ int Buttons::init() {
 
     button->spec = spec;
     button->callback = callback;
-    button->state = 0;
-    button->type = ButtonType::Up + (i % 5);
+    button->type = (ButtonType)(((int)ButtonType::Up) + (i % 5));
     button->color = i < 5 ? ChessColor::White : ChessColor::Black;
+
+    LOG_INF("Button %d initialized", i);
   }
 
   return ret;
@@ -105,4 +107,13 @@ Button *Buttons::getButton(struct gpio_callback *callback) {
   }
 
   return nullptr;
+}
+
+bool Buttons::isPressed(ChessColor color, ButtonType type) {
+  Button *button = this->getButton(color, type);
+  if (!button) {
+    return false;
+  }
+
+  return button->isPressed();
 }

@@ -22,7 +22,6 @@ class Button {
  public:
   struct gpio_dt_spec* spec = nullptr;
   struct gpio_callback* callback = nullptr;
-  uint8_t state = 0;
   ChessColor color = ChessColor::White;
   ButtonType type = ButtonType::Up;
 
@@ -30,6 +29,13 @@ class Button {
   Button(struct gpio_dt_spec* spec, struct gpio_callback* callback,
          ChessColor color, ButtonType type);
   ~Button();
+
+  bool isPressed();
+
+  void press() { this->pressedCount++; }
+
+ private:
+  uint16_t pressedCount = 0;
 };
 
 #endif  // BUTTON_H
