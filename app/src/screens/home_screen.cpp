@@ -58,7 +58,7 @@ void HomeScreen::init() {
                               LV_PART_MAIN | LV_STATE_DEFAULT);
   lv_obj_set_style_text_opa(this->ui_Label1, 255,
                             LV_PART_MAIN | LV_STATE_DEFAULT);
-  lv_obj_set_style_text_font(this->ui_Label1, &lv_font_montserrat_26,
+  lv_obj_set_style_text_font(this->ui_Label1, &lv_font_roboto_26,
                              LV_PART_MAIN | LV_STATE_DEFAULT);
 
   if (this->ui_Button1 == nullptr)
@@ -97,7 +97,7 @@ void HomeScreen::init() {
                               LV_PART_MAIN | LV_STATE_DEFAULT);
   lv_obj_set_style_text_opa(this->ui_Label2, 255,
                             LV_PART_MAIN | LV_STATE_DEFAULT);
-  lv_obj_set_style_text_font(this->ui_Label2, &lv_font_montserrat_26,
+  lv_obj_set_style_text_font(this->ui_Label2, &lv_font_roboto_26,
                              LV_PART_MAIN | LV_STATE_DEFAULT);
 
   if (this->ui_Button3 == nullptr)
@@ -136,7 +136,7 @@ void HomeScreen::init() {
                               LV_PART_MAIN | LV_STATE_DEFAULT);
   lv_obj_set_style_text_opa(this->ui_Label3, 255,
                             LV_PART_MAIN | LV_STATE_DEFAULT);
-  lv_obj_set_style_text_font(this->ui_Label3, &lv_font_montserrat_26,
+  lv_obj_set_style_text_font(this->ui_Label3, &lv_font_roboto_26,
                              LV_PART_MAIN | LV_STATE_DEFAULT);
 
   if (this->ui_Label4 == nullptr)
@@ -155,7 +155,7 @@ void HomeScreen::init() {
                                      LV_PART_MAIN | LV_STATE_DEFAULT);
   lv_obj_set_style_text_line_space(this->ui_Label4, 0,
                                    LV_PART_MAIN | LV_STATE_DEFAULT);
-  lv_obj_set_style_text_font(this->ui_Label4, &lv_font_montserrat_46,
+  lv_obj_set_style_text_font(this->ui_Label4, &lv_font_roboto_46,
                              LV_PART_MAIN | LV_STATE_DEFAULT);
 
   if (this->ui_Image6 == nullptr) this->ui_Image6 = lv_img_create(this->screen);

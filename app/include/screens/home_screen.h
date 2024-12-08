@@ -7,6 +7,7 @@
 #define HOME_SCREEN_H
 
 #include "base_screen.h"
+#include "fonts.h"
 #include "images.h"
 
 /**
