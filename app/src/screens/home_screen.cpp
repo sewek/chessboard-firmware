@@ -3,11 +3,17 @@
  * @brief This file contains the implementation of the HomeScreen class
  */
 
-#include <home_screen.h>
+#include "screens/home_screen.h"
 
-HomeScreen::HomeScreen() : BaseScreen() {}
+#include <zephyr/kernel.h>
 
-HomeScreen::~HomeScreen() : ~BaseScreen() {}
+#include "buttons.h"
+
+extern Buttons buttons;
+
+HomeScreen::HomeScreen(ChessColor color) : BaseScreen(color) {}
+
+HomeScreen::~HomeScreen() {}
 
 void HomeScreen::init() {
   lv_obj_clear_flag(this->screen, LV_OBJ_FLAG_SCROLLABLE);  /// Flags

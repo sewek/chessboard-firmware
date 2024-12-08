@@ -5,17 +5,13 @@
 
 #include <button.h>
 #include <buttons.h>
+#include <chess_types.h>
 #include <zephyr/kernel.h>
 #include <zephyr/logging/log.h>
 
 LOG_MODULE_REGISTER(buttons_trigger);
 
 extern Buttons buttons;
-
-K_THREAD_DEFINE(buttons_callback_thread, 1024, buttonPressedHandler, nullptr,
-                nullptr, nullptr, 10, 0, 0);
-K_SEM_DEFINE(buttons_sem, 1, 1);
-K_MSGQ_DEFINE(buttons_queue, sizeof(Button *), 64, 4);
 
 void buttonPressedCallback(const struct device *dev, struct gpio_callback *cb,
                            uint32_t pins) {
@@ -25,31 +21,28 @@ void buttonPressedCallback(const struct device *dev, struct gpio_callback *cb,
     return;
   }
 
-  button->state = 1;
+  button->press();
 
-  while (k_msgq_put(&buttons_queue, &button, K_NO_WAIT) != 0) {
-    k_yield();
-  }
+  const char *color = (button->color == ChessColor::White) ? "White" : "Black";
+  switch (button->type) {
+    case ButtonType::Up:
+      LOG_INF("%s up timer button pressed\n", color);
+      break;
+    case ButtonType::Down:
+      LOG_INF("%s down button pressed\n", color);
+      break;
+    case ButtonType::Accept:
+      LOG_INF("%s accept button pressed\n", color);
+      break;
+    case ButtonType::Cancel:
+      LOG_INF("%s cancel button pressed\n", color);
+      break;
+    case ButtonType::Timer:
+      LOG_INF("%s timer button pressed\n", color);
+      break;
 
-  k_sem_give(&buttons_sem);
-}
-
-void buttonPressedHandler(void *arg1, void *arg2, void *arg3) {
-  ARG_UNUSED(arg1);
-  ARG_UNUSED(arg2);
-  ARG_UNUSED(arg3);
-
-  Button *button = nullptr;
-
-  while (1) {
-    k_sem_take(&buttons_sem, K_FOREVER);
-
-    while (k_msgq_get(&buttons_queue, &button, K_NO_WAIT) == 0) {
-      if (!button) {
-        continue;
-      }
-
-      LOG_INF("Button pressed: %d", button->type);
-    }
+    default:
+      LOG_ERR("Unknown button type\n");
+      break;
   }
 }

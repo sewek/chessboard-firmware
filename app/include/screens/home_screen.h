@@ -6,7 +6,7 @@
 #ifndef HOME_SCREEN_H
 #define HOME_SCREEN_H
 
-#include <base_screen.h>
+#include "base_screen.h"
 
 #include "images.h"
 
@@ -15,9 +15,10 @@
  */
 class HomeScreen : public BaseScreen {
  public:
-  HomeScreen();
+  explicit HomeScreen(ChessColor color);
   ~HomeScreen();
 
+  const char *getName() override { return "home"; }
   void init() override;
   void update() override;
 
@@ -32,5 +33,8 @@ class HomeScreen : public BaseScreen {
   lv_obj_t* ui_Image1 = nullptr;
   lv_obj_t* ui_Image6 = nullptr;
 };
+
+inline HomeScreen whiteHomeScreen(ChessColor::White);
+inline HomeScreen blackHomeScreen(ChessColor::Black);
 
 #endif  // HOME_SCREEN_H
