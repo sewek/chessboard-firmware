@@ -11,6 +11,12 @@
 #include "base_screen.h"
 #include "display.h"
 #include "home_screen.h"
+#include "mode_screen.h"
+#include "open_screen.h"
+#include "piece_screen.h"
+#include "settings_screen.h"
+#include "start_screen.h"
+#include "time_screen.h"
 
 /**
  * @brief This class represents the screen controller of the application
@@ -59,7 +65,13 @@ class ScreenController {
  private:
   BaseScreen *currentScreen[2] = {nullptr, nullptr};
 
-  BaseScreen *screens[2] = {&whiteHomeScreen, &blackHomeScreen};
+  BaseScreen *screens[14] = {
+      &whiteHomeScreen,     &blackHomeScreen,  &whiteSettingsScreen,
+      &blackSettingsScreen, &whiteStartScreen, &blackStartScreen,
+      &whitePieceScreen,    &blackPieceScreen, &whiteModeScreen,
+      &blackModeScreen,     &whiteTimeScreen,  &blackTimeScreen,
+      &whiteOpenScreen,     &blackOpenScreen,
+  };
   uint8_t screen_count = sizeof(screens) / sizeof(screens[0]);
 
   Display displays[2] = {

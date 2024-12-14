@@ -3,11 +3,21 @@
 
 #include <lvgl.h>
 
+#define LV_FONT_ROBOTO_16 1
 #define LV_FONT_ROBOTO_26 1
+#define LV_FONT_ROBOTO_36 1
 #define LV_FONT_ROBOTO_46 1
+
+#if LV_FONT_ROBOTO_16
+extern const lv_font_t lv_font_roboto_16;
+#endif
 
 #if LV_FONT_ROBOTO_26
 extern const lv_font_t lv_font_roboto_26;
+#endif
+
+#if LV_FONT_ROBOTO_36
+extern const lv_font_t lv_font_roboto_36;
 #endif
 
 #if LV_FONT_ROBOTO_46

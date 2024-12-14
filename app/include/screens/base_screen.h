@@ -46,6 +46,12 @@ class BaseScreen {
    */
   lv_obj_t *getScreen() { return this->screen; }
 
+  /**
+   * @brief This function is used to set the screen object.
+   * @param screen The screen object
+   */
+  void setScreen(lv_obj_t *screen) { this->screen = screen; }
+
  protected:
   ChessColor color = ChessColor::White;
   lv_obj_t *screen = nullptr;

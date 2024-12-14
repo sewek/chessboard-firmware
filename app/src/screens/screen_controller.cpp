@@ -41,6 +41,8 @@ int ScreenController::init() {
 }
 
 int ScreenController::navigateTo(ChessColor color, const char *screen) {
+  LOG_INF("Navigating to screen: %s\n", screen);
+
   int colorIndex = (int)color;
   Display *display = &this->displays[colorIndex];
   if (!display->dev) {
@@ -52,11 +54,16 @@ int ScreenController::navigateTo(ChessColor color, const char *screen) {
   lv_disp_set_default(display->display);
 
   BaseScreen *currentScreen = this->getCurrentScreen(color);
-  if (currentScreen) {
+  if (currentScreen != nullptr && currentScreen->getScreen() != nullptr) {
     lv_obj_del(currentScreen->getScreen());
+    currentScreen->setScreen(nullptr);
   }
 
   for (int i = 0; i < this->screen_count; i++) {
+    if (this->screens[i] == nullptr) {
+      continue;
+    }
+
     LOG_INF("Screen: %s\n", this->screens[i]->getName());
     if (this->screens[i]->getColor() != color) {
       continue;

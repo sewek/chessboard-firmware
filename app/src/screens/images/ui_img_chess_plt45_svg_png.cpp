@@ -37,7 +37,7 @@ const LV_ATTRIBUTE_MEM_ALIGN LV_ATTRIBUTE_LARGE_CONST LV_ATTRIBUTE_IMG_ATT
         0x00, 0x00,
 };
 
-lv_img_dsc_t ui_img_chess_plt45_svg_png = {
+const lv_img_dsc_t ui_img_chess_plt45_svg_png = {
     {
         LV_IMG_CF_INDEXED_1BIT,
         0,
