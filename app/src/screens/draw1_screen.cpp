@@ -35,7 +35,7 @@ void Draw1Screen::init() {
                             LV_PART_MAIN | LV_STATE_DEFAULT);
   lv_obj_set_style_text_align(this->ui_Label16, LV_TEXT_ALIGN_CENTER,
                               LV_PART_MAIN | LV_STATE_DEFAULT);
-  lv_obj_set_style_text_font(this->ui_Label16, &lv_font_roboto_34,
+  lv_obj_set_style_text_font(this->ui_Label16, &lv_font_roboto_36,
                              LV_PART_MAIN | LV_STATE_DEFAULT);
 
   this->ui_Button10 = lv_btn_create(this->screen);

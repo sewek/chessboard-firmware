@@ -182,7 +182,7 @@ int main() {
   while (true) {
     // Refresh the screen
     screenController.run();
-    k_sleep(K_MSEC(200));
+    k_sleep(K_MSEC(50));
   }
 
   return 0;

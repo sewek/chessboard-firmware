@@ -8,8 +8,10 @@
 #include <zephyr/kernel.h>
 
 #include "buttons.h"
+#include "screens/screen_controller.h"
 
 extern Buttons buttons;
+extern ScreenController screenController;
 
 OpenScreen::OpenScreen(ChessColor color) : BaseScreen(color) {}
 
@@ -36,6 +38,8 @@ void OpenScreen::init() {
                           LV_PART_MAIN | LV_STATE_DEFAULT);
   lv_obj_set_style_bg_color(this->ui_Button23, lv_color_hex(0xFFFFFF),
                             LV_PART_MAIN | LV_STATE_DEFAULT);
+  lv_obj_set_style_bg_color(this->ui_Button23, lv_color_hex(0xD9EAFD),
+                            LV_PART_MAIN | LV_STATE_FOCUSED);
   lv_obj_set_style_bg_opa(this->ui_Button23, 255,
                           LV_PART_MAIN | LV_STATE_DEFAULT);
   lv_obj_set_style_shadow_color(this->ui_Button23, lv_color_hex(0xFFFFFF),
@@ -73,6 +77,8 @@ void OpenScreen::init() {
                           LV_PART_MAIN | LV_STATE_DEFAULT);
   lv_obj_set_style_bg_color(this->ui_Button24, lv_color_hex(0xFFFFFF),
                             LV_PART_MAIN | LV_STATE_DEFAULT);
+  lv_obj_set_style_bg_color(this->ui_Button24, lv_color_hex(0xD9EAFD),
+                            LV_PART_MAIN | LV_STATE_FOCUSED);
   lv_obj_set_style_bg_opa(this->ui_Button24, 255,
                           LV_PART_MAIN | LV_STATE_DEFAULT);
   lv_obj_set_style_shadow_color(this->ui_Button24, lv_color_hex(0xFFFFFF),
@@ -110,6 +116,8 @@ void OpenScreen::init() {
                           LV_PART_MAIN | LV_STATE_DEFAULT);
   lv_obj_set_style_bg_color(this->ui_Button25, lv_color_hex(0xFFFFFF),
                             LV_PART_MAIN | LV_STATE_DEFAULT);
+  lv_obj_set_style_bg_color(this->ui_Button25, lv_color_hex(0xD9EAFD),
+                            LV_PART_MAIN | LV_STATE_FOCUSED);
   lv_obj_set_style_bg_opa(this->ui_Button25, 255,
                           LV_PART_MAIN | LV_STATE_DEFAULT);
   lv_obj_set_style_shadow_color(this->ui_Button25, lv_color_hex(0xFFFFFF),
@@ -146,7 +154,7 @@ void OpenScreen::init() {
                             LV_PART_MAIN | LV_STATE_DEFAULT);
   lv_obj_set_style_text_align(this->ui_Label39, LV_TEXT_ALIGN_CENTER,
                               LV_PART_MAIN | LV_STATE_DEFAULT);
-  lv_obj_set_style_text_font(this->ui_Label39, &lv_font_roboto_34,
+  lv_obj_set_style_text_font(this->ui_Label39, &lv_font_roboto_36,
                              LV_PART_MAIN | LV_STATE_DEFAULT);
 
   this->ui_Button26 = lv_btn_create(this->screen);
@@ -163,6 +171,8 @@ void OpenScreen::init() {
                           LV_PART_MAIN | LV_STATE_DEFAULT);
   lv_obj_set_style_bg_color(this->ui_Button26, lv_color_hex(0xFFFFFF),
                             LV_PART_MAIN | LV_STATE_DEFAULT);
+  lv_obj_set_style_bg_color(this->ui_Button26, lv_color_hex(0xD9EAFD),
+                            LV_PART_MAIN | LV_STATE_FOCUSED);
   lv_obj_set_style_bg_opa(this->ui_Button26, 255,
                           LV_PART_MAIN | LV_STATE_DEFAULT);
   lv_obj_set_style_shadow_color(this->ui_Button26, lv_color_hex(0xFFFFFF),
@@ -200,6 +210,8 @@ void OpenScreen::init() {
                           LV_PART_MAIN | LV_STATE_DEFAULT);
   lv_obj_set_style_bg_color(this->ui_Button27, lv_color_hex(0xFFFFFF),
                             LV_PART_MAIN | LV_STATE_DEFAULT);
+  lv_obj_set_style_bg_color(this->ui_Button27, lv_color_hex(0xD9EAFD),
+                            LV_PART_MAIN | LV_STATE_FOCUSED);
   lv_obj_set_style_bg_opa(this->ui_Button27, 255,
                           LV_PART_MAIN | LV_STATE_DEFAULT);
   lv_obj_set_style_shadow_color(this->ui_Button27, lv_color_hex(0xFFFFFF),
@@ -237,6 +249,8 @@ void OpenScreen::init() {
                           LV_PART_MAIN | LV_STATE_DEFAULT);
   lv_obj_set_style_bg_color(this->ui_Button28, lv_color_hex(0xFFFFFF),
                             LV_PART_MAIN | LV_STATE_DEFAULT);
+  lv_obj_set_style_bg_color(this->ui_Button28, lv_color_hex(0xD9EAFD),
+                            LV_PART_MAIN | LV_STATE_FOCUSED);
   lv_obj_set_style_bg_opa(this->ui_Button28, 255,
                           LV_PART_MAIN | LV_STATE_DEFAULT);
   lv_obj_set_style_shadow_color(this->ui_Button28, lv_color_hex(0xFFFFFF),
@@ -263,17 +277,17 @@ void OpenScreen::init() {
 
 void OpenScreen::update() {
   if (buttons.isPressed(this->color, ButtonType::Up)) {
-    this->buttonIndex = (this->buttonIndex + 1) % 6;
+    this->buttonIndex = (this->buttonIndex + 5) % 6;
   }
 
   if (buttons.isPressed(this->color, ButtonType::Down)) {
-    this->buttonIndex = (this->buttonIndex + 2) % 6;
+    this->buttonIndex = (this->buttonIndex + 1) % 6;
   }
 
   switch (this->buttonIndex) {
     case 0:
-      lv_obj_clear_state(this->ui_Button23, LV_STATE_FOCUSED);
-      lv_obj_add_state(this->ui_Button24, LV_STATE_FOCUSED);
+      lv_obj_add_state(this->ui_Button23, LV_STATE_FOCUSED);
+      lv_obj_clear_state(this->ui_Button24, LV_STATE_FOCUSED);
       lv_obj_clear_state(this->ui_Button25, LV_STATE_FOCUSED);
       lv_obj_clear_state(this->ui_Button26, LV_STATE_FOCUSED);
       lv_obj_clear_state(this->ui_Button27, LV_STATE_FOCUSED);
@@ -281,8 +295,8 @@ void OpenScreen::update() {
       break;
     case 1:
       lv_obj_clear_state(this->ui_Button23, LV_STATE_FOCUSED);
-      lv_obj_clear_state(this->ui_Button24, LV_STATE_FOCUSED);
-      lv_obj_add_state(this->ui_Button25, LV_STATE_FOCUSED);
+      lv_obj_add_state(this->ui_Button24, LV_STATE_FOCUSED);
+      lv_obj_clear_state(this->ui_Button25, LV_STATE_FOCUSED);
       lv_obj_clear_state(this->ui_Button26, LV_STATE_FOCUSED);
       lv_obj_clear_state(this->ui_Button27, LV_STATE_FOCUSED);
       lv_obj_clear_state(this->ui_Button28, LV_STATE_FOCUSED);
@@ -290,8 +304,8 @@ void OpenScreen::update() {
     case 2:
       lv_obj_clear_state(this->ui_Button23, LV_STATE_FOCUSED);
       lv_obj_clear_state(this->ui_Button24, LV_STATE_FOCUSED);
-      lv_obj_clear_state(this->ui_Button25, LV_STATE_FOCUSED);
-      lv_obj_add_state(this->ui_Button26, LV_STATE_FOCUSED);
+      lv_obj_add_state(this->ui_Button25, LV_STATE_FOCUSED);
+      lv_obj_clear_state(this->ui_Button26, LV_STATE_FOCUSED);
       lv_obj_clear_state(this->ui_Button27, LV_STATE_FOCUSED);
       lv_obj_clear_state(this->ui_Button28, LV_STATE_FOCUSED);
       break;
@@ -299,8 +313,8 @@ void OpenScreen::update() {
       lv_obj_clear_state(this->ui_Button23, LV_STATE_FOCUSED);
       lv_obj_clear_state(this->ui_Button24, LV_STATE_FOCUSED);
       lv_obj_clear_state(this->ui_Button25, LV_STATE_FOCUSED);
-      lv_obj_clear_state(this->ui_Button26, LV_STATE_FOCUSED);
-      lv_obj_add_state(this->ui_Button27, LV_STATE_FOCUSED);
+      lv_obj_add_state(this->ui_Button26, LV_STATE_FOCUSED);
+      lv_obj_clear_state(this->ui_Button27, LV_STATE_FOCUSED);
       lv_obj_clear_state(this->ui_Button28, LV_STATE_FOCUSED);
       break;
     case 4:
@@ -308,16 +322,16 @@ void OpenScreen::update() {
       lv_obj_clear_state(this->ui_Button24, LV_STATE_FOCUSED);
       lv_obj_clear_state(this->ui_Button25, LV_STATE_FOCUSED);
       lv_obj_clear_state(this->ui_Button26, LV_STATE_FOCUSED);
-      lv_obj_clear_state(this->ui_Button27, LV_STATE_FOCUSED);
-      lv_obj_add_state(this->ui_Button28, LV_STATE_FOCUSED);
+      lv_obj_add_state(this->ui_Button27, LV_STATE_FOCUSED);
+      lv_obj_clear_state(this->ui_Button28, LV_STATE_FOCUSED);
       break;
     case 5:
-      lv_obj_add_state(this->ui_Button23, LV_STATE_FOCUSED);
+      lv_obj_clear_state(this->ui_Button23, LV_STATE_FOCUSED);
       lv_obj_clear_state(this->ui_Button24, LV_STATE_FOCUSED);
       lv_obj_clear_state(this->ui_Button25, LV_STATE_FOCUSED);
       lv_obj_clear_state(this->ui_Button26, LV_STATE_FOCUSED);
       lv_obj_clear_state(this->ui_Button27, LV_STATE_FOCUSED);
-      lv_obj_clear_state(this->ui_Button28, LV_STATE_FOCUSED);
+      lv_obj_add_state(this->ui_Button28, LV_STATE_FOCUSED);
       break;
     default:
       break;
@@ -347,5 +361,9 @@ void OpenScreen::update() {
         // LOG_ERR("Unknown button index\n");
         break;
     }
+  }
+
+  if (buttons.isPressed(this->color, ButtonType::Cancel)) {
+    screenController.navigateTo(this->color, "settings");
   }
 }

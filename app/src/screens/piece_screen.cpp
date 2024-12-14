@@ -35,7 +35,7 @@ void PieceScreen::init() {
                             LV_PART_MAIN | LV_STATE_DEFAULT);
   lv_obj_set_style_text_align(this->ui_Label55, LV_TEXT_ALIGN_CENTER,
                               LV_PART_MAIN | LV_STATE_DEFAULT);
-  lv_obj_set_style_text_font(this->ui_Label55, &lv_font_roboto_34,
+  lv_obj_set_style_text_font(this->ui_Label55, &lv_font_roboto_36,
                              LV_PART_MAIN | LV_STATE_DEFAULT);
 
   this->ui_Button29 = lv_btn_create(this->screen);
@@ -185,7 +185,7 @@ void PieceScreen::init() {
                              LV_PART_MAIN | LV_STATE_DEFAULT);
 
   this->ui_Image8 = lv_img_create(this->screen);
-  lv_img_set_src(this->ui_Image8, &this->ui_img_chess_blt45_svg_png);
+  lv_img_set_src(this->ui_Image8, &ui_img_chess_blt45_svg_png);
   lv_obj_set_width(this->ui_Image8, LV_SIZE_CONTENT);   /// 1
   lv_obj_set_height(this->ui_Image8, LV_SIZE_CONTENT);  /// 1
   lv_obj_set_x(this->ui_Image8, -66);
@@ -196,7 +196,7 @@ void PieceScreen::init() {
   lv_img_set_zoom(this->ui_Image8, 170);
 
   this->ui_Image3 = lv_img_create(this->screen);
-  lv_img_set_src(this->ui_Image3, &this->ui_img_chess_nlt45_svg_png);
+  lv_img_set_src(this->ui_Image3, &ui_img_chess_nlt45_svg_png);
   lv_obj_set_width(this->ui_Image3, LV_SIZE_CONTENT);   /// 1
   lv_obj_set_height(this->ui_Image3, LV_SIZE_CONTENT);  /// 1
   lv_obj_set_x(this->ui_Image3, -72);
@@ -207,7 +207,7 @@ void PieceScreen::init() {
   lv_img_set_zoom(this->ui_Image3, 170);
 
   this->ui_Image4 = lv_img_create(this->screen);
-  lv_img_set_src(this->ui_Image4, &this->ui_img_chess_qlt45_svg_png);
+  lv_img_set_src(this->ui_Image4, &ui_img_chess_qlt45_svg_png);
   lv_obj_set_width(this->ui_Image4, LV_SIZE_CONTENT);   /// 1
   lv_obj_set_height(this->ui_Image4, LV_SIZE_CONTENT);  /// 1
   lv_obj_set_x(this->ui_Image4, -75);
@@ -218,7 +218,7 @@ void PieceScreen::init() {
   lv_img_set_zoom(this->ui_Image4, 170);
 
   this->ui_Image5 = lv_img_create(this->screen);
-  lv_img_set_src(this->ui_Image5, &this->ui_img_chess_rlt45_svg_png);
+  lv_img_set_src(this->ui_Image5, &ui_img_chess_rlt45_svg_png);
   lv_obj_set_width(this->ui_Image5, LV_SIZE_CONTENT);   /// 1
   lv_obj_set_height(this->ui_Image5, LV_SIZE_CONTENT);  /// 1
   lv_obj_set_x(this->ui_Image5, -62);

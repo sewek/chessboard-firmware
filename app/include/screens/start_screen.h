@@ -9,6 +9,7 @@
 #include "base_screen.h"
 #include "fonts.h"
 #include "images.h"
+#include "timer.h"
 
 /**
  * @brief This class represents the home screen of the application
@@ -22,8 +23,13 @@ class StartScreen : public BaseScreen {
   void init() override;
   void update() override;
 
+  void setOponentReady(bool ready) { this->oponentReady = ready; }
+
  private:
+  Timer* timer = nullptr;
+  bool oponentReady = false;
   uint8_t buttonIndex = 0;
+  char timeString[8] = {0};
   lv_obj_t* ui_Button5 = nullptr;
   lv_obj_t* ui_Button4 = nullptr;
   lv_obj_t* ui_Label6 = nullptr;

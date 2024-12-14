@@ -35,10 +35,10 @@ void EnPassantScreen::init() {
                             LV_PART_MAIN | LV_STATE_DEFAULT);
   lv_obj_set_style_text_align(this->ui_Label49, LV_TEXT_ALIGN_CENTER,
                               LV_PART_MAIN | LV_STATE_DEFAULT);
-  lv_obj_set_style_text_font(this->ui_Label49, &lv_font_roboto_34,
+  lv_obj_set_style_text_font(this->ui_Label49, &lv_font_roboto_36,
                              LV_PART_MAIN | LV_STATE_DEFAULT);
 
-  this->ui_Image2 = lv_img_create(this->screen);
+  /* this->ui_Image2 = lv_img_create(this->screen);
   lv_img_set_src(this->ui_Image2, &ui_img_en_passant_png);
   lv_obj_set_width(this->ui_Image2, LV_SIZE_CONTENT);   /// 1
   lv_obj_set_height(this->ui_Image2, LV_SIZE_CONTENT);  /// 1
@@ -47,7 +47,7 @@ void EnPassantScreen::init() {
   lv_obj_set_align(this->ui_Image2, LV_ALIGN_CENTER);
   lv_obj_add_flag(this->ui_Image2, LV_OBJ_FLAG_ADV_HITTEST);   /// Flags
   lv_obj_clear_flag(this->ui_Image2, LV_OBJ_FLAG_SCROLLABLE);  /// Flags
-  lv_img_set_zoom(this->ui_Image2, 200);
+  lv_img_set_zoom(this->ui_Image2, 200); */
 
   this->ui_Label50 = lv_label_create(this->screen);
   lv_obj_set_width(this->ui_Label50, lv_pct(90));
@@ -58,7 +58,7 @@ void EnPassantScreen::init() {
   lv_label_set_text(
       this->ui_Label50,
       "Aby dokończyć bicie zdejmij pionka przeciwnika z podświetlonego pola.");
-  lv_obj_set_style_text_font(this->ui_Label50, &lv_font_roboto_22,
+  lv_obj_set_style_text_font(this->ui_Label50, &lv_font_roboto_26,
                              LV_PART_MAIN | LV_STATE_DEFAULT);
 
   this->ui_Label51 = lv_label_create(this->screen);
@@ -73,7 +73,10 @@ void EnPassantScreen::init() {
 }
 
 void EnPassantScreen::update() {
+  /*
+  What is this?
   if (buttons.isPressed(this->color, ButtonType::Timer)) {
     break;
   }
+  */
 }

@@ -35,7 +35,7 @@ void ErrorScreen::init() {
                             LV_PART_MAIN | LV_STATE_DEFAULT);
   lv_obj_set_style_text_align(this->ui_Label60, LV_TEXT_ALIGN_CENTER,
                               LV_PART_MAIN | LV_STATE_DEFAULT);
-  lv_obj_set_style_text_font(this->ui_Label60, &lv_font_roboto_34,
+  lv_obj_set_style_text_font(this->ui_Label60, &lv_font_roboto_36,
                              LV_PART_MAIN | LV_STATE_DEFAULT);
 
   this->ui_Label61 = lv_label_create(this->screen);
@@ -48,7 +48,7 @@ void ErrorScreen::init() {
       this->ui_Label61,
       "Twój ruch jest nieedozwolony. Cofnij ostatni ruch figury na zaznaczone "
       "pole.\n\n\n\nJeśli popełnisz 3 błędy przegrywasz!");
-  lv_obj_set_style_text_font(this->ui_Label61, &lv_font_roboto_22,
+  lv_obj_set_style_text_font(this->ui_Label61, &lv_font_roboto_26,
                              LV_PART_MAIN | LV_STATE_DEFAULT);
 
   this->ui_Label62 = lv_label_create(this->screen);
@@ -63,7 +63,10 @@ void ErrorScreen::init() {
 }
 
 void ErrorScreen::update() {
+  /*
+  What is this?
   if (buttons.isPressed(this->color, ButtonType::Timer)) {
     break;
   }
+  */
 }

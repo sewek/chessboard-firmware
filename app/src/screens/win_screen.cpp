@@ -33,7 +33,7 @@ void WinScreen::init() {
                             LV_PART_MAIN | LV_STATE_DEFAULT);
   lv_obj_set_style_text_align(this->ui_Label43, LV_TEXT_ALIGN_CENTER,
                               LV_PART_MAIN | LV_STATE_DEFAULT);
-  lv_obj_set_style_text_font(this->ui_Label43, &lv_font_roboto_48,
+  lv_obj_set_style_text_font(this->ui_Label43, &lv_font_roboto_46,
                              LV_PART_MAIN | LV_STATE_DEFAULT);
 
   this->ui_Label64 = lv_label_create(this->screen);
@@ -48,7 +48,10 @@ void WinScreen::init() {
 }
 
 void WinScreen::update() {
-  if (buttons.isPressed(this->color, ButtonType::Time)) {
+  /*
+  What is this?
+  if (buttons.isPressed(this->color, ButtonType::Timer)) {
     break;
   }
+  */
 }

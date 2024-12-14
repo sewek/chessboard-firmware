@@ -24,6 +24,18 @@ class Timer {
   int stop();
 
   /**
+   * @brief Is the timer stopped
+   * @return True if the timer is stopped, false otherwise
+   */
+  bool isStopped() { return this->stopped; }
+
+  /**
+   * @brief Is the timer paused
+   * @return True if the timer is paused, false otherwise
+   */
+  bool isPaused() { return this->paused; }
+
+  /**
    * @brief Pause the timer
    * @return 0 on success, negative error code on failure
    */
@@ -47,9 +59,18 @@ class Timer {
    */
   void setElapsedTime(uint32_t time);
 
+  /**
+   * @brief Get the elapsed time as a string
+   * @return The elapsed time as a string
+   */
+  void toString(char* buff);
+
  private:
+  char buff[8];
   uint32_t startTime = 0;
   uint32_t elapsedTime = 0;
+  bool stopped = true;
+  bool paused = false;
 };
 
 #endif  // TIMER_H

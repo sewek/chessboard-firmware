@@ -8,8 +8,10 @@
 #include <zephyr/kernel.h>
 
 #include "buttons.h"
+#include "screens/screen_controller.h"
 
 extern Buttons buttons;
+extern ScreenController screenController;
 
 ModeScreen::ModeScreen(ChessColor color) : BaseScreen(color) {}
 
@@ -36,6 +38,8 @@ void ModeScreen::init() {
                           LV_PART_MAIN | LV_STATE_DEFAULT);
   lv_obj_set_style_bg_color(this->ui_Button21, lv_color_hex(0xFFFFFF),
                             LV_PART_MAIN | LV_STATE_DEFAULT);
+  lv_obj_set_style_bg_color(this->ui_Button21, lv_color_hex(0xD9EAFD),
+                            LV_PART_MAIN | LV_STATE_FOCUSED);
   lv_obj_set_style_bg_opa(this->ui_Button21, 255,
                           LV_PART_MAIN | LV_STATE_DEFAULT);
   lv_obj_set_style_shadow_color(this->ui_Button21, lv_color_hex(0xFFFFFF),
@@ -73,6 +77,8 @@ void ModeScreen::init() {
                           LV_PART_MAIN | LV_STATE_DEFAULT);
   lv_obj_set_style_bg_color(this->ui_Button22, lv_color_hex(0xFFFFFF),
                             LV_PART_MAIN | LV_STATE_DEFAULT);
+  lv_obj_set_style_bg_color(this->ui_Button22, lv_color_hex(0xD9EAFD),
+                            LV_PART_MAIN | LV_STATE_FOCUSED);
   lv_obj_set_style_bg_opa(this->ui_Button22, 255,
                           LV_PART_MAIN | LV_STATE_DEFAULT);
   lv_obj_set_style_shadow_color(this->ui_Button22, lv_color_hex(0xFFFFFF),
@@ -109,7 +115,7 @@ void ModeScreen::init() {
                             LV_PART_MAIN | LV_STATE_DEFAULT);
   lv_obj_set_style_text_align(this->ui_Label36, LV_TEXT_ALIGN_CENTER,
                               LV_PART_MAIN | LV_STATE_DEFAULT);
-  lv_obj_set_style_text_font(this->ui_Label36, &lv_font_roboto_34,
+  lv_obj_set_style_text_font(this->ui_Label36, &lv_font_roboto_36,
                              LV_PART_MAIN | LV_STATE_DEFAULT);
 }
 
@@ -119,17 +125,17 @@ void ModeScreen::update() {
   }
 
   if (buttons.isPressed(this->color, ButtonType::Down)) {
-    this->buttonIndex = (this->buttonIndex + 2) % 2;
+    this->buttonIndex = (this->buttonIndex + 1) % 2;
   }
 
   switch (this->buttonIndex) {
     case 0:
-      lv_obj_clear_state(this->ui_Button21, LV_STATE_FOCUSED);
-      lv_obj_add_state(this->ui_Button22, LV_STATE_FOCUSED);
-      break;
-    case 1:
       lv_obj_add_state(this->ui_Button21, LV_STATE_FOCUSED);
       lv_obj_clear_state(this->ui_Button22, LV_STATE_FOCUSED);
+      break;
+    case 1:
+      lv_obj_clear_state(this->ui_Button21, LV_STATE_FOCUSED);
+      lv_obj_add_state(this->ui_Button22, LV_STATE_FOCUSED);
       break;
     default:
       break;
@@ -147,5 +153,9 @@ void ModeScreen::update() {
         // LOG_ERR("Unknown button index\n");
         break;
     }
+  }
+
+  if (buttons.isPressed(this->color, ButtonType::Cancel)) {
+    screenController.navigateTo(this->color, "settings");
   }
 }

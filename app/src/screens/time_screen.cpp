@@ -8,15 +8,43 @@
 #include <zephyr/kernel.h>
 
 #include "buttons.h"
+#include "screens/screen_controller.h"
+#include "timer.h"
 
 extern Buttons buttons;
+extern ScreenController screenController;
+extern Timer whiteTimer;
+extern Timer blackTimer;
 
 TimeScreen::TimeScreen(ChessColor color) : BaseScreen(color) {}
 
 TimeScreen::~TimeScreen() {}
 
 void TimeScreen::init() {
+  this->buttonIndex = 0;
   if (this->screen == nullptr) this->screen = lv_obj_create(nullptr);
+  this->timer = (this->color == ChessColor::White) ? &whiteTimer : &blackTimer;
+
+  switch (this->timer->getElapsedTime()) {
+    case 60 * 5:
+      this->buttonIndex = 1;
+      break;
+    case 60 * 10:
+      this->buttonIndex = 2;
+      break;
+    case 60 * 15:
+      this->buttonIndex = 3;
+      break;
+    case 60 * 30:
+      this->buttonIndex = 4;
+      break;
+    case 60 * 60:
+      this->buttonIndex = 5;
+      break;
+    default:
+      this->buttonIndex = 0;
+      break;
+  }
 
   lv_obj_clear_flag(this->screen, LV_OBJ_FLAG_SCROLLABLE);  /// Flags
   lv_obj_set_style_bg_color(this->screen, lv_color_hex(0xFFFFFF),
@@ -36,6 +64,8 @@ void TimeScreen::init() {
                           LV_PART_MAIN | LV_STATE_DEFAULT);
   lv_obj_set_style_bg_color(this->ui_Button15, lv_color_hex(0xFFFFFF),
                             LV_PART_MAIN | LV_STATE_DEFAULT);
+  lv_obj_set_style_bg_color(this->ui_Button15, lv_color_hex(0xD9EAFD),
+                            LV_PART_MAIN | LV_STATE_FOCUSED);
   lv_obj_set_style_bg_opa(this->ui_Button15, 255,
                           LV_PART_MAIN | LV_STATE_DEFAULT);
   lv_obj_set_style_shadow_color(this->ui_Button15, lv_color_hex(0xFFFFFF),
@@ -73,6 +103,8 @@ void TimeScreen::init() {
                           LV_PART_MAIN | LV_STATE_DEFAULT);
   lv_obj_set_style_bg_color(this->ui_Button16, lv_color_hex(0xFFFFFF),
                             LV_PART_MAIN | LV_STATE_DEFAULT);
+  lv_obj_set_style_bg_color(this->ui_Button16, lv_color_hex(0xD9EAFD),
+                            LV_PART_MAIN | LV_STATE_FOCUSED);
   lv_obj_set_style_bg_opa(this->ui_Button16, 255,
                           LV_PART_MAIN | LV_STATE_DEFAULT);
   lv_obj_set_style_shadow_color(this->ui_Button16, lv_color_hex(0xFFFFFF),
@@ -110,6 +142,8 @@ void TimeScreen::init() {
                           LV_PART_MAIN | LV_STATE_DEFAULT);
   lv_obj_set_style_bg_color(this->ui_Button17, lv_color_hex(0xFFFFFF),
                             LV_PART_MAIN | LV_STATE_DEFAULT);
+  lv_obj_set_style_bg_color(this->ui_Button17, lv_color_hex(0xD9EAFD),
+                            LV_PART_MAIN | LV_STATE_FOCUSED);
   lv_obj_set_style_bg_opa(this->ui_Button17, 255,
                           LV_PART_MAIN | LV_STATE_DEFAULT);
   lv_obj_set_style_shadow_color(this->ui_Button17, lv_color_hex(0xFFFFFF),
@@ -146,7 +180,7 @@ void TimeScreen::init() {
                             LV_PART_MAIN | LV_STATE_DEFAULT);
   lv_obj_set_style_text_align(this->ui_Label32, LV_TEXT_ALIGN_CENTER,
                               LV_PART_MAIN | LV_STATE_DEFAULT);
-  lv_obj_set_style_text_font(this->ui_Label32, &lv_font_roboto_34,
+  lv_obj_set_style_text_font(this->ui_Label32, &lv_font_roboto_36,
                              LV_PART_MAIN | LV_STATE_DEFAULT);
 
   this->ui_Button18 = lv_btn_create(this->screen);
@@ -163,6 +197,8 @@ void TimeScreen::init() {
                           LV_PART_MAIN | LV_STATE_DEFAULT);
   lv_obj_set_style_bg_color(this->ui_Button18, lv_color_hex(0xFFFFFF),
                             LV_PART_MAIN | LV_STATE_DEFAULT);
+  lv_obj_set_style_bg_color(this->ui_Button18, lv_color_hex(0xD9EAFD),
+                            LV_PART_MAIN | LV_STATE_FOCUSED);
   lv_obj_set_style_bg_opa(this->ui_Button18, 255,
                           LV_PART_MAIN | LV_STATE_DEFAULT);
   lv_obj_set_style_shadow_color(this->ui_Button18, lv_color_hex(0xFFFFFF),
@@ -200,6 +236,8 @@ void TimeScreen::init() {
                           LV_PART_MAIN | LV_STATE_DEFAULT);
   lv_obj_set_style_bg_color(this->ui_Button19, lv_color_hex(0xFFFFFF),
                             LV_PART_MAIN | LV_STATE_DEFAULT);
+  lv_obj_set_style_bg_color(this->ui_Button19, lv_color_hex(0xD9EAFD),
+                            LV_PART_MAIN | LV_STATE_FOCUSED);
   lv_obj_set_style_bg_opa(this->ui_Button19, 255,
                           LV_PART_MAIN | LV_STATE_DEFAULT);
   lv_obj_set_style_shadow_color(this->ui_Button19, lv_color_hex(0xFFFFFF),
@@ -237,6 +275,8 @@ void TimeScreen::init() {
                           LV_PART_MAIN | LV_STATE_DEFAULT);
   lv_obj_set_style_bg_color(this->ui_Button20, lv_color_hex(0xFFFFFF),
                             LV_PART_MAIN | LV_STATE_DEFAULT);
+  lv_obj_set_style_bg_color(this->ui_Button20, lv_color_hex(0xD9EAFD),
+                            LV_PART_MAIN | LV_STATE_FOCUSED);
   lv_obj_set_style_bg_opa(this->ui_Button20, 255,
                           LV_PART_MAIN | LV_STATE_DEFAULT);
   lv_obj_set_style_shadow_color(this->ui_Button20, lv_color_hex(0xFFFFFF),
@@ -263,55 +303,15 @@ void TimeScreen::init() {
 
 void TimeScreen::update() {
   if (buttons.isPressed(this->color, ButtonType::Up)) {
-    this->buttonIndex = (this->buttonIndex + 1) % 6;
+    this->buttonIndex = (this->buttonIndex + 5) % 6;
   }
 
   if (buttons.isPressed(this->color, ButtonType::Down)) {
-    this->buttonIndex = (this->buttonIndex + 2) % 6;
+    this->buttonIndex = (this->buttonIndex + 1) % 6;
   }
 
   switch (this->buttonIndex) {
     case 0:
-      lv_obj_clear_state(this->ui_Button15, LV_STATE_FOCUSED);
-      lv_obj_add_state(this->ui_Button16, LV_STATE_FOCUSED);
-      lv_obj_clear_state(this->ui_Button17, LV_STATE_FOCUSED);
-      lv_obj_clear_state(this->ui_Button18, LV_STATE_FOCUSED);
-      lv_obj_clear_state(this->ui_Button19, LV_STATE_FOCUSED);
-      lv_obj_clear_state(this->ui_Button20, LV_STATE_FOCUSED);
-      break;
-    case 1:
-      lv_obj_clear_state(this->ui_Button15, LV_STATE_FOCUSED);
-      lv_obj_clear_state(this->ui_Button16, LV_STATE_FOCUSED);
-      lv_obj_add_state(this->ui_Button17, LV_STATE_FOCUSED);
-      lv_obj_clear_state(this->ui_Button18, LV_STATE_FOCUSED);
-      lv_obj_clear_state(this->ui_Button19, LV_STATE_FOCUSED);
-      lv_obj_clear_state(this->ui_Button20, LV_STATE_FOCUSED);
-      break;
-    case 2:
-      lv_obj_clear_state(this->ui_Button15, LV_STATE_FOCUSED);
-      lv_obj_clear_state(this->ui_Button16, LV_STATE_FOCUSED);
-      lv_obj_clear_state(this->ui_Button17, LV_STATE_FOCUSED);
-      lv_obj_add_state(this->ui_Button18, LV_STATE_FOCUSED);
-      lv_obj_clear_state(this->ui_Button19, LV_STATE_FOCUSED);
-      lv_obj_clear_state(this->ui_Button20, LV_STATE_FOCUSED);
-      break;
-    case 3:
-      lv_obj_clear_state(this->ui_Button15, LV_STATE_FOCUSED);
-      lv_obj_clear_state(this->ui_Button16, LV_STATE_FOCUSED);
-      lv_obj_clear_state(this->ui_Button17, LV_STATE_FOCUSED);
-      lv_obj_clear_state(this->ui_Button18, LV_STATE_FOCUSED);
-      lv_obj_add_state(this->ui_Button19, LV_STATE_FOCUSED);
-      lv_obj_clear_state(this->ui_Button20, LV_STATE_FOCUSED);
-      break;
-    case 4:
-      lv_obj_clear_state(this->ui_Button15, LV_STATE_FOCUSED);
-      lv_obj_clear_state(this->ui_Button16, LV_STATE_FOCUSED);
-      lv_obj_clear_state(this->ui_Button17, LV_STATE_FOCUSED);
-      lv_obj_clear_state(this->ui_Button18, LV_STATE_FOCUSED);
-      lv_obj_clear_state(this->ui_Button19, LV_STATE_FOCUSED);
-      lv_obj_add_state(this->ui_Button20, LV_STATE_FOCUSED);
-      break;
-    case 5:
       lv_obj_add_state(this->ui_Button15, LV_STATE_FOCUSED);
       lv_obj_clear_state(this->ui_Button16, LV_STATE_FOCUSED);
       lv_obj_clear_state(this->ui_Button17, LV_STATE_FOCUSED);
@@ -319,33 +319,75 @@ void TimeScreen::update() {
       lv_obj_clear_state(this->ui_Button19, LV_STATE_FOCUSED);
       lv_obj_clear_state(this->ui_Button20, LV_STATE_FOCUSED);
       break;
+    case 1:
+      lv_obj_clear_state(this->ui_Button15, LV_STATE_FOCUSED);
+      lv_obj_add_state(this->ui_Button16, LV_STATE_FOCUSED);
+      lv_obj_clear_state(this->ui_Button17, LV_STATE_FOCUSED);
+      lv_obj_clear_state(this->ui_Button18, LV_STATE_FOCUSED);
+      lv_obj_clear_state(this->ui_Button19, LV_STATE_FOCUSED);
+      lv_obj_clear_state(this->ui_Button20, LV_STATE_FOCUSED);
+      break;
+    case 2:
+      lv_obj_clear_state(this->ui_Button15, LV_STATE_FOCUSED);
+      lv_obj_clear_state(this->ui_Button16, LV_STATE_FOCUSED);
+      lv_obj_add_state(this->ui_Button17, LV_STATE_FOCUSED);
+      lv_obj_clear_state(this->ui_Button18, LV_STATE_FOCUSED);
+      lv_obj_clear_state(this->ui_Button19, LV_STATE_FOCUSED);
+      lv_obj_clear_state(this->ui_Button20, LV_STATE_FOCUSED);
+      break;
+    case 3:
+      lv_obj_clear_state(this->ui_Button15, LV_STATE_FOCUSED);
+      lv_obj_clear_state(this->ui_Button16, LV_STATE_FOCUSED);
+      lv_obj_clear_state(this->ui_Button17, LV_STATE_FOCUSED);
+      lv_obj_add_state(this->ui_Button18, LV_STATE_FOCUSED);
+      lv_obj_clear_state(this->ui_Button19, LV_STATE_FOCUSED);
+      lv_obj_clear_state(this->ui_Button20, LV_STATE_FOCUSED);
+      break;
+    case 4:
+      lv_obj_clear_state(this->ui_Button15, LV_STATE_FOCUSED);
+      lv_obj_clear_state(this->ui_Button16, LV_STATE_FOCUSED);
+      lv_obj_clear_state(this->ui_Button17, LV_STATE_FOCUSED);
+      lv_obj_clear_state(this->ui_Button18, LV_STATE_FOCUSED);
+      lv_obj_add_state(this->ui_Button19, LV_STATE_FOCUSED);
+      lv_obj_clear_state(this->ui_Button20, LV_STATE_FOCUSED);
+      break;
+    case 5:
+      lv_obj_clear_state(this->ui_Button15, LV_STATE_FOCUSED);
+      lv_obj_clear_state(this->ui_Button16, LV_STATE_FOCUSED);
+      lv_obj_clear_state(this->ui_Button17, LV_STATE_FOCUSED);
+      lv_obj_clear_state(this->ui_Button18, LV_STATE_FOCUSED);
+      lv_obj_clear_state(this->ui_Button19, LV_STATE_FOCUSED);
+      lv_obj_add_state(this->ui_Button20, LV_STATE_FOCUSED);
+      break;
     default:
       break;
   }
 
   if (buttons.isPressed(this->color, ButtonType::Accept)) {
     switch (this->buttonIndex) {
-      case 0:
-        // LOG_INF("Null button pressed\n");
-        break;
       case 1:
-        // LOG_INF("5 button pressed\n");
+        this->timer->setElapsedTime(60 * 5);
         break;
       case 2:
-        // LOG_INF("10 button pressed\n");
+        this->timer->setElapsedTime(60 * 10);
         break;
       case 3:
-        // LOG_INF("15 button pressed\n");
+        this->timer->setElapsedTime(60 * 15);
         break;
       case 4:
-        // LOG_INF("30 button pressed\n");
+        this->timer->setElapsedTime(60 * 30);
         break;
       case 5:
-        // LOG_INF("60 button pressed\n");
+        this->timer->setElapsedTime(60 * 60);
         break;
       default:
-        // LOG_ERR("Unknown button index\n");
+        this->timer->setElapsedTime(0);
         break;
     }
+    screenController.navigateTo(this->color, "settings");
+  }
+
+  if (buttons.isPressed(this->color, ButtonType::Cancel)) {
+    screenController.navigateTo(this->color, "settings");
   }
 }

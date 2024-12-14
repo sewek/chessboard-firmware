@@ -35,7 +35,7 @@ void PromotionScreen::init() {
                             LV_PART_MAIN | LV_STATE_DEFAULT);
   lv_obj_set_style_text_align(this->ui_Label52, LV_TEXT_ALIGN_CENTER,
                               LV_PART_MAIN | LV_STATE_DEFAULT);
-  lv_obj_set_style_text_font(this->ui_Label52, &lv_font_roboto_34,
+  lv_obj_set_style_text_font(this->ui_Label52, &lv_font_roboto_36,
                              LV_PART_MAIN | LV_STATE_DEFAULT);
 
   this->ui_Label53 = lv_label_create(this->screen);
@@ -48,7 +48,7 @@ void PromotionScreen::init() {
                     "Doprowadziłeś pionka do linii promocji. Możesz teraz "
                     "wybrać na jaką figurę chcesz go zamienić. Pamiętaj, aby "
                     "zmienić figurę na szachownicy.");
-  lv_obj_set_style_text_font(this->ui_Label53, &lv_font_roboto_22,
+  lv_obj_set_style_text_font(this->ui_Label53, &lv_font_roboto_26,
                              LV_PART_MAIN | LV_STATE_DEFAULT);
 
   this->ui_Label54 = lv_label_create(this->screen);
@@ -63,7 +63,10 @@ void PromotionScreen::init() {
 }
 
 void PromotionScreen::update() {
+  /*
+  What is this?
   if (buttons.isPressed(this->color, ButtonType::Timer)) {
     break;
   }
+  */
 }
