@@ -205,42 +205,101 @@
    pinctrl-1 = <&i2c0_sleep>;
    pinctrl-names = "default", "sleep";
 
-   /*
-   tile0: tiles@40 {
-      status = "okay";
-      reg = <0x40>;
-      compatible = "chess,tiles";
-   };
 
-   tile1: tiles@41 {
-      status = "okay";
-      reg = <0x41>;
-      compatible = "chess,tiles";
-   };
-
-   tile2: tiles@42 {
-      status = "okay";
-      reg = <0x42>;
-      compatible = "chess,tiles";
-   };
-
-   tiles3: tiles@43 {
-      reg = <0x43>;
-      compatible = "chess,tiles";
-   };
-
-   tile4: tiles@44 {
-      status = "okay";
-      reg = <0x44>;
-      compatible = "chess,tiles";
-   };
-
-   tile5: tiles@45 {
+   tile0: tiles@45 {
       status = "okay";
       reg = <0x45>;
       compatible = "chess,tiles";
    };
-    */
+
+   tile1: tiles@46 {
+      status = "okay";
+      reg = <0x46>;
+      compatible = "chess,tiles";
+   };
+
+   tile2: tiles@47 {
+      status = "okay";
+      reg = <0x47>;
+      compatible = "chess,tiles";
+   };
+
+   tiles3: tiles@48 {
+      reg = <0x48>;
+      compatible = "chess,tiles";
+   };
+
+   tile4: tiles@49 {
+      status = "okay";
+      reg = <0x49>;
+      compatible = "chess,tiles";
+   };
+
+   tile5: tiles@4a {
+      status = "okay";
+      reg = <0x4a>;
+      compatible = "chess,tiles";
+   };
+
+   tile6: tiles@4b {
+      status = "okay";
+      reg = <0x4b>;
+      compatible = "chess,tiles";
+   };
+
+   tile7: tiles@4c {
+      status = "okay";
+      reg = <0x4c>;
+      compatible = "chess,tiles";
+   };
+
+   tile8: tiles@4d {
+      status = "okay";
+      reg = <0x4d>;
+      compatible = "chess,tiles";
+   };
+
+   tile9: tiles@4e {
+      status = "okay";
+      reg = <0x4e>;
+      compatible = "chess,tiles";
+   };
+
+   tile10: tiles@4f {
+      status = "okay";
+      reg = <0x4f>;
+      compatible = "chess,tiles";
+   };
+
+   tile11: tiles@50 {
+      status = "okay";
+      reg = <0x50>;
+      compatible = "chess,tiles";
+   };
+
+   tile12: tiles@51 {
+      status = "okay";
+      reg = <0x51>;
+      compatible = "chess,tiles";
+   };
+
+   tile13: tiles@52 {
+      status = "okay";
+      reg = <0x52>;
+      compatible = "chess,tiles";
+   };
+
+   tile14: tiles@53 {
+      status = "okay";
+      reg = <0x53>;
+      compatible = "chess,tiles";
+   };
+
+   tile15: tiles@54 {
+      status = "okay";
+      reg = <0x54>;
+      compatible = "chess,tiles";
+   };
 };
 
 &spi3 {
