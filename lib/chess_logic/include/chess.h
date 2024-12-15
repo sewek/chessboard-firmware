@@ -151,7 +151,7 @@ class Chess : public ChessEvents {
   ChessGameResult gameResult = ChessGameResult::Draw;
   uint8_t whiteWrongMoves = 0;
   uint8_t blackWrongMoves = 0;
-  uint8_t movesFor50Rule = 0;
+  uint8_t movesFor75Rule = 0;
   uint8_t repeatedPosition = 0;
 
   // void highlightPositions(ChessPosition *position, uint8_t count);

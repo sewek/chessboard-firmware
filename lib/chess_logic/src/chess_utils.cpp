@@ -341,15 +341,15 @@ void Chess::createMove(ChessMove *move, ChessPosition *from,
   move->setTo(to);
   move->setPiece(piece);
   move->setType(ChessMoveType::Normal);
-  this->movesFor50Rule++;
+  this->movesFor75Rule++;
 
   if (piece->getType() == ChessPieceType::Pawn) {
-    this->movesFor50Rule = 0;
+    this->movesFor75Rule = 0;
   }
 
   if (oponent != nullptr) {
     move->setType(ChessMoveType::Capture);
-    this->movesFor50Rule = 0;
+    this->movesFor75Rule = 0;
   }
 
   if (this->piece->getType() == ChessPieceType::Pawn &&

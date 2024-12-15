@@ -152,7 +152,7 @@ void Chess::notifyTileAction(ChessPosition *position,
         return;
       }
 
-      if (this->movesFor50Rule == 100) {
+      if (this->movesFor75Rule == 150) {
         this->gameResult = ChessGameResult::Draw;
         this->gameState = ChessGameState::Ended;
         notifyGameEnded();
