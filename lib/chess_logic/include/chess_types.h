@@ -47,6 +47,10 @@ enum class ChessEventType {
   HighlightSquare,
   UnhighlightSquare,
   GameCannotStart,
+  Castling,
+  Promotion,
+  EnPassant,
+  Error,
 };
 
 enum class ChessMoveType {
@@ -111,6 +115,7 @@ enum class ChessHighlightType {
   NormalMove = 0,
   CaptureMove,
   Check,
+  Checkmate,
   Error,
   Info,
 };

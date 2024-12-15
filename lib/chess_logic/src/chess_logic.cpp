@@ -75,7 +75,7 @@ uint8_t Chess::getAvailablePositions(ChessPiece *piece,
       if (lastMove->getPiece()->getType() == ChessPieceType::Pawn &&
           lastMove->getTo()->getRank() == position->getRank() &&
           lastMoveRankDelta == 2) {
-        int fileDelta = lastMove->getTo()->getRank() - position->getRank();
+        int fileDelta = lastMove->getTo()->getFile() - position->getFile();
 
         if (fileDelta == 1) {
           chessPositions[count++] = ChessPosition(position->getFile() + 1,

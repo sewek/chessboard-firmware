@@ -115,6 +115,101 @@ bool Chess::willBeKingChecked(ChessPosition *kingPosition, ChessColor color) {
   return false;  // nie szach
 }
 
+bool Chess::isKingCheckmate(ChessColor color) {
+  ChessPiece *king = this->findPiece(ChessPieceType::King, color);
+  ChessPosition positions[27];
+  ChessPosition *currentPosition;
+  uint8_t positionsCount = 0;
+  for (int i = 0; i < 32; ++i) {
+    ChessPiece *piece = &this->piece[i];
+
+    if (piece->getColor() != color) {
+      continue;
+    }
+
+    positionsCount = this->getAvailablePositions(piece, positions);
+    for (int j = 0; j < positionsCount; ++j) {
+      currentPosition = &positions[j];
+
+      if (this->willBeKingChecked(currentPosition, color) == false) {
+        return false;  // nie mat
+      }
+    }
+  }
+
+  return true;  // mat
+}
+// sprawdzenie czy jest pat
+bool Chess::isStalemate(ChessColor color) {
+  ChessPiece *ourpiece = nullptr;
+
+  ChessPosition positions[27];
+  ChessPosition *currentPosition;
+  uint8_t positionsCount = 0;
+  for (int i = 0; i < 32; ++i) {
+    ourpiece = &this->piece[i];
+
+    if (ourpiece->getPosition() == nullptr || ourpiece->isOnBoard == false) {
+      continue;
+    }
+
+    if (ourpiece->getColor() != color) {
+      continue;
+    }
+
+    positionsCount = this->getAvailablePositions(ourpiece, positions, false);
+
+    if (positionsCount > 0) {
+      return false;  // nie pat
+    }
+  }
+
+  return true;  // pat
+}
+
+// sprawdzenie czy jest możliwy mat -> 2 gońce na tym samym kolorze, skoczek i
+// król, goniec i król, krl i krl
+bool Chess::isMatPossible() {
+  uint8_t onBoardCount = 0;
+  for (int i = 0; i < 32; ++i) {
+    if (this->piece[i].isOnBoard) {
+      onBoardCount++;
+    }
+  }
+
+  if (onBoardCount == 2) {
+    return false;
+  }
+
+  if (onBoardCount == 3 &&
+      (this->findPiece(ChessPieceType::Knight, ChessColor::White)->isOnBoard ==
+           true ||
+       this->findPiece(ChessPieceType::Knight, ChessColor::Black)->isOnBoard ==
+           true)) {
+    return false;
+  }
+
+  if (onBoardCount == 3 &&
+      (this->findPiece(ChessPieceType::Bishop, ChessColor::White)->isOnBoard ==
+           true ||
+       this->findPiece(ChessPieceType::Bishop, ChessColor::Black)->isOnBoard ==
+           true)) {
+    return false;
+  }
+
+  if (onBoardCount == 4 && this->piece[2].isOnBoard &&
+      this->piece[21].isOnBoard) {
+    return false;
+  }
+
+  if (onBoardCount == 4 && this->piece[19].isOnBoard &&
+      this->piece[21].isOnBoard) {
+    return false;
+  }
+
+  return true;
+}
+
 ChessColor Chess::getCurrentPlayerColor() {
   if (this->move_index == 0) {
     return ChessColor::White;
@@ -246,9 +341,22 @@ void Chess::createMove(ChessMove *move, ChessPosition *from,
   move->setTo(to);
   move->setPiece(piece);
   move->setType(ChessMoveType::Normal);
+  this->movesFor50Rule++;
+
+  if (piece->getType() == ChessPieceType::Pawn) {
+    this->movesFor50Rule = 0;
+  }
 
   if (oponent != nullptr) {
     move->setType(ChessMoveType::Capture);
+    this->movesFor50Rule = 0;
+  }
+
+  if (this->piece->getType() == ChessPieceType::Pawn &&
+      (this->piece->getPosition()->getRank() == 1 ||
+       this->piece->getPosition()->getRank() == 8)) {
+    move->setType(ChessMoveType::Promotion);
+    pawnPromotion(piece->getPosition());
   }
 }
 
@@ -281,4 +389,25 @@ ChessPosition *Chess::getPosition(const char *position) {
   }
 
   return &this->position[file][rank];
+}
+
+void Chess::pawnPromotion(ChessPosition *position) {
+  ChessPiece *piece = this->findPiece(position);
+  if (piece == nullptr) {
+    return;
+  }
+
+  if (piece->getType() != ChessPieceType::Pawn) {
+    return;
+  }
+
+  if (piece->getColor() == ChessColor::White && position->getRank() != 8) {
+    return;
+  }
+
+  if (piece->getColor() == ChessColor::Black && position->getRank() != 1) {
+    return;
+  }
+
+  // TODO: Add pawn promotion request and wait for user input
 }

@@ -23,6 +23,25 @@ void ChessEvents::addListener(ChessEventType event,
 }
 
 void ChessEvents::addListener(ChessEventType event,
+                              ChessCallbackWithColor callback) {
+  if (event == ChessEventType::Castling) {
+    this->callbacksCastling_[this->callbackCountCastling_++] = callback;
+  }
+
+  if (event == ChessEventType::Promotion) {
+    this->callbacksPromotion_[this->callbackCountPromotion_++] = callback;
+  }
+
+  if (event == ChessEventType::EnPassant) {
+    this->callbacksEnPassant_[this->callbackCountEnPassant_++] = callback;
+  }
+
+  if (event == ChessEventType::Error) {
+    this->callbacksError_[this->callbackCountError_++] = callback;
+  }
+}
+
+void ChessEvents::addListener(ChessEventType event,
                               ChessCallbackWithPosition callback) {
   if (event == ChessEventType::UnhighlightSquare) {
     this->callbacksUnhighlightSquare_[this->callbackCountUnhighlightSquare_++] =
@@ -83,6 +102,33 @@ void ChessEvents::removeListener(ChessEventType event,
   }
 }
 
+void ChessEvents::removeListener(ChessEventType event,
+                                 ChessCallbackWithColor callback) {
+  if (event == ChessEventType::Castling) {
+    this->removeListener((ChessCallbackUnknwon)callback,
+                         (ChessCallbackUnknwon*)this->callbacksCastling_,
+                         &this->callbackCountCastling_);
+  }
+
+  if (event == ChessEventType::Promotion) {
+    this->removeListener((ChessCallbackUnknwon)callback,
+                         (ChessCallbackUnknwon*)this->callbacksPromotion_,
+                         &this->callbackCountPromotion_);
+  }
+
+  if (event == ChessEventType::EnPassant) {
+    this->removeListener((ChessCallbackUnknwon)callback,
+                         (ChessCallbackUnknwon*)this->callbacksEnPassant_,
+                         &this->callbackCountEnPassant_);
+  }
+
+  if (event == ChessEventType::Error) {
+    this->removeListener((ChessCallbackUnknwon)callback,
+                         (ChessCallbackUnknwon*)this->callbacksError_,
+                         &this->callbackCountError_);
+  }
+}
+
 void ChessEvents::removeListener(
     ChessEventType event, ChessCallbackWithPositionAndHighlight callback) {
   if (event == ChessEventType::HighlightSquare) {
@@ -137,6 +183,38 @@ void ChessEvents::notifyGameCannotStart(ChessPosition* position) {
   for (int i = 0; i < this->callbackCountGameCantStart_; i++) {
     if (this->callbacksGameCantStart_[i]) {
       this->callbacksGameCantStart_[i](position);
+    }
+  }
+}
+
+void ChessEvents::notifyCastling(ChessColor color) {
+  for (int i = 0; i < this->callbackCountCastling_; i++) {
+    if (this->callbacksCastling_[i]) {
+      this->callbacksCastling_[i](color);
+    }
+  }
+}
+
+void ChessEvents::notifyPromotion(ChessColor color) {
+  for (int i = 0; i < this->callbackCountPromotion_; i++) {
+    if (this->callbacksPromotion_[i]) {
+      this->callbacksPromotion_[i](color);
+    }
+  }
+}
+
+void ChessEvents::notifyEnPassant(ChessColor color) {
+  for (int i = 0; i < this->callbackCountEnPassant_; i++) {
+    if (this->callbacksEnPassant_[i]) {
+      this->callbacksEnPassant_[i](color);
+    }
+  }
+}
+
+void ChessEvents::notifyError(ChessColor color) {
+  for (int i = 0; i < this->callbackCountError_; i++) {
+    if (this->callbacksError_[i]) {
+      this->callbacksError_[i](color);
     }
   }
 }

@@ -151,6 +151,8 @@ class Chess : public ChessEvents {
   ChessGameResult gameResult = ChessGameResult::Draw;
   uint8_t whiteWrongMoves = 0;
   uint8_t blackWrongMoves = 0;
+  uint8_t movesFor50Rule = 0;
+  uint8_t repeatedPosition = 0;
 
   // void highlightPositions(ChessPosition *position, uint8_t count);
   ChessColor getCurrentPlayerColor();
@@ -158,6 +160,9 @@ class Chess : public ChessEvents {
                                 ChessPosition *chessPositions,
                                 bool removeKingCheck = true);
   bool isKingChecked(ChessColor color);
+  bool isKingCheckmate(ChessColor color);
+  bool isStalemate(ChessColor color);
+  bool isMatPossible();
   bool willBeKingChecked(ChessPosition *kingPosition, ChessColor color);
   ChessPiece *findPiece(ChessPosition *position);
   ChessPiece *findPiece(ChessPieceType type, ChessColor color);
@@ -167,6 +172,7 @@ class Chess : public ChessEvents {
   void applyMove(ChessMove *move);
   int checkPiecesArrangement();
   void assignPiecesToPositions();
+  void pawnPromotion(ChessPosition *position);
 
   void startSimulation();
   void endSimulation();
