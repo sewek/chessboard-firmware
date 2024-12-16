@@ -8,8 +8,8 @@ LOG_MODULE_REGISTER(tiles_trigger);
 extern Tiles tiles;
 extern Chess chess;
 
-K_THREAD_DEFINE(tiles_callback_thread, 1024, tilesTriggerHandler, nullptr,
-                nullptr, nullptr, 10, 0, 0);
+/* K_THREAD_DEFINE(tiles_callback_thread, 4096, tilesTriggerHandler, nullptr,
+                nullptr, nullptr, 10, 0, 0); */
 K_SEM_DEFINE(tiles_sem, 1, 1);
 K_MSGQ_DEFINE(chess_queue, sizeof(Tile *), 64, 4);
 
@@ -82,5 +82,36 @@ void tilesTriggerHandler(void *arg1, void *arg2, void *arg3) {
 
       k_yield();
     }
+  }
+}
+
+void handleTilesAction() {
+  if (k_sem_take(&tiles_sem, K_NO_WAIT) != 0) {
+    return;
+  }
+
+  Tile *tile = nullptr;
+  ChessPosition *position = nullptr;
+  char buff[3];
+
+  while (k_msgq_num_used_get(&chess_queue)) {
+    k_msgq_get(&chess_queue, &tile, K_NO_WAIT);
+
+    if (tile == nullptr) {
+      LOG_ERR("HANDLER: Tile is null\n");
+      continue;
+    }
+
+    position = &tile->position;
+
+    position->toString(buff);
+    buff[2] = '\0';
+
+    LOG_INF("HANDLER: Tile at %s has been %s\n", buff,
+            tile->state ? "put down" : "picked up");
+
+    ChessTileActionType action = (tile->state) ? ChessTileActionType::PutDown
+                                               : ChessTileActionType::PickUp;
+    chess.notifyTileAction(position, action);
   }
 }

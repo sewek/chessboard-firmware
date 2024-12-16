@@ -9,6 +9,7 @@
 #include "base_screen.h"
 #include "fonts.h"
 #include "images.h"
+#include "timer.h"
 
 /**
  * @brief This class represents the home screen of the application
@@ -23,6 +24,7 @@ class PromotionScreen : public BaseScreen {
   void update() override;
 
  private:
+  Timer* timer = nullptr;
   uint8_t buttonIndex = 0;
   lv_obj_t* ui_Label52 = nullptr;
   lv_obj_t* ui_Label53 = nullptr;

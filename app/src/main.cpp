@@ -47,82 +47,73 @@ Tiles tiles;
 /* Chess */
 Chess chess;
 
-void gameStartedCb() { LOG_INF("Game started\n"); }
+void gameStartedCb() { LOG_INF("Game started"); }
 
-void gameEndedCb() { LOG_INF("Game ended\n"); }
+void gameEndedCb() {
+  LOG_INF("Game ended");
+  ChessGameResult result = chess.getGameResult();
+
+  whiteTimer.stop();
+  blackTimer.stop();
+
+  if (result == ChessGameResult::WhiteWins) {
+    screenController.navigateTo(ChessColor::White, "win");
+    screenController.navigateTo(ChessColor::Black, "lose");
+  } else if (result == ChessGameResult::BlackWins) {
+    screenController.navigateTo(ChessColor::White, "lose");
+    screenController.navigateTo(ChessColor::Black, "win");
+  } else {
+    screenController.navigateTo(ChessColor::White, "draw2");
+    screenController.navigateTo(ChessColor::Black, "draw2");
+  }
+}
 
 void moveMadeCb(ChessMove *move) {
   char buff[7];
   move->toString(buff);
   buff[6] = '\0';
-  LOG_INF("Move made: %s\n", buff);
+  LOG_INF("Move made: %s", buff);
 }
 
 void pieceHighlightedCb(ChessPosition *position, ChessHighlightType type) {
   printk("Highlighting piece\n");
-  char buff[3];
-  position->toString(buff);
-  buff[2] = '\0';
-  LOG_INF("Piece at %s highlighted\n", buff);
+  // char buff[3];
+  // position->toString(buff);
+  // buff[2] = '\0';
+  // LOG_INF("Piece at %s highlighted", buff);
 
   tiles.setTileColor(position, getColor(type));
 }
 
 void pieceUnhighlightedCb(ChessPosition *position) {
-  char buff[3];
-  position->toString(buff);
-  buff[2] = '\0';
-  LOG_INF("Piece at %s unhighlighted\n", buff);
+  printk("Unhighlighting piece\n");
+  // char buff[3];
+  // position->toString(buff);
+  // buff[2] = '\0';
+  // LOG_INF("Piece at %s unhighlighted", buff);
 
   refreshTileColor(&tiles, position);
 }
 
-/* void tilesChangeCallback(const struct device *dev,
-                         const struct sensor_trigger *trg) {
-  struct sensor_value buff;
-  Tile *tile = nullptr;
-  ChessPosition *position = nullptr;
-  uint8_t state = 0;
+void chessCastlingCb(ChessColor color) {
+  screenController.navigateTo(color, "castling");
+}
 
-  sensor_channel_get(dev, (enum sensor_channel)SENSOR_CHAN_TILES_STATE, &buff);
+void chessPromotionCb(ChessColor color) {
+  screenController.navigateTo(color, "promotion");
+}
 
-  for (int i = 0; i < 64; i++) {
-    if (!tiles.tiles[i].dev) {
-      continue;
-    }
+void chessEnPassantCb(ChessColor color) {
+  screenController.navigateTo(color, "en_passant");
+}
 
-    if (tiles.tiles[i].dev != dev) {
-      continue;
-    }
-
-    tile = &tiles.tiles[i];
-    position = &tile->position;
-    state = (buff.val1 >> (tile->channel - 1)) & 0x01;
-
-    bool state_changed = (tile->state != state);
-
-    LOG_INF("Tile %d state: %d\n", i, state);
-
-    if (state_changed) {
-      // Test log
-      char buff[3];
-      position->toString(buff);
-      buff[2] = '\0';
-
-      LOG_INF("Tile at %s has been %s\n", buff,
-              state ? "put down" : "picked up");
-
-      tile->state = state;
-      ChessTileActionType action =
-          (state) ? ChessTileActionType::PutDown : ChessTileActionType::PickUp;
-      chess.notifyTileAction(position, action);
-    }
-  }
-} */
+void chessErrorCb(ChessColor color) {
+  screenController.navigateTo(color, "error");
+}
 
 int main() {
-  LOG_INF("build time: " __DATE__ " " __TIME__ "\n");
-  LOG_INF("board: %s\n", CONFIG_BOARD);
+  LOG_INF("build time: " __DATE__ " " __TIME__ "");
+  LOG_INF("board: %s", CONFIG_BOARD);
 
   int ret;
 
@@ -131,33 +122,37 @@ int main() {
   chess.addListener(ChessEventType::MoveMade, moveMadeCb);
   chess.addListener(ChessEventType::HighlightSquare, pieceHighlightedCb);
   chess.addListener(ChessEventType::UnhighlightSquare, pieceUnhighlightedCb);
+  chess.addListener(ChessEventType::Castling, chessCastlingCb);
+  chess.addListener(ChessEventType::Promotion, chessPromotionCb);
+  chess.addListener(ChessEventType::EnPassant, chessEnPassantCb);
+  chess.addListener(ChessEventType::Error, chessErrorCb);
   tiles.setTriggerHandler(tilesChangeCallback);
 
   LOG_INF("Initializing buttons");
   ret = buttons.init();
   if (ret < 0) {
-    LOG_ERR("Failed to initialize buttons\n");
+    LOG_ERR("Failed to initialize buttons");
     return ret;
   }
-  LOG_INF("Buttons initialized\n");
-
-  LOG_INF("Initializing screen controller");
-  ret = screenController.init();
-  if (ret < 0) {
-    LOG_ERR("Failed to initialize screen controller\n");
-    return ret;
-  }
-  LOG_INF("Screen controller initialized\n");
+  LOG_INF("Buttons initialized");
 
   LOG_INF("Initializing tiles");
   ret = tiles.init();
   if (ret < 0) {
-    LOG_ERR("Failed to initialize tiles\n");
+    LOG_ERR("Failed to initialize tiles");
     return ret;
   }
-  LOG_INF("Tiles initialized\n");
+  LOG_INF("Tiles initialized");
 
   refreshTilesColor(&tiles);
+
+  LOG_INF("Initializing screen controller");
+  ret = screenController.init();
+  if (ret < 0) {
+    LOG_ERR("Failed to initialize screen controller");
+    return ret;
+  }
+  LOG_INF("Screen controller initialized");
 
   Tile *tile = nullptr;
   for (int i = 0; i < 64; i++) {
@@ -171,17 +166,11 @@ int main() {
                                                 : ChessTileActionType::PickUp);
   }
 
-  if (chess.startGame() != ChessGameStartError::Ok) {
-    LOG_ERR("Failed to start game\n");
-    return -1;
-  }
-
-  // display_blanking_off(white_display.dev);
-  // display_blanking_off(black_display.dev);
-
   while (true) {
     // Refresh the screen
+    handleTilesAction();
     screenController.run();
+
     k_sleep(K_MSEC(50));
   }
 

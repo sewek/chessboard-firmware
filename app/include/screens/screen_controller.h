@@ -9,14 +9,24 @@
 #include <chess_types.h>
 
 #include "base_screen.h"
+#include "castling_screen.h"
 #include "display.h"
+#include "draw1_screen.h"
+#include "draw2_screen.h"
+#include "draw_screen.h"
+#include "en_passant_screen.h"
+#include "error_screen.h"
+#include "giveup_screen.h"
 #include "home_screen.h"
+#include "lose_screen.h"
 #include "mode_screen.h"
 #include "open_screen.h"
 #include "piece_screen.h"
+#include "promotion_screen.h"
 #include "settings_screen.h"
 #include "start_screen.h"
 #include "time_screen.h"
+#include "win_screen.h"
 
 /**
  * @brief This class represents the screen controller of the application
@@ -65,12 +75,19 @@ class ScreenController {
  private:
   BaseScreen *currentScreen[2] = {nullptr, nullptr};
 
-  BaseScreen *screens[14] = {
-      &whiteHomeScreen,     &blackHomeScreen,  &whiteSettingsScreen,
-      &blackSettingsScreen, &whiteStartScreen, &blackStartScreen,
-      &whitePieceScreen,    &blackPieceScreen, &whiteModeScreen,
-      &blackModeScreen,     &whiteTimeScreen,  &blackTimeScreen,
-      &whiteOpenScreen,     &blackOpenScreen,
+  BaseScreen *screens[34] = {
+      &whiteHomeScreen,      &blackHomeScreen,      &whiteSettingsScreen,
+      &blackSettingsScreen,  &whiteStartScreen,     &blackStartScreen,
+      &whitePieceScreen,     &blackPieceScreen,     &whiteModeScreen,
+      &blackModeScreen,      &whiteTimeScreen,      &blackTimeScreen,
+      &whiteOpenScreen,      &blackOpenScreen,      &whiteDraw2Screen,
+      &blackDraw2Screen,     &whiteWinScreen,       &blackWinScreen,
+      &whiteLoseScreen,      &blackLoseScreen,      &whiteCastlingScreen,
+      &blackCastlingScreen,  &whitePromotionScreen, &blackPromotionScreen,
+      &whiteEnPassantScreen, &blackEnPassantScreen, &whiteErrorScreen,
+      &blackErrorScreen,     &whiteDraw1Screen,     &blackDraw1Screen,
+      &whiteGiveUpScreen,    &blackGiveUpScreen,    &whiteDrawScreen,
+      &blackDrawScreen,
   };
   uint8_t screen_count = sizeof(screens) / sizeof(screens[0]);
 

@@ -8,8 +8,14 @@
 #include <zephyr/kernel.h>
 
 #include "buttons.h"
+#include "chess.h"
+#include "screens/screen_controller.h"
 
 extern Buttons buttons;
+extern ScreenController screenController;
+extern Timer whiteTimer;
+extern Timer blackTimer;
+extern Chess chess;
 
 PieceScreen::PieceScreen(ChessColor color) : BaseScreen(color) {}
 
@@ -17,6 +23,7 @@ PieceScreen::~PieceScreen() {}
 
 void PieceScreen::init() {
   if (this->screen == nullptr) this->screen = lv_obj_create(nullptr);
+  this->timer = (this->color == ChessColor::White) ? &whiteTimer : &blackTimer;
 
   lv_obj_clear_flag(this->screen, LV_OBJ_FLAG_SCROLLABLE);  /// Flags
   lv_obj_set_style_bg_color(this->screen, lv_color_hex(0xFFFFFF),
@@ -52,6 +59,8 @@ void PieceScreen::init() {
                           LV_PART_MAIN | LV_STATE_DEFAULT);
   lv_obj_set_style_bg_color(this->ui_Button29, lv_color_hex(0xFFFFFF),
                             LV_PART_MAIN | LV_STATE_DEFAULT);
+  lv_obj_set_style_bg_color(this->ui_Button29, lv_color_hex(0xD9EAFD),
+                            LV_PART_MAIN | LV_STATE_FOCUSED);
   lv_obj_set_style_bg_opa(this->ui_Button29, 255,
                           LV_PART_MAIN | LV_STATE_DEFAULT);
   lv_obj_set_style_shadow_color(this->ui_Button29, lv_color_hex(0xFFFFFF),
@@ -87,6 +96,8 @@ void PieceScreen::init() {
                           LV_PART_MAIN | LV_STATE_DEFAULT);
   lv_obj_set_style_bg_color(this->ui_Button30, lv_color_hex(0xFFFFFF),
                             LV_PART_MAIN | LV_STATE_DEFAULT);
+  lv_obj_set_style_bg_color(this->ui_Button30, lv_color_hex(0xD9EAFD),
+                            LV_PART_MAIN | LV_STATE_FOCUSED);
   lv_obj_set_style_bg_opa(this->ui_Button30, 255,
                           LV_PART_MAIN | LV_STATE_DEFAULT);
   lv_obj_set_style_shadow_color(this->ui_Button30, lv_color_hex(0xFFFFFF),
@@ -124,6 +135,8 @@ void PieceScreen::init() {
                           LV_PART_MAIN | LV_STATE_DEFAULT);
   lv_obj_set_style_bg_color(this->ui_Button31, lv_color_hex(0xFFFFFF),
                             LV_PART_MAIN | LV_STATE_DEFAULT);
+  lv_obj_set_style_bg_color(this->ui_Button31, lv_color_hex(0xD9EAFD),
+                            LV_PART_MAIN | LV_STATE_FOCUSED);
   lv_obj_set_style_bg_opa(this->ui_Button31, 255,
                           LV_PART_MAIN | LV_STATE_DEFAULT);
   lv_obj_set_style_shadow_color(this->ui_Button31, lv_color_hex(0xFFFFFF),
@@ -161,6 +174,8 @@ void PieceScreen::init() {
                           LV_PART_MAIN | LV_STATE_DEFAULT);
   lv_obj_set_style_bg_color(this->ui_Button32, lv_color_hex(0xFFFFFF),
                             LV_PART_MAIN | LV_STATE_DEFAULT);
+  lv_obj_set_style_bg_color(this->ui_Button32, lv_color_hex(0xD9EAFD),
+                            LV_PART_MAIN | LV_STATE_FOCUSED);
   lv_obj_set_style_bg_opa(this->ui_Button32, 255,
                           LV_PART_MAIN | LV_STATE_DEFAULT);
   lv_obj_set_style_shadow_color(this->ui_Button32, lv_color_hex(0xFFFFFF),
@@ -231,37 +246,37 @@ void PieceScreen::init() {
 
 void PieceScreen::update() {
   if (buttons.isPressed(this->color, ButtonType::Up)) {
-    this->buttonIndex = (this->buttonIndex + 1) % 4;
+    this->buttonIndex = (this->buttonIndex + 3) % 4;
   }
 
   if (buttons.isPressed(this->color, ButtonType::Down)) {
-    this->buttonIndex = (this->buttonIndex + 2) % 4;
+    this->buttonIndex = (this->buttonIndex + 1) % 4;
   }
 
   switch (this->buttonIndex) {
     case 0:
-      lv_obj_clear_state(this->ui_Button29, LV_STATE_FOCUSED);
-      lv_obj_add_state(this->ui_Button30, LV_STATE_FOCUSED);
+      lv_obj_add_state(this->ui_Button29, LV_STATE_FOCUSED);
+      lv_obj_clear_state(this->ui_Button30, LV_STATE_FOCUSED);
       lv_obj_clear_state(this->ui_Button31, LV_STATE_FOCUSED);
       lv_obj_clear_state(this->ui_Button32, LV_STATE_FOCUSED);
       break;
     case 1:
       lv_obj_clear_state(this->ui_Button29, LV_STATE_FOCUSED);
-      lv_obj_clear_state(this->ui_Button30, LV_STATE_FOCUSED);
-      lv_obj_add_state(this->ui_Button31, LV_STATE_FOCUSED);
+      lv_obj_add_state(this->ui_Button30, LV_STATE_FOCUSED);
+      lv_obj_clear_state(this->ui_Button31, LV_STATE_FOCUSED);
       lv_obj_clear_state(this->ui_Button32, LV_STATE_FOCUSED);
       break;
     case 2:
       lv_obj_clear_state(this->ui_Button29, LV_STATE_FOCUSED);
       lv_obj_clear_state(this->ui_Button30, LV_STATE_FOCUSED);
-      lv_obj_clear_state(this->ui_Button31, LV_STATE_FOCUSED);
-      lv_obj_add_state(this->ui_Button32, LV_STATE_FOCUSED);
+      lv_obj_add_state(this->ui_Button31, LV_STATE_FOCUSED);
+      lv_obj_clear_state(this->ui_Button32, LV_STATE_FOCUSED);
       break;
     case 3:
-      lv_obj_add_state(this->ui_Button29, LV_STATE_FOCUSED);
+      lv_obj_clear_state(this->ui_Button29, LV_STATE_FOCUSED);
       lv_obj_clear_state(this->ui_Button30, LV_STATE_FOCUSED);
       lv_obj_clear_state(this->ui_Button31, LV_STATE_FOCUSED);
-      lv_obj_clear_state(this->ui_Button32, LV_STATE_FOCUSED);
+      lv_obj_add_state(this->ui_Button32, LV_STATE_FOCUSED);
       break;
     default:
       break;
@@ -271,15 +286,27 @@ void PieceScreen::update() {
     switch (this->buttonIndex) {
       case 0:
         // LOG_INF("Queen button pressed\n");
+        chess.setPromotionPiece(ChessPieceType::Queen);
+        this->timer->resume();
+        screenController.navigateTo(this->color, "start");
         break;
       case 1:
-        // LOG_INF("Rock button pressed\n");
+        // LOG_INF("Rook button pressed\n");
+        chess.setPromotionPiece(ChessPieceType::Rook);
+        this->timer->resume();
+        screenController.navigateTo(this->color, "start");
         break;
       case 2:
         // LOG_INF("Bishop button pressed\n");
+        chess.setPromotionPiece(ChessPieceType::Bishop);
+        this->timer->resume();
+        screenController.navigateTo(this->color, "start");
         break;
       case 3:
         // LOG_INF("Knight button pressed\n");
+        chess.setPromotionPiece(ChessPieceType::Knight);
+        this->timer->resume();
+        screenController.navigateTo(this->color, "start");
         break;
       default:
         // LOG_ERR("Unknown button index\n");

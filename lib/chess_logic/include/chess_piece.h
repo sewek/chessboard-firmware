@@ -32,6 +32,14 @@ class ChessPiece {
   void setLastMove(ChessMove *move) { this->lastMove = move; }
   void setColor(ChessColor color) { this->color = color; }
   void setType(ChessPieceType type) { this->type = type; }
+
+  bool operator==(const ChessPiece &other) const {
+    return this->color == other.color && this->type == other.type &&
+           this->position == other.position &&
+           this->isOnBoard == other.isOnBoard;
+  }
+
+  bool operator!=(const ChessPiece &other) const { return !(*this == other); }
 };
 
 #endif  // CHESS_PIECE_H

@@ -8,8 +8,10 @@
 #include <zephyr/kernel.h>
 
 #include "buttons.h"
+#include "screens/screen_controller.h"
 
 extern Buttons buttons;
+extern ScreenController screenController;
 
 LoseScreen::LoseScreen(ChessColor color) : BaseScreen(color) {}
 
@@ -48,10 +50,7 @@ void LoseScreen::init() {
 }
 
 void LoseScreen::update() {
-  /*
-  What is this?
   if (buttons.isPressed(this->color, ButtonType::Timer)) {
-    break;
+    screenController.navigateTo(this->color, "home");
   }
-  */
 }

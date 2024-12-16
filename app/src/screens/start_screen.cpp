@@ -8,12 +8,14 @@
 #include <zephyr/kernel.h>
 
 #include "buttons.h"
+#include "chess.h"
 #include "screens/screen_controller.h"
 
 extern Buttons buttons;
 extern ScreenController screenController;
 extern Timer whiteTimer;
 extern Timer blackTimer;
+extern Chess chess;
 
 StartScreen::StartScreen(ChessColor color) : BaseScreen(color) {}
 
@@ -150,12 +152,32 @@ void StartScreen::init() {
 void StartScreen::update() {
   if (this->color == ChessColor::White && this->timer->isStopped() &&
       this->oponentReady) {
-    this->timer->start();
+    if (!chess.isInProgress()) {
+      chess.startGame(this->timer->getElapsedTime() > 0);
+    } else {
+      this->timer->start();
+    }
   }
 
   if (!this->timer->isPaused()) {
+    uint32_t time = this->timer->getElapsedTime();
+    if (time < this->lastTime && time <= 0 && chess.isInProgress()) {
+      this->timer->stop();
+      chess.finishGame(this->color == ChessColor::White
+                           ? ChessGameResult::BlackWins
+                           : ChessGameResult::WhiteWins);
+    }
+
     this->timer->toString(this->timeString);
     lv_label_set_text(this->ui_Label9, this->timeString);
+
+    char buff[3];
+    uint8_t wrongMoves = chess.getWrongMoves(this->color);
+    if (this->lastWrongMoves != wrongMoves) {
+      this->lastWrongMoves = wrongMoves;
+      snprintf(buff, 2, "%d", wrongMoves);
+      lv_label_set_text(this->ui_Label8, buff);
+    }
   }
 
   if (buttons.isPressed(this->color, ButtonType::Up)) {
@@ -182,10 +204,12 @@ void StartScreen::update() {
   if (buttons.isPressed(this->color, ButtonType::Accept)) {
     switch (this->buttonIndex) {
       case 0:
-        // LOG_INF("Draw button pressed\n");
+        this->timer->pause();
+        screenController.navigateTo(this->color, "draw");
         break;
       case 1:
-        // LOG_INF("Give up button pressed\n");
+        this->timer->pause();
+        screenController.navigateTo(this->color, "give_up");
         break;
       default:
         // LOG_ERR("Unknown button index\n");
@@ -196,6 +220,7 @@ void StartScreen::update() {
   if (buttons.isPressed(this->color, ButtonType::Timer) &&
       !this->timer->isPaused()) {
     this->timer->pause();
+    chess.pressTimmerButton(this->color);
     if (this->color == ChessColor::White) {
       if (blackTimer.isStopped()) blackTimer.start();
       blackTimer.resume();

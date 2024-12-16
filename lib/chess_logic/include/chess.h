@@ -23,7 +23,43 @@ class Chess : public ChessEvents {
   /**
    * @brief Start game by user
    */
-  ChessGameStartError startGame();
+  ChessGameStartError startGame(bool shouldWaitForTimmer = false);
+
+  /**
+   * @brief Check if the game is in progress.
+   */
+  bool isInProgress() const { return gameState == ChessGameState::InProgress; }
+
+  /**
+   * @brief Get wrong moves count for given color.
+   * @param color The color of the player.
+   * @return The wrong moves count.
+   */
+  uint8_t getWrongMoves(ChessColor color) const {
+    return color == ChessColor::White ? whiteWrongMoves : blackWrongMoves;
+  }
+
+  /**
+   * @brief Get the game result.
+   */
+  ChessGameResult getGameResult() const { return gameResult; }
+
+  /**
+   * @brief Get the game state.
+   */
+  void pressTimmerButton(ChessColor color);
+
+  /**
+   * @brief Finish the game.
+   * @param result The result of the game.
+   */
+  void finishGame(ChessGameResult result);
+
+  /**
+   * @brief Set promotion piece.
+   * @param piece The piece to promote.
+   */
+  void setPromotionPiece(ChessPieceType piece);
 
  private:
   ChessTileState tileState[8][8] = {};
@@ -143,7 +179,9 @@ class Chess : public ChessEvents {
       ChessPiece(ChessColor::Black, ChessPieceType::Pawn),
       ChessPiece(ChessColor::Black, ChessPieceType::Pawn),
   };
+  ChessPiece repeatedPositions[50][32];
   ChessPiece pieceSimulationBackup[32];
+  uint8_t repeatedPositionIndex = 0;
   ChessPiece *pickedUpPiece = nullptr;
   ChessMove move[CHESS_MOVE_MAX];
   uint16_t move_index = 0;
@@ -153,12 +191,24 @@ class Chess : public ChessEvents {
   uint8_t blackWrongMoves = 0;
   uint8_t movesFor75Rule = 0;
   uint8_t repeatedPosition = 0;
+  uint8_t highlightedPositions[8][8];
+  ChessPiece *castlingRook = nullptr;
+  ChessPosition *castlingRookPosition = nullptr;
+  ChessPosition *enPassantPosition = nullptr;
+  int lastWrongMoveWhite = -1;
+  int lastWrongMoveBlack = -1;
+  ChessPosition *positionsToExcludeFromWrongMoves[50];
+  uint8_t positionsToExcludeFromWrongMovesCount = 0;
+  bool shouldWaitForTimmer = false;
+  bool waitingForTimmer = false;
+  ChessPiece *promotionPiece = nullptr;
 
   // void highlightPositions(ChessPosition *position, uint8_t count);
   ChessColor getCurrentPlayerColor();
   uint8_t getAvailablePositions(ChessPiece *piece,
-                                ChessPosition *chessPositions,
-                                bool removeKingCheck = true);
+                                ChessPosition *chessPositions);
+  uint8_t filterAvailablePositions(ChessPosition *chessPositions, uint8_t count,
+                                   ChessPiece *piece);
   bool isKingChecked(ChessColor color);
   bool isKingCheckmate(ChessColor color);
   bool isStalemate(ChessColor color);
@@ -179,6 +229,13 @@ class Chess : public ChessEvents {
   void simulateMove(ChessMove *move);
   bool isCastlingPossible(ChessCastlingType type, ChessColor color);
   ChessPosition *getPosition(const char *position);
+  void clear();
+
+  uint8_t getKingAvailablePositions(ChessPiece *king, ChessPosition *positions);
+
+  void saveRepeatedPosition();
+  void clearRepeatedPositions();
+  bool are3RepeatedPositions();
 };
 
 #endif  // _CHESS_LOGIC_H_

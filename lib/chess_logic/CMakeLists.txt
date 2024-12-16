@@ -23,6 +23,7 @@ set(SOURCES
    src/chess_simulation.cpp
    src/chess_utils.cpp
    src/chess_logic.cpp
+   src/chess_repeated.cpp
 )
 
 #include_directories(include)

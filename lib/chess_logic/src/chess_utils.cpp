@@ -1,6 +1,10 @@
 #include "chess.h"
 #include "chess_log.h"
 
+#ifdef CHESS_ZEPHYR_LOG
+LOG_MODULE_REGISTER(chess_utils, LOG_LEVEL_DBG);
+#endif
+
 ChessPiece *Chess::findPiece(ChessPosition *position) {
   for (int i = 0; i < 32; ++i) {
     if (*this->piece[i].position == *position) {
@@ -50,19 +54,72 @@ int Chess::isOccupied(ChessPosition *position, ChessColor color) {
 // szach ten tego
 bool Chess::isKingChecked(ChessColor color) {
   ChessPiece *king = this->findPiece(ChessPieceType::King, color);
-  ChessPiece *oponent = nullptr;
 
   if (king == nullptr) {
-    print_error("King not found\n");
     return false;  // błąd
   }
 
   if (king->getPosition() == nullptr) {
-    print_error("King not on board\n");
     return false;  // błąd
   }
 
+  ChessPiece *oponent = nullptr;
   ChessPosition positions[27];
+  ChessPosition *kingPosition = king->getPosition();
+  ChessPosition *currentPosition;
+  uint8_t positionsCount = 0;
+  for (int i = 0; i < 32; ++i) {
+    oponent = &this->piece[i];
+
+    if (oponent == nullptr) {
+      print_error("Oponent not found\n");
+      continue;
+    }
+
+    if (oponent->getPosition() == nullptr) {
+      continue;
+    }
+
+    if (!oponent->isOnBoard) {
+      continue;
+    }
+
+    if (oponent->getColor() == color) {
+      continue;
+    }
+
+    if (oponent->getType() == ChessPieceType::King) {
+      positionsCount = this->getKingAvailablePositions(oponent, positions);
+      for (int j = 0; j < positionsCount; ++j) {
+        currentPosition = &positions[j];
+
+        if (*currentPosition == *kingPosition) {
+          return true;  // szach od króla przeciwnika
+        }
+      }
+      continue;
+    }
+
+    positionsCount = this->getAvailablePositions(oponent, positions);
+
+    for (int j = 0; j < positionsCount; ++j) {
+      currentPosition = &positions[j];
+
+      if (*currentPosition == *kingPosition) {
+        return true;  // szach
+      }
+    }
+  }
+
+  return false;  // nie szach
+}
+
+bool Chess::willBeKingChecked(ChessPosition *kingPosition, ChessColor color) {
+  ChessPiece *oponentKing = this->findPiece(
+      ChessPieceType::King,
+      color == ChessColor::White ? ChessColor::Black : ChessColor::White);
+  ChessPosition positions[27];
+  ChessPiece *oponent;
   ChessPosition *currentPosition;
   uint8_t positionsCount = 0;
   for (int i = 0; i < 32; ++i) {
@@ -76,33 +133,21 @@ bool Chess::isKingChecked(ChessColor color) {
       continue;
     }
 
-    positionsCount = this->getAvailablePositions(oponent, positions, false);
+    if (oponent->getType() == ChessPieceType::King) {
+      positionsCount = this->getKingAvailablePositions(oponentKing, positions);
+      for (int j = 0; j < positionsCount; ++j) {
+        currentPosition = &positions[j];
 
-    for (int j = 0; j < positionsCount; ++j) {
-      currentPosition = &positions[j];
-
-      if (*currentPosition == *king->getPosition()) {
-        return true;  // szach
+        if (*currentPosition == *kingPosition) {
+          return true;  // szach od króla przeciwnika
+        }
       }
-    }
-  }
-
-  return false;  // nie szach
-}
-
-bool Chess::willBeKingChecked(ChessPosition *kingPosition, ChessColor color) {
-  ChessPosition positions[27];
-  ChessPiece *oponent;
-  ChessPosition *currentPosition;
-  uint8_t positionsCount = 0;
-  for (int i = 0; i < 32; ++i) {
-    oponent = &this->piece[i];
-
-    if (oponent->getColor() == color) {
       continue;
     }
 
     positionsCount = this->getAvailablePositions(oponent, positions);
+    positionsCount =
+        this->filterAvailablePositions(positions, positionsCount, oponent);
     for (int j = 0; j < positionsCount; ++j) {
       currentPosition = &positions[i];
 
@@ -128,6 +173,8 @@ bool Chess::isKingCheckmate(ChessColor color) {
     }
 
     positionsCount = this->getAvailablePositions(piece, positions);
+    positionsCount =
+        this->filterAvailablePositions(positions, positionsCount, piece);
     for (int j = 0; j < positionsCount; ++j) {
       currentPosition = &positions[j];
 
@@ -157,7 +204,7 @@ bool Chess::isStalemate(ChessColor color) {
       continue;
     }
 
-    positionsCount = this->getAvailablePositions(ourpiece, positions, false);
+    positionsCount = this->getAvailablePositions(ourpiece, positions);
 
     if (positionsCount > 0) {
       return false;  // nie pat
@@ -239,10 +286,12 @@ bool Chess::isCastlingPossible(ChessCastlingType type, ChessColor color) {
   }
 
   if (king->hasMoved()) {
+    print_debug("King has moved\n");
     return false;
   }
 
   if (this->isKingChecked(color)) {
+    print_debug("King is checked\n");
     return false;
   }
 
@@ -257,53 +306,32 @@ bool Chess::isCastlingPossible(ChessCastlingType type, ChessColor color) {
 
     if (rookPosition->getFile() == 1) {
       longRook = rook;
+      print_debug("Long rook found\n");
     } else if (rookPosition->getFile() == 8) {
       shortRook = rook;
+      print_debug("Short rook found\n");
     }
   }
 
   if (type == ChessCastlingType::Short) {
+    print_debug("Checking short castling\n");
     if (shortRook == nullptr) {
+      print_debug("Short rook not found\n");
       return false;
     }
 
     if (shortRook->hasMoved()) {
-      return false;
-    }
-
-    for (int i = 1; i < 3; ++i) {
-      tempPosition =
-          ChessPosition(kingPosition->getFile() + i, kingPosition->getRank());
-
-      if (this->willBeKingChecked(&tempPosition, color)) {
-        return false;
-      }
-
-      if (i == 2) {
-        continue;
-      }
-
-      isOccupied = this->isOccupied(&tempPosition, color);
-      if (isOccupied != 0) {
-        return false;
-      }
-    }
-  }
-
-  if (type == ChessCastlingType::Long) {
-    if (longRook == nullptr) {
-      return false;
-    }
-
-    if (longRook->hasMoved()) {
+      print_debug("Short rook has moved\n");
       return false;
     }
 
     for (int i = 1; i < 4; ++i) {
       tempPosition =
-          ChessPosition(kingPosition->getFile() - i, kingPosition->getRank());
+          ChessPosition(kingPosition->getFile() + i, kingPosition->getRank());
 
       if (this->willBeKingChecked(&tempPosition, color)) {
+        print_debug("King will be checked in %d iteration (%d %d position)\n",
+                    i, tempPosition.getFile(), tempPosition.getRank());
         return false;
       }
 
@@ -313,12 +341,48 @@ bool Chess::isCastlingPossible(ChessCastlingType type, ChessColor color) {
 
       isOccupied = this->isOccupied(&tempPosition, color);
       if (isOccupied != 0) {
+        print_debug("Position %d %d is occupied\n", tempPosition.getFile(),
+                    tempPosition.getRank());
         return false;
       }
     }
   }
 
-  return false;
+  if (type == ChessCastlingType::Long) {
+    if (longRook == nullptr) {
+      print_debug("Long rook not found\n");
+      return false;
+    }
+
+    if (longRook->hasMoved()) {
+      print_debug("Long rook has moved\n");
+      return false;
+    }
+
+    for (int i = 1; i < 5; ++i) {
+      tempPosition =
+          ChessPosition(kingPosition->getFile() - i, kingPosition->getRank());
+
+      if (this->willBeKingChecked(&tempPosition, color)) {
+        print_debug("King will be checked in %d iteration (%d %d position)\n",
+                    i, tempPosition.getFile(), tempPosition.getRank());
+        return false;
+      }
+
+      if (i == 4) {
+        continue;
+      }
+
+      isOccupied = this->isOccupied(&tempPosition, color);
+      if (isOccupied != 0) {
+        print_debug("Position %d %d is occupied\n", tempPosition.getFile(),
+                    tempPosition.getRank());
+        return false;
+      }
+    }
+  }
+
+  return true;
 }
 
 void Chess::createMove(ChessMove *move, ChessPosition *from,
@@ -333,7 +397,7 @@ void Chess::createMove(ChessMove *move, ChessPosition *from,
   ChessPiece *oponent = this->findPiece(to);
 
   if (oponent != nullptr) {
-    print_debug("Found oponent piece %d %s\n", oponent->getType(),
+    print_debug("Found oponent piece %d %s\n", (int)oponent->getType(),
                 oponent->getColor() == ChessColor::White ? "white" : "black");
   }
 
@@ -352,11 +416,26 @@ void Chess::createMove(ChessMove *move, ChessPosition *from,
     this->movesFor75Rule = 0;
   }
 
-  if (this->piece->getType() == ChessPieceType::Pawn &&
-      (this->piece->getPosition()->getRank() == 1 ||
-       this->piece->getPosition()->getRank() == 8)) {
+  if (piece->getType() == ChessPieceType::Pawn && oponent == nullptr &&
+      from->getFile() != to->getFile()) {
+    move->setType(ChessMoveType::EnPassant);
+    ChessColor color = piece->getColor();
+    this->enPassantPosition =
+        &this->position[to->getFile() - 1]
+                       [to->getRank() - 1 +
+                        (color == ChessColor::White ? -1 : 1)];
+  }
+
+  if (piece->getType() == ChessPieceType::Pawn &&
+      (to->getRank() == 1 || to->getRank() == 8)) {
     move->setType(ChessMoveType::Promotion);
     pawnPromotion(piece->getPosition());
+  }
+
+  if (piece->getType() == ChessPieceType::King &&
+      (from->getFile() - to->getFile() == 2 ||
+       to->getFile() - from->getFile() == 2)) {
+    move->setType(ChessMoveType::Castling);
   }
 }
 
@@ -378,6 +457,76 @@ void Chess::applyMove(ChessMove *move) {
   piece->setLastMove(move);
 
   this->move_index++;
+
+  if (move->getType() == ChessMoveType::Castling) {
+    ChessPiece *rook = nullptr;
+    ChessPosition *rookPosition = nullptr;
+    ChessPosition *kingPosition = piece->getPosition();
+    ChessPosition *tempPosition = nullptr;
+
+    if (kingPosition->getFile() == 7) {
+      tempPosition = &this->position[7][kingPosition->getRank() - 1];
+    } else if (kingPosition->getFile() == 3) {
+      tempPosition = &this->position[0][kingPosition->getRank() - 1];
+    } else {
+      print_error("Invalid castling move\n");
+      return;
+    }
+
+    rook = this->findPiece(tempPosition);
+
+    if (kingPosition->getFile() == 7) {
+      rookPosition = &this->position[5][kingPosition->getRank() - 1];
+    } else if (kingPosition->getFile() == 3) {
+      rookPosition = &this->position[3][kingPosition->getRank() - 1];
+    } else {
+      print_error("Invalid castling move\n");
+      return;
+    }
+
+    this->castlingRookPosition = rook->getPosition();
+    rook->setPosition(rookPosition);
+    this->castlingRook = rook;
+  }
+
+  /* if (move->getType() == ChessMoveType::Capture ||
+      move->getType() == ChessMoveType::Promotion ||
+      move->getType() == ChessMoveType::Castling ||
+      piece->getType() == ChessPieceType::Pawn ||
+      (piece->getType() == ChessPieceType::Rook && !piece->hasMoved()) ||
+      (piece->getType() == ChessPieceType::King && !piece->hasMoved())) {
+    this->clearRepeatedPositions();
+  }
+
+  bool isPotentialEnPassant =
+      (move->getType() == ChessMoveType::Normal &&
+       piece->getType() == ChessPieceType::Pawn &&
+       (move->getFrom()->getRank() - move->getTo()->getRank() == 2 ||
+        move->getTo()->getRank() - move->getFrom()->getRank() == 2));
+
+  if (isPotentialEnPassant) {
+    ChessPosition leftPosition =
+        ChessPosition(move->getTo()->getFile() - 1, move->getTo()->getRank());
+    ChessPosition rightPosition =
+        ChessPosition(move->getTo()->getFile() + 1, move->getTo()->getRank());
+    ChessPiece *pieceAtLeft = this->findPiece(&leftPosition);
+    ChessPiece *pieceAtRight = this->findPiece(&rightPosition);
+
+    bool oponentAtLeft = pieceAtLeft != nullptr &&
+                         pieceAtLeft->getColor() != piece->getColor() &&
+                         pieceAtLeft->getType() == ChessPieceType::Pawn;
+    bool oponentAtRight = pieceAtRight != nullptr &&
+                          pieceAtRight->getColor() != piece->getColor() &&
+                          pieceAtRight->getType() == ChessPieceType::Pawn;
+
+    if (!oponentAtLeft && !oponentAtRight) {
+      isPotentialEnPassant = false;
+    }
+  }
+
+  if (!isPotentialEnPassant) {
+    this->saveRepeatedPosition();
+  } */
 }
 
 ChessPosition *Chess::getPosition(const char *position) {
@@ -410,4 +559,17 @@ void Chess::pawnPromotion(ChessPosition *position) {
   }
 
   // TODO: Add pawn promotion request and wait for user input
+}
+
+void Chess::clear() {
+  this->whiteWrongMoves = 0;
+  this->blackWrongMoves = 0;
+  this->lastWrongMoveWhite = -1;
+  this->lastWrongMoveBlack = -1;
+  this->move_index = 0;
+  this->positionsToExcludeFromWrongMovesCount = 0;
+  this->castlingRook = nullptr;
+  this->castlingRookPosition = nullptr;
+  this->enPassantPosition = nullptr;
+  this->shouldWaitForTimmer = shouldWaitForTimmer;
 }

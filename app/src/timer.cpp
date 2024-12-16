@@ -39,7 +39,9 @@ int Timer::resume() {
 uint32_t Timer::getElapsedTime() {
   if (this->stopped) return this->elapsedTime;
   if (this->paused) return this->elapsedTime;
-  return this->elapsedTime - ((k_uptime_get_32() - this->startTime) / 1000);
+  int time =
+      (int)(this->elapsedTime - ((k_uptime_get_32() - this->startTime) / 1000));
+  return time < 0 ? 0 : time;
 }
 
 void Timer::setElapsedTime(uint32_t time) { this->elapsedTime = time; }
