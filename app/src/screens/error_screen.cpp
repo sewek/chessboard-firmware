@@ -8,7 +8,12 @@
 #include <zephyr/kernel.h>
 
 #include "buttons.h"
+#include "screens/screen_controller.h"
+#include "timer.h"
 
+extern ScreenController screenController;
+extern Timer whiteTimer;
+extern Timer blackTimer;
 extern Buttons buttons;
 
 ErrorScreen::ErrorScreen(ChessColor color) : BaseScreen(color) {}
@@ -17,6 +22,8 @@ ErrorScreen::~ErrorScreen() {}
 
 void ErrorScreen::init() {
   if (this->screen == nullptr) this->screen = lv_obj_create(nullptr);
+  this->timer = (this->color == ChessColor::White) ? &whiteTimer : &blackTimer;
+  this->timer->pause();
 
   lv_obj_clear_flag(this->screen, LV_OBJ_FLAG_SCROLLABLE);  /// Flags
   lv_obj_set_style_bg_color(this->screen, lv_color_hex(0xFFFFFF),
@@ -63,10 +70,8 @@ void ErrorScreen::init() {
 }
 
 void ErrorScreen::update() {
-  /*
-  What is this?
   if (buttons.isPressed(this->color, ButtonType::Timer)) {
-    break;
+    this->timer->resume();
+    screenController.navigateTo(this->color, "start");
   }
-  */
 }

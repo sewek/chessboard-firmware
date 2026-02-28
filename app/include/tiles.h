@@ -110,4 +110,6 @@ void tilesChangeCallback(const struct device *dev,
                          const struct sensor_trigger *trg);
 void tilesTriggerHandler(void *arg1, void *arg2, void *arg3);
 
+void handleTilesAction();
+
 #endif  // TILES_H

@@ -8,8 +8,13 @@
 #include <zephyr/kernel.h>
 
 #include "buttons.h"
+#include "screens/screen_controller.h"
+#include "timer.h"
 
 extern Buttons buttons;
+extern ScreenController screenController;
+extern Timer whiteTimer;
+extern Timer blackTimer;
 
 DrawScreen::DrawScreen(ChessColor color) : BaseScreen(color) {}
 
@@ -17,6 +22,7 @@ DrawScreen::~DrawScreen() {}
 
 void DrawScreen::init() {
   if (this->screen == nullptr) this->screen = lv_obj_create(nullptr);
+  this->timer = (this->color == ChessColor::White) ? &whiteTimer : &blackTimer;
 
   lv_obj_clear_flag(this->screen, LV_OBJ_FLAG_SCROLLABLE);  /// Flags
   lv_obj_set_style_bg_color(this->screen, lv_color_hex(0xFFFFFF),
@@ -50,6 +56,8 @@ void DrawScreen::init() {
   lv_obj_set_style_radius(this->ui_Button8, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
   lv_obj_set_style_bg_color(this->ui_Button8, lv_color_hex(0xFFFFFF),
                             LV_PART_MAIN | LV_STATE_DEFAULT);
+  lv_obj_set_style_bg_color(this->ui_Button8, lv_color_hex(0xD9EAFD),
+                            LV_PART_MAIN | LV_STATE_FOCUSED);
   lv_obj_set_style_bg_opa(this->ui_Button8, 255,
                           LV_PART_MAIN | LV_STATE_DEFAULT);
   lv_obj_set_style_shadow_color(this->ui_Button8, lv_color_hex(0xFFFFFF),
@@ -83,6 +91,8 @@ void DrawScreen::init() {
   lv_obj_set_style_radius(this->ui_Button9, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
   lv_obj_set_style_bg_color(this->ui_Button9, lv_color_hex(0xFFFFFF),
                             LV_PART_MAIN | LV_STATE_DEFAULT);
+  lv_obj_set_style_bg_color(this->ui_Button9, lv_color_hex(0xD9EAFD),
+                            LV_PART_MAIN | LV_STATE_FOCUSED);
   lv_obj_set_style_bg_opa(this->ui_Button9, 255,
                           LV_PART_MAIN | LV_STATE_DEFAULT);
   lv_obj_set_style_shadow_color(this->ui_Button9, lv_color_hex(0xFFFFFF),
@@ -113,17 +123,17 @@ void DrawScreen::update() {
   }
 
   if (buttons.isPressed(this->color, ButtonType::Down)) {
-    this->buttonIndex = (this->buttonIndex + 2) % 2;
+    this->buttonIndex = (this->buttonIndex + 1) % 2;
   }
 
   switch (this->buttonIndex) {
     case 0:
-      lv_obj_clear_state(this->ui_Button8, LV_STATE_FOCUSED);
-      lv_obj_add_state(this->ui_Button9, LV_STATE_FOCUSED);
-      break;
-    case 1:
       lv_obj_add_state(this->ui_Button8, LV_STATE_FOCUSED);
       lv_obj_clear_state(this->ui_Button9, LV_STATE_FOCUSED);
+      break;
+    case 1:
+      lv_obj_clear_state(this->ui_Button8, LV_STATE_FOCUSED);
+      lv_obj_add_state(this->ui_Button9, LV_STATE_FOCUSED);
       break;
     default:
       break;
@@ -132,10 +142,14 @@ void DrawScreen::update() {
   if (buttons.isPressed(this->color, ButtonType::Accept)) {
     switch (this->buttonIndex) {
       case 0:
-        // LOG_INF("Yes button pressed\n");
+        screenController.navigateTo(this->color == ChessColor::White
+                                        ? ChessColor::Black
+                                        : ChessColor::White,
+                                    "draw1");
         break;
       case 1:
-        // LOG_INF("No button pressed\n");
+        this->timer->resume();
+        screenController.navigateTo(this->color, "start");
         break;
       default:
         // LOG_ERR("Unknown button index\n");

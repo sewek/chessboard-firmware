@@ -16,13 +16,13 @@
 #else
 
 #ifdef __ZEPHYR__
-#include <zephyr/sys/printk.h>
-#include <zephyr/zephyr.h>
+#include <zephyr/logging/log.h>
 
-#define print_debug(...) printk("[ChessLogic] DEBUG: " __VA_ARGS__)
-#define print_info(...) printk("[ChessLogic] INFO: " __VA_ARGS__)
-#define print_warning(...) printk("[ChessLogic] WARNING: " __VA_ARGS__)
-#define print_error(...) printk("[ChessLogic] ERROR: " __VA_ARGS__)
+#define CHESS_ZEPHYR_LOG 1
+#define print_debug(...) LOG_DBG(__VA_ARGS__)
+#define print_info(...) LOG_INF(__VA_ARGS__)
+#define print_warning(...) LOG_WRN(__VA_ARGS__)
+#define print_error(...) LOG_ERR(__VA_ARGS__)
 
 #else
 

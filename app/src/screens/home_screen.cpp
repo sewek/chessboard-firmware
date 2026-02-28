@@ -103,6 +103,7 @@ void HomeScreen::init() {
   lv_obj_set_style_text_font(this->ui_Label2, &lv_font_roboto_26,
                              LV_PART_MAIN | LV_STATE_DEFAULT);
 
+  /*
   this->ui_Button3 = lv_btn_create(this->screen);
   lv_obj_set_width(this->ui_Button3, 315);
   lv_obj_set_height(this->ui_Button3, 50);
@@ -140,6 +141,7 @@ void HomeScreen::init() {
                             LV_PART_MAIN | LV_STATE_DEFAULT);
   lv_obj_set_style_text_font(this->ui_Label3, &lv_font_roboto_26,
                              LV_PART_MAIN | LV_STATE_DEFAULT);
+  */
 
   this->ui_Label4 = lv_label_create(this->screen);
   lv_obj_set_width(this->ui_Label4, LV_SIZE_CONTENT);   /// 1
@@ -183,12 +185,12 @@ void HomeScreen::init() {
 
 void HomeScreen::update() {
   if (buttons.isPressed(this->color, ButtonType::Up)) {
-    this->buttonIndex = (this->buttonIndex + 2) % 3;
+    this->buttonIndex = (this->buttonIndex + 1) % 2;
     LOG_INF("Button index: %d\n", this->buttonIndex);
   }
 
   if (buttons.isPressed(this->color, ButtonType::Down)) {
-    this->buttonIndex = (this->buttonIndex + 1) % 3;
+    this->buttonIndex = (this->buttonIndex + 1) % 2;
     LOG_INF("Button index: %d\n", this->buttonIndex);
   }
 
@@ -203,11 +205,13 @@ void HomeScreen::update() {
       lv_obj_clear_state(this->ui_Button2, LV_STATE_FOCUSED);
       lv_obj_clear_state(this->ui_Button3, LV_STATE_FOCUSED);
       break;
+    /*
     case 2:
       lv_obj_clear_state(this->ui_Button1, LV_STATE_FOCUSED);
       lv_obj_clear_state(this->ui_Button2, LV_STATE_FOCUSED);
       lv_obj_add_state(this->ui_Button3, LV_STATE_FOCUSED);
       break;
+    */
     default:
       break;
   }
@@ -220,9 +224,11 @@ void HomeScreen::update() {
       case 1:
         screenController.navigateTo(this->color, "settings");
         break;
+      /*
       case 2:
         LOG_INF("Info button pressed\n");
         break;
+      */
       default:
         LOG_ERR("Unknown button index\n");
         break;

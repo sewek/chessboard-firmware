@@ -27,8 +27,10 @@ class StartScreen : public BaseScreen {
 
  private:
   Timer* timer = nullptr;
-  bool oponentReady = false;
+  uint32_t lastTime = 0;
+  uint8_t lastWrongMoves = 0;
   uint8_t buttonIndex = 0;
+  bool oponentReady = false;
   char timeString[8] = {0};
   lv_obj_t* ui_Button5 = nullptr;
   lv_obj_t* ui_Button4 = nullptr;

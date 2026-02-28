@@ -8,8 +8,14 @@
 #include <zephyr/kernel.h>
 
 #include "buttons.h"
+#include "chess.h"
+#include "screens/screen_controller.h"
 
 extern Buttons buttons;
+extern ScreenController screenController;
+extern Timer whiteTimer;
+extern Timer blackTimer;
+extern Chess chess;
 
 GiveUpScreen::GiveUpScreen(ChessColor color) : BaseScreen(color) {}
 
@@ -17,6 +23,7 @@ GiveUpScreen::~GiveUpScreen() {}
 
 void GiveUpScreen::init() {
   if (this->screen == nullptr) this->screen = lv_obj_create(nullptr);
+  this->timer = (this->color == ChessColor::White) ? &whiteTimer : &blackTimer;
 
   lv_obj_clear_flag(this->screen, LV_OBJ_FLAG_SCROLLABLE);  /// Flags
   lv_obj_set_style_bg_color(this->screen, lv_color_hex(0xFFFFFF),
@@ -50,6 +57,8 @@ void GiveUpScreen::init() {
   lv_obj_set_style_radius(this->ui_Button7, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
   lv_obj_set_style_bg_color(this->ui_Button7, lv_color_hex(0xFFFFFF),
                             LV_PART_MAIN | LV_STATE_DEFAULT);
+  lv_obj_set_style_bg_color(this->ui_Button7, lv_color_hex(0xD9EAFD),
+                            LV_PART_MAIN | LV_STATE_FOCUSED);
   lv_obj_set_style_bg_opa(this->ui_Button7, 255,
                           LV_PART_MAIN | LV_STATE_DEFAULT);
   lv_obj_set_style_shadow_color(this->ui_Button7, lv_color_hex(0xFFFFFF),
@@ -83,6 +92,8 @@ void GiveUpScreen::init() {
   lv_obj_set_style_radius(this->ui_Button6, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
   lv_obj_set_style_bg_color(this->ui_Button6, lv_color_hex(0xFFFFFF),
                             LV_PART_MAIN | LV_STATE_DEFAULT);
+  lv_obj_set_style_bg_color(this->ui_Button6, lv_color_hex(0xD9EAFD),
+                            LV_PART_MAIN | LV_STATE_FOCUSED);
   lv_obj_set_style_bg_opa(this->ui_Button6, 255,
                           LV_PART_MAIN | LV_STATE_DEFAULT);
   lv_obj_set_style_shadow_color(this->ui_Button6, lv_color_hex(0xFFFFFF),
@@ -113,17 +124,17 @@ void GiveUpScreen::update() {
   }
 
   if (buttons.isPressed(this->color, ButtonType::Down)) {
-    this->buttonIndex = (this->buttonIndex + 2) % 2;
+    this->buttonIndex = (this->buttonIndex + 1) % 2;
   }
 
   switch (this->buttonIndex) {
     case 0:
-      lv_obj_clear_state(this->ui_Button7, LV_STATE_FOCUSED);
-      lv_obj_add_state(this->ui_Button6, LV_STATE_FOCUSED);
-      break;
-    case 1:
       lv_obj_add_state(this->ui_Button7, LV_STATE_FOCUSED);
       lv_obj_clear_state(this->ui_Button6, LV_STATE_FOCUSED);
+      break;
+    case 1:
+      lv_obj_clear_state(this->ui_Button7, LV_STATE_FOCUSED);
+      lv_obj_add_state(this->ui_Button6, LV_STATE_FOCUSED);
       break;
     default:
       break;
@@ -132,10 +143,16 @@ void GiveUpScreen::update() {
   if (buttons.isPressed(this->color, ButtonType::Accept)) {
     switch (this->buttonIndex) {
       case 0:
-        // LOG_INF("Yes button pressed\n");
+        whiteTimer.stop();
+        blackTimer.stop();
+        chess.finishGame(this->color == ChessColor::White
+                             ? ChessGameResult::BlackWins
+                             : ChessGameResult::WhiteWins);
+
         break;
       case 1:
-        // LOG_INF("No button pressed\n");
+        this->timer->resume();
+        screenController.navigateTo(this->color, "start");
         break;
       default:
         // LOG_ERR("Unknown button index\n");

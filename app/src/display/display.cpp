@@ -44,7 +44,7 @@ int Display::init() {
 #endif
 
 #if CONFIG_LV_Z_LOG_LEVEL != 0
-  lv_log_register_print_cb(lvgl_log);
+  // lv_log_register_print_cb(lvgl_log);
 #endif
 
   lv_init();

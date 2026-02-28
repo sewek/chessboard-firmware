@@ -8,7 +8,11 @@
 #include <zephyr/kernel.h>
 
 #include "buttons.h"
+#include "screens/screen_controller.h"
 
+extern ScreenController screenController;
+extern Timer whiteTimer;
+extern Timer blackTimer;
 extern Buttons buttons;
 
 CastlingScreen::CastlingScreen(ChessColor color) : BaseScreen(color) {}
@@ -17,6 +21,8 @@ CastlingScreen::~CastlingScreen() {}
 
 void CastlingScreen::init() {
   if (this->screen == nullptr) this->screen = lv_obj_create(nullptr);
+  this->timer = (this->color == ChessColor::White) ? &whiteTimer : &blackTimer;
+  this->timer->pause();
 
   lv_obj_clear_flag(this->screen, LV_OBJ_FLAG_SCROLLABLE);  /// Flags
   lv_obj_set_style_bg_color(this->screen, lv_color_hex(0xFFFFFF),
@@ -72,10 +78,8 @@ void CastlingScreen::init() {
 }
 
 void CastlingScreen::update() {
-  /*
-  What is this?
   if (buttons.isPressed(this->color, ButtonType::Timer)) {
-    break;
+    this->timer->resume();
+    screenController.navigateTo(this->color, "start");
   }
-  */
 }

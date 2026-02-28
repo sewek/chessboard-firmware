@@ -43,7 +43,10 @@ uint8_t ChessPosition::getFile() const { return (this->data_ >> 4) & 0x0f; }
 uint8_t ChessPosition::getRank() const { return this->data_ & 0x0f; }
 
 bool ChessPosition::isValid() const {
-  return (this->data_ & 0xf0) && (this->data_ & 0x0f);
+  uint8_t file = this->getFile();
+  uint8_t rank = this->getRank();
+
+  return (file >= 1 && file <= 8) && (rank >= 1 && rank <= 8);
 }
 
 uint8_t ChessPosition::toData() const { return this->data_; }

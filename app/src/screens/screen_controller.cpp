@@ -64,12 +64,12 @@ int ScreenController::navigateTo(ChessColor color, const char *screen) {
       continue;
     }
 
-    LOG_INF("Screen: %s\n", this->screens[i]->getName());
     if (this->screens[i]->getColor() != color) {
       continue;
     }
 
     if (strcmp(this->screens[i]->getName(), screen) == 0) {
+      LOG_INF("Found screen: %s\n", this->screens[i]->getName());
       this->showScreen(this->screens[i]);
       return 0;
     }

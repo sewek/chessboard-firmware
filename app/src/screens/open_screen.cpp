@@ -5,13 +5,17 @@
 
 #include "screens/open_screen.h"
 
+#include <chess.h>
 #include <zephyr/kernel.h>
 
 #include "buttons.h"
 #include "screens/screen_controller.h"
 
+extern Chess chess;
 extern Buttons buttons;
 extern ScreenController screenController;
+
+#define SCREEN_WIDTH 320
 
 OpenScreen::OpenScreen(ChessColor color) : BaseScreen(color) {}
 
@@ -19,6 +23,8 @@ OpenScreen::~OpenScreen() {}
 
 void OpenScreen::init() {
   if (this->screen == nullptr) this->screen = lv_obj_create(nullptr);
+
+  this->buttonIndex = chess.getOpeningIndex() + 1;
 
   lv_obj_clear_flag(this->screen, LV_OBJ_FLAG_SCROLLABLE);  /// Flags
   lv_obj_set_style_bg_color(this->screen, lv_color_hex(0xFFFFFF),
@@ -52,7 +58,7 @@ void OpenScreen::init() {
                             LV_PART_MAIN | LV_STATE_DEFAULT);
 
   this->ui_Label35 = lv_label_create(this->ui_Button23);
-  lv_obj_set_width(this->ui_Label35, LV_SIZE_CONTENT);   /// 1
+  lv_obj_set_width(this->ui_Label35, SCREEN_WIDTH);      /// 1
   lv_obj_set_height(this->ui_Label35, LV_SIZE_CONTENT);  /// 1
   lv_obj_set_align(this->ui_Label35, LV_ALIGN_LEFT_MID);
   lv_label_set_text(this->ui_Label35, "Brak");
@@ -91,10 +97,11 @@ void OpenScreen::init() {
                             LV_PART_MAIN | LV_STATE_DEFAULT);
 
   this->ui_Label37 = lv_label_create(this->ui_Button24);
-  lv_obj_set_width(this->ui_Label37, LV_SIZE_CONTENT);   /// 1
+  lv_obj_set_width(this->ui_Label37, SCREEN_WIDTH);      /// 1
   lv_obj_set_height(this->ui_Label37, LV_SIZE_CONTENT);  /// 1
   lv_obj_set_align(this->ui_Label37, LV_ALIGN_LEFT_MID);
-  lv_label_set_text(this->ui_Label37, "Otwarcie 1");
+  lv_label_set_long_mode(this->ui_Label37, LV_LABEL_LONG_WRAP);
+  lv_label_set_text(this->ui_Label37, chess.getOpening(0)->name);
   lv_obj_set_style_text_color(this->ui_Label37, lv_color_hex(0x000000),
                               LV_PART_MAIN | LV_STATE_DEFAULT);
   lv_obj_set_style_text_opa(this->ui_Label37, 255,
@@ -130,10 +137,11 @@ void OpenScreen::init() {
                             LV_PART_MAIN | LV_STATE_DEFAULT);
 
   this->ui_Label38 = lv_label_create(this->ui_Button25);
-  lv_obj_set_width(this->ui_Label38, LV_SIZE_CONTENT);   /// 1
+  lv_obj_set_width(this->ui_Label38, SCREEN_WIDTH);      /// 1
   lv_obj_set_height(this->ui_Label38, LV_SIZE_CONTENT);  /// 1
   lv_obj_set_align(this->ui_Label38, LV_ALIGN_LEFT_MID);
-  lv_label_set_text(this->ui_Label38, "Otwarcie 2");
+  lv_label_set_long_mode(this->ui_Label38, LV_LABEL_LONG_WRAP);
+  lv_label_set_text(this->ui_Label38, chess.getOpening(1)->name);
   lv_obj_set_style_text_color(this->ui_Label38, lv_color_hex(0x000000),
                               LV_PART_MAIN | LV_STATE_DEFAULT);
   lv_obj_set_style_text_opa(this->ui_Label38, 255,
@@ -142,12 +150,12 @@ void OpenScreen::init() {
                              LV_PART_MAIN | LV_STATE_DEFAULT);
 
   this->ui_Label39 = lv_label_create(this->screen);
-  lv_obj_set_width(this->ui_Label39, LV_SIZE_CONTENT);   /// 1
+  lv_obj_set_width(this->ui_Label39, SCREEN_WIDTH);      /// 1
   lv_obj_set_height(this->ui_Label39, LV_SIZE_CONTENT);  /// 1
   lv_obj_set_x(this->ui_Label39, 0);
   lv_obj_set_y(this->ui_Label39, -180);
   lv_obj_set_align(this->ui_Label39, LV_ALIGN_CENTER);
-  lv_label_set_text(this->ui_Label39, "Otwarcie");
+  lv_label_set_text(this->ui_Label39, chess.getOpening(2)->name);
   lv_obj_set_style_text_color(this->ui_Label39, lv_color_hex(0x000000),
                               LV_PART_MAIN | LV_STATE_DEFAULT);
   lv_obj_set_style_text_opa(this->ui_Label39, 255,
@@ -185,10 +193,11 @@ void OpenScreen::init() {
                             LV_PART_MAIN | LV_STATE_DEFAULT);
 
   this->ui_Label40 = lv_label_create(this->ui_Button26);
-  lv_obj_set_width(this->ui_Label40, LV_SIZE_CONTENT);   /// 1
+  lv_obj_set_width(this->ui_Label40, SCREEN_WIDTH);      /// 1
   lv_obj_set_height(this->ui_Label40, LV_SIZE_CONTENT);  /// 1
   lv_obj_set_align(this->ui_Label40, LV_ALIGN_LEFT_MID);
-  lv_label_set_text(this->ui_Label40, "Otwarcie 3");
+  lv_label_set_long_mode(this->ui_Label38, LV_LABEL_LONG_WRAP);
+  lv_label_set_text(this->ui_Label40, chess.getOpening(2)->name);
   lv_obj_set_style_text_color(this->ui_Label40, lv_color_hex(0x000000),
                               LV_PART_MAIN | LV_STATE_DEFAULT);
   lv_obj_set_style_text_opa(this->ui_Label40, 255,
@@ -224,10 +233,11 @@ void OpenScreen::init() {
                             LV_PART_MAIN | LV_STATE_DEFAULT);
 
   this->ui_Label41 = lv_label_create(this->ui_Button27);
-  lv_obj_set_width(this->ui_Label41, LV_SIZE_CONTENT);   /// 1
+  lv_obj_set_width(this->ui_Label41, SCREEN_WIDTH);      /// 1
   lv_obj_set_height(this->ui_Label41, LV_SIZE_CONTENT);  /// 1
   lv_obj_set_align(this->ui_Label41, LV_ALIGN_LEFT_MID);
-  lv_label_set_text(this->ui_Label41, "Otwarcie 4");
+  lv_label_set_long_mode(this->ui_Label38, LV_LABEL_LONG_WRAP);
+  lv_label_set_text(this->ui_Label41, chess.getOpening(3)->name);
   lv_obj_set_style_text_color(this->ui_Label41, lv_color_hex(0x000000),
                               LV_PART_MAIN | LV_STATE_DEFAULT);
   lv_obj_set_style_text_opa(this->ui_Label41, 255,
@@ -263,10 +273,11 @@ void OpenScreen::init() {
                             LV_PART_MAIN | LV_STATE_DEFAULT);
 
   this->ui_Label42 = lv_label_create(this->ui_Button28);
-  lv_obj_set_width(this->ui_Label42, LV_SIZE_CONTENT);   /// 1
+  lv_obj_set_width(this->ui_Label42, SCREEN_WIDTH);      /// 1
   lv_obj_set_height(this->ui_Label42, LV_SIZE_CONTENT);  /// 1
   lv_obj_set_align(this->ui_Label42, LV_ALIGN_LEFT_MID);
-  lv_label_set_text(this->ui_Label42, "Otwarcie 5");
+  lv_label_set_long_mode(this->ui_Label38, LV_LABEL_LONG_WRAP);
+  lv_label_set_text(this->ui_Label42, chess.getOpening(4)->name);
   lv_obj_set_style_text_color(this->ui_Label42, lv_color_hex(0x000000),
                               LV_PART_MAIN | LV_STATE_DEFAULT);
   lv_obj_set_style_text_opa(this->ui_Label42, 255,
@@ -338,7 +349,10 @@ void OpenScreen::update() {
   }
 
   if (buttons.isPressed(this->color, ButtonType::Accept)) {
-    switch (this->buttonIndex) {
+    chess.setOpening(this->buttonIndex - 1);
+    screenController.navigateTo(this->color, "settings");
+
+    /* switch (this->buttonIndex) {
       case 0:
         // LOG_INF("Null button pressed\n");
         break;
@@ -360,7 +374,7 @@ void OpenScreen::update() {
       default:
         // LOG_ERR("Unknown button index\n");
         break;
-    }
+    } */
   }
 
   if (buttons.isPressed(this->color, ButtonType::Cancel)) {
