@@ -14,11 +14,18 @@ It is published as an educational/portfolio project, and it most likely still co
 The system handles a physical chessboard and synchronizes game state using board-square sensor readings.
 
 Key features:
+
 - 64-square piece state detection (pick-up / put-down),
 - full chess rules handling (including special cases),
 - per-square LED highlighting,
 - two independent player displays (white/black) with an LVGL-based UI,
 - firmware image flow prepared for MCUboot updates.
+
+## Demo
+
+Project demo (presentation + embedded video showing the system in action):
+
+- **Canva presentation (PL):** https://www.canva.com/design/DAGd6gJVaPo/vVfK3YDnZuc7xg0F_5g1jA/view?utm_content=DAGd6gJVaPo&utm_campaign=designshare&utm_medium=link2&utm_source=uniquelinks&utlId=h2b56bc22a3
 
 ## Tech Stack
 
