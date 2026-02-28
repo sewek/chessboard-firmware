@@ -31,6 +31,8 @@ void Chess::notifyTileAction(ChessPosition *position,
 
   ChessPiece *piece = this->findPiece(position);
   ChessColor color = this->getCurrentPlayerColor();
+  ChessColor oponentColor =
+      color == ChessColor::White ? ChessColor::Black : ChessColor::White;
 
   print_debug("Move made by %s\n",
               color == ChessColor::White ? "white" : "black");
@@ -83,45 +85,41 @@ void Chess::notifyTileAction(ChessPosition *position,
     return;
   }
 
-  // Został podniesiony drugi pionek przez przeciwkina
-  // więc sprawdzamy czy jest to pionek bity, jeśli nie to dodajemy błąd
-  if (action == ChessTileActionType::PickUp && color != piece->getColor()) {
-    for (uint8_t i = 0; i < this->positionsToExcludeFromWrongMovesCount; i++) {
-      if (*this->positionsToExcludeFromWrongMoves[i] == *position) {
-        return;
-      }
-    }
-
-    print_debug("Picked up piece of different color than current player\n");
-    if (color == ChessColor::White) {
-      if (this->lastWrongMoveWhite != this->move_index) {
-        this->lastWrongMoveWhite = this->move_index;
-        this->whiteWrongMoves++;
-      }
-    } else {
-      if (this->lastWrongMoveBlack != this->move_index) {
-        this->lastWrongMoveBlack = this->move_index;
-        this->blackWrongMoves++;
-      }
-    }
-
-    return;
-  }
-
-  // Pionek został podniesiony
   if (action == ChessTileActionType::PickUp && piece != nullptr &&
       piece->getColor() == color) {
     print_debug("First picked up piece\n");
 
+    notifyHighlightSquare(piece->getPosition(), ChessHighlightType::Info);
+
+    this->pickedUpPiece = piece;
+
+    if (this->choosenOpening >= 0) {
+      ChessOpening *opening = &this->openings[this->choosenOpening];
+
+      if (this->move_index < opening->movesCount) {
+        ChessMove *move = &opening->moves[this->move_index];
+        if (*move->getFrom() == *piece->getPosition()) {
+          notifyHighlightSquare(move->getTo(),
+                                move->getType() == ChessMoveType::Capture
+                                    ? ChessHighlightType::CaptureMove
+                                    : ChessHighlightType::NormalMove);
+          return;
+        }
+      }
+    }
+
+    bool highlight = color == ChessColor::White ? this->highlightWhites
+                                                : this->highlightBlacks;
+    if (!highlight) {
+      return;
+    }
+
     ChessPosition possiblePositions[27];
     uint8_t count = this->getAvailablePositions(piece, possiblePositions);
     count = this->filterAvailablePositions(possiblePositions, count, piece);
-    this->pickedUpPiece = piece;
 
     print_debug("Found %d possible positions\n", count);
     print_debug("Saved picked up piece\n");
-
-    notifyHighlightSquare(piece->getPosition(), ChessHighlightType::Info);
 
     ChessPiece *oponent = nullptr;
     for (int i = 0; i < count; ++i) {
@@ -215,11 +213,25 @@ void Chess::notifyTileAction(ChessPosition *position,
     if (isGoodMove) {
       this->waitingForTimmer = this->shouldWaitForTimmer;
       print_debug("Good move\n");
-      // TODO: Add move to history
+
       ChessMove *move = &this->move[this->move_index];
       this->createMove(move, this->pickedUpPiece->getPosition(), position);
+
+      if (this->choosenOpening >= 0) {
+        ChessOpening *opening = &this->openings[this->choosenOpening];
+
+        if (this->move_index < opening->movesCount) {
+          ChessMove *openingMove = &opening->moves[this->move_index];
+          if (*openingMove->getFrom() != *move->getFrom() ||
+              *openingMove->getTo() != *move->getTo()) {
+            this->choosenOpening = -1;
+          }
+        } else {
+          this->choosenOpening = -1;
+        }
+      }
+
       this->applyMove(move);
-      // notifyMoveMade(move);
       this->pickedUpPiece = nullptr;
       this->positionsToExcludeFromWrongMovesCount = 0;
 
@@ -237,68 +249,69 @@ void Chess::notifyTileAction(ChessPosition *position,
       }
 
       // Zasada 3 powtórzeń pozycji na szachownicy
-      /* if (this->are3RepeatedPositions()) {
+      if (this->are3RepeatedPositions()) {
         this->gameResult = ChessGameResult::Draw;
         this->gameState = ChessGameState::Ended;
         notifyGameEnded();
         clear();
         return;
-      } */
+      }
 
-      /* if (this->isMatPossible() == false) {
+      if (this->isMatPossible() == false) {
         this->gameResult = ChessGameResult::Draw;
         this->gameState = ChessGameState::Ended;
         notifyGameEnded();
         clear();
         return;
-      } */
+      }
 
       // Zasada 75 ruchów
-      /* if (this->movesFor75Rule == 150) {
+      if (this->movesFor75Rule == 150) {
         this->gameResult = ChessGameResult::Draw;
         this->gameState = ChessGameState::Ended;
         notifyGameEnded();
         clear();
         return;
-      } */
-
-      /* if (this->isKingCheckmate(ChessColor::White)) {
-        notifyHighlightSquare(whiteKing->getPosition(),
-                              ChessHighlightType::Checkmate);
-        this->gameResult = ChessGameResult::BlackWins;
-        this->gameState = ChessGameState::Ended;
-        notifyGameEnded();
-        clear();
-        return;
-      } */
+      }
 
       if (this->isKingChecked(ChessColor::White)) {
+        if (this->isKingCheckmate(ChessColor::White)) {
+          notifyHighlightSquare(whiteKing->getPosition(),
+                                ChessHighlightType::Checkmate);
+          this->gameResult = ChessGameResult::BlackWins;
+          this->gameState = ChessGameState::Ended;
+          notifyGameEnded();
+          clear();
+          return;
+        }
+
         notifyHighlightSquare(whiteKing->getPosition(),
                               ChessHighlightType::Check);
       }
 
       if (this->isKingChecked(ChessColor::Black)) {
+        if (this->isKingCheckmate(ChessColor::Black)) {
+          notifyHighlightSquare(blackKing->getPosition(),
+                                ChessHighlightType::Checkmate);
+          this->gameResult = ChessGameResult::WhiteWins;
+          this->gameState = ChessGameState::Ended;
+          notifyGameEnded();
+          clear();
+          return;
+        }
+
         notifyHighlightSquare(blackKing->getPosition(),
                               ChessHighlightType::Check);
       }
 
-      /* if (this->isKingCheckmate(ChessColor::Black)) {
-        notifyHighlightSquare(blackKing->getPosition(),
-                              ChessHighlightType::Checkmate);
-        this->gameResult = ChessGameResult::WhiteWins;
-        this->gameState = ChessGameState::Ended;
-        notifyGameEnded();
-        clear();
-        return;
-      } */
-
-      /* if (this->isStalemate(color)) {
+      if (this->isStalemate(oponentColor) &&
+          !this->isKingChecked(oponentColor)) {
         this->gameResult = ChessGameResult::Draw;
         this->gameState = ChessGameState::Ended;
         notifyGameEnded();
         clear();
         return;
-      } */
+      }
 
       if (move->getType() == ChessMoveType::EnPassant) {
         this->notifyEnPassant(move->getPiece()->getColor());
@@ -312,6 +325,17 @@ void Chess::notifyTileAction(ChessPosition *position,
       if (move->getType() == ChessMoveType::Castling) {
         this->notifyCastling(move->getPiece()->getColor());
       }
+
+      if (this->choosenOpening >= 0) {
+        ChessOpening *opening = &this->openings[this->choosenOpening];
+
+        if (this->move_index < opening->movesCount) {
+          ChessMove *move = &opening->moves[this->move_index];
+          notifyHighlightSquare(move->getFrom(), ChessHighlightType::Info);
+          return;
+        }
+      }
+
     } else {
       print_debug("Wrong move\n");
       if (this->pickedUpPiece->getColor() == ChessColor::White) {
@@ -358,7 +382,7 @@ void Chess::notifyTileAction(ChessPosition *position,
 
   if (this->enPassantPosition != nullptr) {
     this->notifyHighlightSquare(this->enPassantPosition,
-                                ChessHighlightType::Error);
+                                ChessHighlightType::CaptureMove);
   }
 
   print_debug("End of notifyTileAction\n");
@@ -398,6 +422,15 @@ ChessGameStartError Chess::startGame(bool shouldWaitForTimmer) {
   this->shouldWaitForTimmer = shouldWaitForTimmer;
 
   this->gameState = ChessGameState::InProgress;
+
+  if (this->choosenOpening >= 0) {
+    ChessOpening *opening = &this->openings[this->choosenOpening];
+
+    if (this->move_index < opening->movesCount) {
+      ChessMove *move = &opening->moves[this->move_index];
+      notifyHighlightSquare(move->getFrom(), ChessHighlightType::Info);
+    }
+  }
 
   return ChessGameStartError::Ok;
 }
@@ -456,7 +489,7 @@ int Chess::checkPiecesArrangement() {
 // przypisujemy pionki
 void Chess::assignPiecesToPositions() {
   print_debug("Assigning pieces to positions\n");
-  /* #ifndef CONFIG_CHESS_LIB_TEST */
+
   for (int i = 0; i < 8; ++i) {
     this->piece[i].setPosition(&this->position[i][0]);
   }
@@ -474,14 +507,6 @@ void Chess::assignPiecesToPositions() {
   }
 
   print_debug("Assigned all pieces\n");
-
-  /* #else
-    this->piece[8].setPosition(this->getPosition("c2"));
-    this->piece[30].setPosition(this->getPosition("b4"));
-
-    print_debug("Piece 0 assigned to position A1\n");
-    // print_debug("Piece 8 assigned to position A2\n");
-  #endif */
 }
 
 void Chess::pressTimmerButton(ChessColor color) {

@@ -1,3 +1,5 @@
+#include <string.h>
+
 #include "chess.h"
 
 void Chess::saveRepeatedPosition() {
@@ -13,7 +15,8 @@ void Chess::saveRepeatedPosition() {
   }
 
   for (uint8_t i = 0; i < 32; i++) {
-    this->repeatedPositions[this->repeatedPositionIndex][i] = this->piece[i];
+    memcpy(&this->repeatedPositions[this->repeatedPositionIndex][i],
+           &this->piece[i], sizeof(ChessPiece));
   }
 
   this->repeatedPositionIndex++;
@@ -22,16 +25,14 @@ void Chess::saveRepeatedPosition() {
 void Chess::clearRepeatedPositions() { this->repeatedPositionIndex = 0; }
 
 bool Chess::are3RepeatedPositions() {
-  // Check if there are at least 3 repeated positions
   if (this->repeatedPositionIndex < 3) {
     return false;
   }
 
-  // Check in reverse order
   bool areEqual = true;
-  for (uint8_t i = this->repeatedPositionIndex - 1; i >= 2; i--) {
-    for (uint8_t j = i - 1; j >= 1; j--) {
-      for (uint8_t k = j - 1; k >= 0; k--) {
+  for (int16_t i = this->repeatedPositionIndex - 1; i >= 2; i--) {
+    for (int16_t j = i - 1; j >= 1; j--) {
+      for (int16_t k = j - 1; k >= 0; k--) {
         areEqual = true;
         for (uint8_t l = 0; l < 32; l++) {
           if (this->repeatedPositions[i][l] != this->repeatedPositions[j][l] ||

@@ -35,7 +35,7 @@ class ChessPiece {
 
   bool operator==(const ChessPiece &other) const {
     return this->color == other.color && this->type == other.type &&
-           this->position == other.position &&
+           *this->position == *other.position &&
            this->isOnBoard == other.isOnBoard;
   }
 

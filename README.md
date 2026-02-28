@@ -1,43 +1,103 @@
-# Firmware
+# Chessboard Firmware
 
-This directory contains the firmware for the interactive chessboard project. The firmware is written in C++ and is designed to run on a NRF52840 microcontroller.
+Firmware for a smart chessboard built on **nRF52840** and **Zephyr RTOS**.
 
-# Bringing Our Interactive Chessboard to Life with JLCPCB’s Support
+This project was developed as an engineering thesis by **Seweryn Malczewski** and **Dominika Lasa**.
 
-As an engineering student, I’m always looking for ways to push the boundaries of my knowledge and skills. My latest challenge is developing an interactive chessboard—a project that’s not only helping me grow in electronics design, microcontroller programming, and high-level application development, but also giving me the chance to create something truly innovative.
+## Educational Note
 
-One of the most significant hurdles in any hardware project is turning ideas into reality, especially when it comes to prototyping. That’s where JLCPCB comes in. Their support has been invaluable in making our vision for the interactive chessboard a reality.
+This was our first large embedded systems project.
+It is published as an educational/portfolio project, and it most likely still contains bugs and areas that need improvement.
 
-## How JLCPCB is Helping Us Succeed
+## What This Project Does
 
-### 1. EasyEDA: Simplifying PCB Design
+The system handles a physical chessboard and synchronizes game state using board-square sensor readings.
 
-JLCPCB’s EasyEDA tool has been a game-changer for us. Even as a student with limited experience in PCB design, I found EasyEDA incredibly intuitive and powerful. It allowed me to design complex circuits quickly, which is crucial when time is of the essence.
+Key features:
+- 64-square piece state detection (pick-up / put-down),
+- full chess rules handling (including special cases),
+- per-square LED highlighting,
+- two independent player displays (white/black) with an LVGL-based UI,
+- firmware image flow prepared for MCUboot updates.
 
-### 2. Expert Guidance on Schematic Design
+## Tech Stack
 
-Creating a reliable schematic is key to any successful PCB, and JLCPCB has been there to help every step of the way. Their guidance ensures that our schematics are well-designed, minimizing the risk of errors down the line.
+- **nRF Connect SDK 2.6.1** (manifest `west.yml`)
+- **Zephyr RTOS**
+- **C / C++14**
+- **LVGL**
+- **CMake + West**
+- chess logic unit tests: **Catch2** (test build target)
 
-### 3. High-Quality PCB Manufacturing
+## Repository Structure
 
-Once our design is finalized, JLCPCB manufactures the PCBs with precision and care. The quality of their boards is outstanding, which gives us the confidence that our prototypes will perform as expected. Knowing that our boards are in good hands lets us focus on refining other aspects of the project.
+- `app/` - main application (UI, integration logic, event handling)
+- `lib/chess_logic/` - chess rules library + unit tests
+- `drivers/sensor/tiles/` - custom Zephyr sensor driver for chessboard tile modules
+- `boards/arm/chessboard/` - custom board definition and DeviceTree
+- `scripts/` - helper scripts (init, build, tests, coverage)
 
-### 4. Automated PCB Assembly
+## Quick Start
 
-One of the most time-consuming parts of any electronics project is assembling the PCB. Thanks to JLCPCB’s automated assembly services, our boards come fully assembled with all the necessary components. This not only saves us time but also ensures that the assembly is done accurately.
+### Requirements
 
-### 5. Affordable Prototyping for Students
+- installed nRF Connect SDK toolchain and `west`,
+- Python 3,
+- a programmer/debug probe compatible with `west flash` (for example J-Link).
 
-Budget constraints are always a concern as a student. JLCPCB offers incredibly affordable prototyping services without compromising on quality. This affordability has allowed us to iterate and improve our designs without worrying about costs.
+### 1. Initialize dependencies
 
-## Moving Forward with JLCPCB
+```bash
+./scripts/init.sh
+```
 
-With JLCPCB’s support, we’re making steady progress on our interactive chessboard project. Their tools and services have empowered us to turn a complex idea into a working prototype, and I’m excited to see where this project will take us next.
+This script pulls dependencies using `west update`.
 
-If you’re a student working on your own project, I highly recommend checking out JLCPCB. They’ve been a fantastic partner, and I’m confident they can help you bring your ideas to life too.
+### 2. Build firmware
 
-Learn more about [JLCPCB](https://jlcpcb.com/) at https://jlcpcb.com/.
+```bash
+./scripts/build.sh
+```
 
-# License
+### 3. Flash to the board
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+```bash
+west flash
+```
+
+## Useful Commands
+
+```bash
+# Build debug
+./scripts/build-debug.sh
+
+# Kconfig menu
+./scripts/menuconfig.sh
+
+# Build chess-logic tests
+./scripts/build-test.sh
+
+# Run tests
+./scripts/test.sh
+
+# JUnit XML report
+./scripts/test-xml.sh
+
+# Coverage (after build-test)
+./scripts/coverage.sh
+```
+
+## License
+
+This project code is released under the **Apache-2.0** license (see `LICENSE`).
+
+Note: the firmware depends on components fetched through nRF Connect SDK, which remain under their original licenses. Details and restrictions (including Nordic components under `LicenseRef-Nordic-5-Clause`) are documented in `THIRD_PARTY_LICENSES.md`.
+
+## Authors
+
+- Seweryn Malczewski
+- Dominika Lasa
+
+## Acknowledgments
+
+This project was made possible thanks to support from **JLCPCB**, which provided financial support to our student group to help deliver such an ambitious project.

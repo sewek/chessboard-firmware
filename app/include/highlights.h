@@ -8,6 +8,7 @@
 #define NORMAL_MOVE_COLOR 0xbadc58
 #define CAPTURE_MOVE_COLOR 0xc0392b
 #define CHECK_COLOR 0xf1c40f
+#define CHECKMATE_COLOR 0xc0392b
 #define INFO_COLOR 0x9b59b6
 #define ERROR_COLOR 0x9b59b6
 

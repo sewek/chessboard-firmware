@@ -36,7 +36,6 @@ uint8_t Chess::findPieces(ChessPieceType type, ChessColor color,
   return count;
 }
 
-// sprawdzenie czy na polu jest jakaś figura
 int Chess::isOccupied(ChessPosition *position, ChessColor color) {
   ChessPiece *found = this->findPiece(position);
 
@@ -45,13 +44,12 @@ int Chess::isOccupied(ChessPosition *position, ChessColor color) {
   }
 
   if (found->getColor() == color) {
-    return 1;  // nasza figura
+    return 1;
   }
 
-  return -1;  // figura prezciwnika
+  return -1;
 }
 
-// szach ten tego
 bool Chess::isKingChecked(ChessColor color) {
   ChessPiece *king = this->findPiece(ChessPieceType::King, color);
 
@@ -94,7 +92,7 @@ bool Chess::isKingChecked(ChessColor color) {
         currentPosition = &positions[j];
 
         if (*currentPosition == *kingPosition) {
-          return true;  // szach od króla przeciwnika
+          return true;
         }
       }
       continue;
@@ -106,12 +104,12 @@ bool Chess::isKingChecked(ChessColor color) {
       currentPosition = &positions[j];
 
       if (*currentPosition == *kingPosition) {
-        return true;  // szach
+        return true;
       }
     }
   }
 
-  return false;  // nie szach
+  return false;
 }
 
 bool Chess::willBeKingChecked(ChessPosition *kingPosition, ChessColor color) {
@@ -139,7 +137,7 @@ bool Chess::willBeKingChecked(ChessPosition *kingPosition, ChessColor color) {
         currentPosition = &positions[j];
 
         if (*currentPosition == *kingPosition) {
-          return true;  // szach od króla przeciwnika
+          return true;
         }
       }
       continue;
@@ -152,12 +150,12 @@ bool Chess::willBeKingChecked(ChessPosition *kingPosition, ChessColor color) {
       currentPosition = &positions[i];
 
       if (currentPosition == kingPosition) {
-        return true;  // szach
+        return true;
       }
     }
   }
 
-  return false;  // nie szach
+  return false;
 }
 
 bool Chess::isKingCheckmate(ChessColor color) {
@@ -165,6 +163,8 @@ bool Chess::isKingCheckmate(ChessColor color) {
   ChessPosition positions[27];
   ChessPosition *currentPosition;
   uint8_t positionsCount = 0;
+  uint32_t totalAvailablePositions = 0;
+
   for (int i = 0; i < 32; ++i) {
     ChessPiece *piece = &this->piece[i];
 
@@ -175,24 +175,20 @@ bool Chess::isKingCheckmate(ChessColor color) {
     positionsCount = this->getAvailablePositions(piece, positions);
     positionsCount =
         this->filterAvailablePositions(positions, positionsCount, piece);
-    for (int j = 0; j < positionsCount; ++j) {
-      currentPosition = &positions[j];
 
-      if (this->willBeKingChecked(currentPosition, color) == false) {
-        return false;  // nie mat
-      }
-    }
+    totalAvailablePositions += positionsCount;
   }
 
-  return true;  // mat
+  return totalAvailablePositions == 0;
 }
-// sprawdzenie czy jest pat
+
 bool Chess::isStalemate(ChessColor color) {
   ChessPiece *ourpiece = nullptr;
 
   ChessPosition positions[27];
   ChessPosition *currentPosition;
   uint8_t positionsCount = 0;
+
   for (int i = 0; i < 32; ++i) {
     ourpiece = &this->piece[i];
 
@@ -206,16 +202,16 @@ bool Chess::isStalemate(ChessColor color) {
 
     positionsCount = this->getAvailablePositions(ourpiece, positions);
 
+    positionsCount =
+        this->filterAvailablePositions(positions, positionsCount, ourpiece);
     if (positionsCount > 0) {
-      return false;  // nie pat
+      return false;
     }
   }
 
-  return true;  // pat
+  return true;
 }
 
-// sprawdzenie czy jest możliwy mat -> 2 gońce na tym samym kolorze, skoczek i
-// król, goniec i król, krl i krl
 bool Chess::isMatPossible() {
   uint8_t onBoardCount = 0;
   for (int i = 0; i < 32; ++i) {
@@ -489,7 +485,7 @@ void Chess::applyMove(ChessMove *move) {
     this->castlingRook = rook;
   }
 
-  /* if (move->getType() == ChessMoveType::Capture ||
+  if (move->getType() == ChessMoveType::Capture ||
       move->getType() == ChessMoveType::Promotion ||
       move->getType() == ChessMoveType::Castling ||
       piece->getType() == ChessPieceType::Pawn ||
@@ -526,7 +522,7 @@ void Chess::applyMove(ChessMove *move) {
 
   if (!isPotentialEnPassant) {
     this->saveRepeatedPosition();
-  } */
+  }
 }
 
 ChessPosition *Chess::getPosition(const char *position) {

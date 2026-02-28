@@ -16,6 +16,8 @@ uint32_t getColor(ChessHighlightType type) {
       return rgbToHex(CAPTURE_MOVE_COLOR);
     case ChessHighlightType::Check:
       return rgbToHex(CHECK_COLOR);
+    case ChessHighlightType::Checkmate:
+      return rgbToHex(CHECKMATE_COLOR);
     case ChessHighlightType::Error:
       return rgbToHex(ERROR_COLOR);
     case ChessHighlightType::Info:

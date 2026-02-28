@@ -14,11 +14,9 @@ set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(SOURCES
    src/chess.cpp
-   src/chess_board.cpp
    src/chess_position.cpp
    src/chess_move.cpp
    src/chess_events.cpp
-   src/chess_game.cpp
    src/chess_piece.cpp
    src/chess_simulation.cpp
    src/chess_utils.cpp

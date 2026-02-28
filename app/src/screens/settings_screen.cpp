@@ -8,9 +8,13 @@
 #include <zephyr/kernel.h>
 
 #include "buttons.h"
+#include "chess.h"
 #include "screens/screen_controller.h"
 #include "timer.h"
 
+#define SCREEN_WIDTH 320
+
+extern Chess chess;
 extern Buttons buttons;
 extern ScreenController screenController;
 extern Timer whiteTimer;
@@ -125,7 +129,11 @@ void SettingsScreen::init() {
   lv_obj_set_width(this->ui_Label23, LV_SIZE_CONTENT);   /// 1
   lv_obj_set_height(this->ui_Label23, LV_SIZE_CONTENT);  /// 1
   lv_obj_set_align(this->ui_Label23, LV_ALIGN_RIGHT_MID);
-  lv_label_set_text(this->ui_Label23, "Podświetlenie");
+  if (chess.getHighlightAvailablePositions(this->color)) {
+    lv_label_set_text(this->ui_Label23, "Podświetlenie");
+  } else {
+    lv_label_set_text(this->ui_Label23, "Brak podświetlenia");
+  }
   lv_obj_set_style_text_color(this->ui_Label23, lv_color_hex(0x645D5D),
                               LV_PART_MAIN | LV_STATE_DEFAULT);
   lv_obj_set_style_text_opa(this->ui_Label23, 255,
@@ -174,10 +182,21 @@ void SettingsScreen::init() {
                                LV_PART_MAIN | LV_STATE_DEFAULT);
 
     this->ui_Label25 = lv_label_create(this->ui_Button14);
-    lv_obj_set_width(this->ui_Label25, LV_SIZE_CONTENT);   /// 1
-    lv_obj_set_height(this->ui_Label25, LV_SIZE_CONTENT);  /// 1
+    int openingIndex = chess.getOpeningIndex();
+    ChessOpening *opening = chess.getOpening(openingIndex);
+
+    if (opening == nullptr || openingIndex < 0) {
+      lv_obj_set_width(this->ui_Label25, LV_SIZE_CONTENT);   /// 1
+      lv_obj_set_height(this->ui_Label25, LV_SIZE_CONTENT);  /// 1
+      lv_label_set_text(this->ui_Label25, "Brak");
+    } else {
+      lv_obj_set_width(this->ui_Label25, 180);  /// 1
+      lv_obj_set_height(this->ui_Label25, 18);  /// 1
+      lv_label_set_text(this->ui_Label25, opening->name);
+      lv_label_set_long_mode(this->ui_Label25, LV_LABEL_LONG_SCROLL_CIRCULAR);
+    }
+
     lv_obj_set_align(this->ui_Label25, LV_ALIGN_RIGHT_MID);
-    lv_label_set_text(this->ui_Label25, "Brak");
     lv_obj_set_style_text_color(this->ui_Label25, lv_color_hex(0x645D5D),
                                 LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_text_opa(this->ui_Label25, 255,
@@ -240,12 +259,19 @@ void SettingsScreen::update() {
   }
 
   if (buttons.isPressed(this->color, ButtonType::Accept)) {
+    bool curr_highlight = chess.getHighlightAvailablePositions(this->color);
+
     switch (this->buttonIndex) {
       case 0:
         screenController.navigateTo(this->color, "time");
         break;
       case 1:
-        screenController.navigateTo(this->color, "mode");
+        chess.setHighlightAvailablePositions(this->color, !curr_highlight);
+        if (!curr_highlight) {
+          lv_label_set_text(this->ui_Label23, "Podświetlenie");
+        } else {
+          lv_label_set_text(this->ui_Label23, "Brak podświetlenia");
+        }
         break;
       case 2:
         screenController.navigateTo(this->color, "open");

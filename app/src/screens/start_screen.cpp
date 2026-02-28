@@ -154,18 +154,19 @@ void StartScreen::update() {
       this->oponentReady) {
     if (!chess.isInProgress()) {
       chess.startGame(this->timer->getElapsedTime() > 0);
-    } else {
+    } else if (this->timer->getElapsedTime() > 0) {
       this->timer->start();
     }
   }
 
-  if (!this->timer->isPaused()) {
+  if (!this->timer->isPaused() && !this->timer->isStopped()) {
     uint32_t time = this->timer->getElapsedTime();
-    if (time < this->lastTime && time <= 0 && chess.isInProgress()) {
+    if (time <= 0 && chess.isInProgress()) {
       this->timer->stop();
       chess.finishGame(this->color == ChessColor::White
                            ? ChessGameResult::BlackWins
                            : ChessGameResult::WhiteWins);
+      return;
     }
 
     this->timer->toString(this->timeString);
@@ -219,6 +220,11 @@ void StartScreen::update() {
 
   if (buttons.isPressed(this->color, ButtonType::Timer) &&
       !this->timer->isPaused()) {
+    if (!chess.isWaitingForTimmer()) {
+      return;
+    }
+
+    this->lastTime = this->timer->getElapsedTime();
     this->timer->pause();
     chess.pressTimmerButton(this->color);
     if (this->color == ChessColor::White) {
